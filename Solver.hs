@@ -1,20 +1,13 @@
-<<<<<<< HEAD
-module Solver(beginProcess, beginProcess',execute', execute,endProcess, status) where
-
-import Control.Concurrent
-=======
 module Solver(beginProcess, execute,endProcess) where
--- let a = beginProcess "cvc4" ["--smtlib"]
---execute a ...
- 
->>>>>>> b295329d5eb1e0cbdb57f4d3c52174a68a350381
+
 import System.Process
 import GHC.IO.Handle
 import Data.Maybe
 
+
 type CmdPath = String
 type Args = [String] 
-type Process = IO (Maybe Handle,
+type Process = (Maybe Handle,
                      Maybe Handle,
                      Maybe Handle,
                      ProcessHandle)
@@ -25,74 +18,47 @@ newProcess p a = CreateProcess {
         cmdspec = cmd,
 				cwd = Nothing, 
 				env = Nothing, 
-				std_in = CreatePipe,--Ver se estes createPipe estao certas 
+				std_in = CreatePipe,
 				std_out = CreatePipe,
-				std_err = CreatePipe,
-				close_fds = True, -- ver se funciona no windows 
-				create_group =  True --cria um novo grupo de processos ?
+				std_err = Inherit,{-If the processs has an error it 
+				                    prints to the stderr of the 
+				                    process running this file std-}
+				close_fds = False, 
+				create_group =  False 
 				}where cmd = RawCommand p a
 
 
-beginProcess :: CmdPath -> Args -> Maybe Process
-beginProcess [] _ = Nothing
-beginProcess p a  = Just(createProcess$newProcess p a)
-
-beginProcess' :: CmdPath -> Args ->Maybe (IO( Handle, Handle, Handle, ProcessHandle))
-beginProcess' [] _ = Nothing
-beginProcess' p a = Just( runInteractiveProcess p a Nothing Nothing)
-
-write :: Maybe Handle -> String -> IO ()
-write Nothing _ = return ()
-write (Just handle) cmd = hPutStr handle cmd 
-
-result :: Maybe Handle -> IO String
-result Nothing = return "Erro ao ler"
-result (Just handle) = hGetLine handle
-
-execute :: Maybe Process -> String -> IO String
-execute Nothing _ = return "O Smt não esta inicializado"
-execute (Just smt) cmd = do
-               (stdin,stdout,stderr,_) <- smt    
-               hSetBuffering (getX stdout) LineBuffering            
-               write stdin cmd
-               hWaitForInput (getX stdout) (-1)                
-               result stdout            
+beginProcess :: CmdPath -> Args -> (IO Process)
+beginProcess cmd path  = createProcess (newProcess cmd path)
 
 
-execute' :: Maybe (IO(Handle, Handle, Handle, ProcessHandle)) -> String -> IO()
-execute' Nothing _ = return ()
-execute' (Just x) cmd = do
-          (stdin,stdout,_,_) <- x
-          forkIO $ hPutStr stdin cmd
-          hGetContents stdout >>= print
-         
-getX :: Maybe a -> a
-getX (Just x) =  x
 
-status :: Maybe Process -> IO ()
-status Nothing = return ()
-status (Just x) = do
-                 (_,stdinx,_,_) <- x
-                 let stdin = getX stdinx   
-                 hIsEOF stdin >>= print
-                 hGetBuffering stdin >>= print
-                 hIsOpen stdin >>= print
 
-endProcess :: Maybe Process -> IO()
-endProcess Nothing = return ()
-endProcess (Just smt) = do
-                         (_,_,_,processHandle) <- smt
-                         terminateProcess processHandle
-                         waitForProcess processHandle >>= print
+execute :: Process -> String -> IO String
+execute (Just std_in, Just std_out,_,_) cmd = do
+  print "ola"
+  hPutStr std_in cmd 
+  hFlush std_in
+  print "cenas"  
+  b<-(hGetLine std_out)  
+  print "xau"   
+  return b
+
+endProcess :: Process -> IO()
+endProcess (_,_,_,processHandle) = do
+                 terminateProcess processHandle
+                 waitForProcess processHandle >>= print
                          
                          
 main :: IO()
 main = do 
-  let a = beginProcess "z3" ["-smt2 -in"]
-  status a
+  a <- beginProcess "z3" ["-smt2","-in"]
+  --hGetContents b >>= print
+  --status a
   execute a "(set-option :print-success true)" >>= print
-  status a
-  execute a "(set-option :print-success true)" >>= print  
-  execute a "(declare-const x Int)" >>= print
-  status a
-  endProcess a
+  --status a
+  --execute a "(declare-fun f (Int Bool) Int)" >>= print
+  --execute a "(declare-fun f (Int Bool) Int)" >>= print  
+ -- execute a "(echo \"before reset\")" >>= print
+  --status a
+  --endProcess a
