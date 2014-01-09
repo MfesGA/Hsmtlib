@@ -1,6 +1,13 @@
+<<<<<<< HEAD
 module Solver(beginProcess, beginProcess',execute', execute,endProcess, status) where
 
 import Control.Concurrent
+=======
+module Solver(beginProcess, execute,endProcess) where
+-- let a = beginProcess "cvc4" ["--smtlib"]
+--execute a ...
+ 
+>>>>>>> b295329d5eb1e0cbdb57f4d3c52174a68a350381
 import System.Process
 import GHC.IO.Handle
 import Data.Maybe
