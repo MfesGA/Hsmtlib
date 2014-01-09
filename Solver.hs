@@ -1,6 +1,7 @@
 module Solver(beginProcess, execute,endProcess) where
 -- let a = beginProcess "cvc4" ["--smtlib"]
-
+--execute a ...
+ 
 import System.Process
 import GHC.IO.Handle
 import Data.Maybe
