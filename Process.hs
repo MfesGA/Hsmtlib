@@ -1,4 +1,10 @@
-module Solver(beginProcess, send, endProcess, z3, cvc4) where
+module Solver
+    ( beginProcess
+    , send
+    , endProcess
+    , z3
+    , cvc4
+    ) where
 
 import System.Process
 import GHC.IO.Handle
@@ -7,10 +13,14 @@ import Data.Maybe
 
 type CmdPath = String
 type Args = [String] 
-type Process = (Maybe Handle,
-                     Maybe Handle,
-                     Maybe Handle,
-                     ProcessHandle)
+
+--Type returned by CreateProcess
+type Process = 
+    ( Maybe Handle -- process std_in pipe
+    , Maybe Handle -- process std_out pipe
+    , Maybe Handle -- process std_err pipe
+    , ProcessHandle -- process pid
+    )
 
 {- Generates a CreateProcess 
  -with just the command,
@@ -18,17 +28,17 @@ type Process = (Maybe Handle,
  -and creates the pipes to comunicate
  -}
 newProcess :: CmdPath -> Args -> CreateProcess
-newProcess p a = CreateProcess { 
-        cmdspec = cmd,
-				cwd = Nothing, 
-				env = Nothing, 
-				std_in = CreatePipe,
-				std_out = CreatePipe,
-				std_err = CreatePipe,
-				close_fds = False, 
-				create_group =  False 
-				}where cmd = RawCommand p a
-
+newProcess p a = CreateProcess
+    { cmdspec = RawCommand p a
+    , cwd = Nothing
+    , env = Nothing
+    , std_in = CreatePipe
+    , std_out = CreatePipe
+    , std_err = CreatePipe
+    , close_fds = False
+    , create_group =  False 
+	  }
+	  
 
 -- Creates a Process ready to be executed
 beginProcess :: CmdPath -> Args -> (IO Process)
@@ -41,7 +51,7 @@ readResponse = readResponse' "" True
 --Reads the answer from the process on std_out
 readResponse' :: String ->Bool -> Handle ->IO String
 readResponse' str False _ = return str
-readResponse' str True handle  = do
+readResponse' str True handle = do
                   text <- hGetLine handle
                   has_more <-hWaitForInput handle 2
                   readResponse' (str++text) has_more handle
