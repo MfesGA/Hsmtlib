@@ -69,7 +69,7 @@ send' (Just std_in, Just std_out,Just std_err,_) cmd = do
   hPutStr std_in cmd 
   hFlush std_in 
   --readResponse std_err Throws Exception
-  hGetLine std_err
+  hGetLine std_out
  
 --Sends the signal to terminate to the running process
 endProcess :: Process -> IO()
