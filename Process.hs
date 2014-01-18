@@ -74,8 +74,8 @@ send' (Just std_in, Just std_out,Just std_err,_) cmd = do
 --Sends the signal to terminate to the running process
 endProcess :: Process -> IO()
 endProcess (_,_,_,processHandle) = do
-                 terminateProcess processHandle
-                 waitForProcess processHandle >>= print
+  terminateProcess processHandle
+  waitForProcess processHandle >>= print
 --{
 -- z3 seems to work fine
 -- cvc4 does not, if it dosn't like some input,it prints to std_err,
