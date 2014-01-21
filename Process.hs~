@@ -9,6 +9,7 @@ module Solver
 import System.Process
 import GHC.IO.Handle
 import Data.Maybe
+import System.Posix.Redirect
 
 type CmdPath = String
 type Args = [String] 
