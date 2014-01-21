@@ -1,7 +1,7 @@
 LEVENEROK....
 
 this implemmentation runs the smt with a script and keeps context in the haskell program ...
-This implemmentation interfaces with a smt creating a context file in haskell that keeps receiving the commands the user sends (like declare-cost x Int) and when the user requires a assert or some comand that needs to be sent to the SMT-solver for a result,  it sends the entire sequence of previous comands executes the smt-solver gets the answer and closes it. The context file is alaways being updated with new user input so when a new command like assert is sent the entire sequence is sent again. on our aproach to the problem we choose to keep the state at the SMT-solver itself, so we dont kill the process that is running the SMT-solver 
+This implemmentation interfaces with a smt creating a context file in haskell that keeps receiving the commands the user sends (like declare-cost x Int) and when the user requires a assert or some comand that needs to be sent to the SMT-solver for a result,  it sends the entire sequence of previous comands executes the smt-solver gets the answer and closes it. The context file is alaways being updated with new user input so when a new command like assert is sent the entire sequence is sent again. on our aproach to the problem we choose to keep the state at the SMT-solver itself, so we dont kill the process that is running the SMT-solver.
 
 PYTHON
 
