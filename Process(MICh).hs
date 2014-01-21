@@ -87,8 +87,8 @@ z3 :: IO()
 z3 = do
   smt <- beginProcess "z3" ["-smt2","-in"]
   send smt "(set-option :print-success true)\n" >>= print
-  send smt (declare_const(" a Int")) >>= print
-  send smt (declare_fun("f (Int Bool) Int")) >>= print  
+  send smt "(declare-const a Int)\n" >>= print
+  send smt "(declare-fun f (Int Bool) Int)\n" >>= print  
   send smt "(assert (> a 10))\n" >>= print
   send smt "(assert (< (f a true) 100))\n" >>= print
   send smt "(check-sat)\n" >>= print
@@ -101,7 +101,7 @@ cvc4 = do
   send smt "(set-option :print-success true)\n" >>= print
   --CVC4 wont accept the next command and print the warning to std_err 
   send' smt "(declare-const a Int)\n" >>= print 
-  send' smt (declare_fun("f (Int Bool) Int")) >>= print  
+  send' smt "(declare-fun f (Int Bool) Int)\n" >>= print  
   send' smt "(assert (> a 10))\n" >>= print
   send' smt "(assert (< (f a true) 100))\n" >>= print
   --send' smt "(check-sat)\n" >>= print
