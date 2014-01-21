@@ -1,0 +1,11 @@
+LEVENEROK....
+
+this implemmentation runs the smt with a script and keeps context in the haskell program ...
+
+PYTHON
+
+-> keeps the context in python and calls the c api to do things
+
+
+IAGO
+-> implemnts the solver passing the arguments directly to the c api of the solver 
