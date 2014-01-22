@@ -29,7 +29,7 @@ type Process =
     with just the command,
     the arguments
     and creates the pipes to comunicate
- -}
+-}
 newProcess :: CmdPath -> Args -> CreateProcess
 newProcess p a = CreateProcess
     { cmdspec = RawCommand p a
@@ -54,7 +54,7 @@ tryIO ::(a -> IO b ) -> a -> IO(Either IOException b)
 tryIO f arg = try $ f arg
 
        
-{-|
+{- |
     Sends the desired input to the process std_in and then reads from std out.
     Working smt with this method:
       - z3
@@ -76,7 +76,7 @@ send (Just std_in, Just std_out,_,_) cmd =  do
           --if it was succeful then start reading from the std out
           Right _ -> readResponse "" True std_out 
 
-{-|
+{- |
     Receive a inital time to wait for the process to write to the handle,
     a String wich will be added the text read from the handle and the handle.
     If it was able to read a line from the handle then call  the function again
