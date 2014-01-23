@@ -74,7 +74,7 @@ send (Just std_in, Just std_out,_,_) cmd =  do
           --if there was an exception flushing then return the error 
           Left exception -> return $ "send2: "  ++ show exception
           --if it was succeful then start reading from the std out
-          Right _ -> readResponse "" True std_out 
+          Right _ -> readResponse (-1) ""  std_out
 
 {- |
     Receive a inital time to wait for the process to write to the handle,
@@ -101,7 +101,6 @@ readResponse time str handle = do
       case res_get of
         -- if there was an exception then return it.
         Left exception -> return $ "readResponse2:" ++ (show exception)
-        exception)
         --  if some text was read then trys to read the pipe again.  
         Right text -> readResponse 10 (str++text) handle
 
@@ -160,10 +159,10 @@ cvc4 = do
   smt <- beginProcess "cvc4" ["--smtlib-strict","--print-succes"]
   send smt "(set-option :print-success true)\n" >>= print
   --CVC4 wont accept the next command and print the warning to std_err 
-  --send smt "(declare-const a Int)\n" >>= print 
-  --send smt "(declare-fun f (Int Bool) Int)\n" >>= print  
-  --send smt "(assert (> a 10))\n" >>= print
-  --send smt "(assert (< (f a true) 100))\n" >>= print
+  send smt "(declare-const a Int)\n" >>= print 
+  send smt "(declare-fun f (Int Bool) Int)\n" >>= print  
+  send smt "(assert (> a 10))\n" >>= print
+  send smt "(assert (< (f a true) 100))\n" >>= print
   --send smt "(check-sat)\n" >>= print
   --send smt "(get-model)\n" >>= print
   --send smt "(declare-const a Int)\n" >>= print 
