@@ -1,7 +1,9 @@
-module Solver
+module Process
     ( beginProcess
     , send
     , endProcess
+    , sendContext
+    , sendScript
     ) where
 
 import System.Process
@@ -9,6 +11,9 @@ import GHC.IO.Handle
 import Data.Maybe
 import Control.Exception
 import System.IO.Error
+import System.IO
+import System.Exit
+
 
 -- | Path to the process
 type CmdPath = String
@@ -24,12 +29,19 @@ type Process =
     , ProcessHandle -- process pid
     )
 
+-- | Context is just a string wich will be sent to std_in 
+type Context = String
+
+-- | Script is just a String
+type Script = String
+
+
 {- |
     Generates a CreateProcess 
     with just the command,
     the arguments
     and creates the pipes to comunicate
--}
+ -}
 newProcess :: CmdPath -> Args -> CreateProcess
 newProcess p a = CreateProcess
     { cmdspec = RawCommand p a
@@ -42,8 +54,6 @@ newProcess p a = CreateProcess
     , create_group =  False 
 	  }
 	  
-
-
 -- | Creates a Process ready to be executed.
 beginProcess :: CmdPath -> Args -> (IO Process)
 beginProcess cmd path  = createProcess (newProcess cmd path)
@@ -54,7 +64,7 @@ tryIO ::(a -> IO b ) -> a -> IO(Either IOException b)
 tryIO f arg = try $ f arg
 
        
-{- |
+{-|
     Sends the desired input to the process std_in and then reads from std out.
     Working smt with this method:
       - z3
@@ -74,9 +84,9 @@ send (Just std_in, Just std_out,_,_) cmd =  do
           --if there was an exception flushing then return the error 
           Left exception -> return $ "send2: "  ++ show exception
           --if it was succeful then start reading from the std out
-          Right _ -> readResponse (-1) ""  std_out
+          Right _ -> readResponse (20) "" std_out 
 
-{- |
+{-|
     Receive a inital time to wait for the process to write to the handle,
     a String wich will be added the text read from the handle and the handle.
     If it was able to read a line from the handle then call  the function again
@@ -104,71 +114,37 @@ readResponse time str handle = do
         --  if some text was read then trys to read the pipe again.  
         Right text -> readResponse 10 (str++text) handle
 
+
    
 -- | Sends the signal to terminate to the running process.
-endProcess :: Process -> IO()
+endProcess :: Process -> IO ExitCode
 endProcess (_,_,_,processHandle) = do
   terminateProcess processHandle
-  waitForProcess processHandle >>= print
+  waitForProcess processHandle
   
+  
+  
+{-| 
+  It's the same function as readProcess.
+  http://hackage.haskell.org/package/process-1.1.0.1/docs/System-Process.html
+ -}
+sendContext :: CmdPath -> Args -> Context -> IO String
+sendContext = readProcess 
 
--- z3 works fine.
-z3 :: IO()
-z3 = do
-  smt <- beginProcess "z3" ["-smt2","-in"]
-  send smt "(set-option :print-success true)\n" >>= print
-  send smt "(declare-const a Int)\n" >>= print
-  send smt "(declare-fun f (Int Bool) Int)\n" >>= print  
-  send smt "(assert (> a 10))\n" >>= print
-  send smt "(assert (< (f a true) 100))\n" >>= print
-  send smt "(check-sat)\n" >>= print
-  send smt "(get-model)\n" >>= print
-  endProcess smt
+{-|
+  Creates a file with the given file path, writes the script to the file then
+  close it.
+  After that it calls the function readProcess and pass as arguments the
+  arguments given plus the name of the file created.
+  An empty String is passed to the std_in.
   
- 
--- sonolar inst working.
-sonolar :: IO ()
-sonolar = do
-  smt <- beginProcess "sonolar" ["--print-model"]
-  send smt "(set-option :print-success true)\n" >>= print
-  send smt "(declare-const a Int)\n" >>= print
-  send smt "(declare-fun f (Int Bool) Int)\n" >>= print  
-  send smt "(assert (> a 10))\n" >>= print
-  send smt "(assert (< (f a true) 100))\n" >>= print
-  send smt "(check-sat)\n" >>= print
-  send smt "(get-model)\n" >>= print
-  endProcess smt
-  
-
--- mathSat works fine.
-mathSat :: IO()
-mathSat = do
-  smt <- beginProcess "mathsat" []
-  send smt "(set-option :print-success true)\n" >>= print
-  send smt "(declare-const a Int)\n" >>= print
-  send smt "(declare-fun f (Int Bool) Int)\n" >>= print  
-  send smt "(assert (> a 10))\n" >>= print
-  send smt "(assert (< (f a true) 100))\n" >>= print
-  send smt "(check-sat)\n" >>= print
-  send smt "(get-model)\n" >>= print
-  endProcess smt
-  
--- cvc dosen't work, breaks the pipe and prints to std out.   
-cvc4 :: IO()
-cvc4 = do
-  smt <- beginProcess "cvc4" ["--smtlib-strict","--print-succes"]
-  send smt "(set-option :print-success true)\n" >>= print
-  --CVC4 wont accept the next command and print the warning to std_err 
-  send smt "(declare-const a Int)\n" >>= print 
-  send smt "(declare-fun f (Int Bool) Int)\n" >>= print  
-  send smt "(assert (> a 10))\n" >>= print
-  send smt "(assert (< (f a true) 100))\n" >>= print
-  --send smt "(check-sat)\n" >>= print
-  --send smt "(get-model)\n" >>= print
-  --send smt "(declare-const a Int)\n" >>= print 
-  --send smt "(declare-fun f (Int Bool) Int)\n" >>= print  
-  --send smt "(assert (> a 10))\n" >>= print
-  --send smt "(assert (< (f a true) 100))\n" >>= print
-  --send smt "(check-sat)\n" >>= print
-  --send smt "(get-model)\n" >>= print
-  endProcess smt  
+  readProcess:
+    http://hackage.haskell.org/package/process-1.1.0.1/docs/System-Process.html
+-}
+sendScript :: CmdPath -> Args -> FilePath-> Script -> IO String
+sendScript cmdPath args script_name script = do
+  handle <- openFile script_name WriteMode 
+  hPutStr handle script
+  hFlush handle
+  hClose handle
+  readProcess cmdPath (args ++ [script_name]) "" 
