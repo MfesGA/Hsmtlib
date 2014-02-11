@@ -1,0 +1,6 @@
+{
+  "path": "cvc4",
+  "args": ["--smtlib-strict","--print-succes"],
+  "default_mode":"Context",
+  "avaliable_modes": ["Context", "Script"]
+}

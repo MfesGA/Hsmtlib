@@ -1,0 +1,6 @@
+{
+  "path": "mathsat",
+  "args": [],
+  "default_mode":"Online",
+  "avaliable_modes": ["Online","Context", "Script"]
+}

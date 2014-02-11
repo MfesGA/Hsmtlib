@@ -1,0 +1,6 @@
+{
+  "path": "z3",
+  "args": ["-smt2","-in"],
+  "default_mode": "Online",
+  "avaliable_modes": ["Online","Context", "Script"]
+}
