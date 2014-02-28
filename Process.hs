@@ -4,6 +4,9 @@ module Process
     , endProcess
     , sendContext
     , sendScript
+    , Process
+    , CmdPath
+    , Args
     ) where
 
 import System.Process
@@ -55,12 +58,12 @@ newProcess p a = CreateProcess
 	  }
 	  
 -- | Creates a Process ready to be executed.
-beginProcess :: CmdPath -> Args -> (IO Process)
+beginProcess :: CmdPath -> Args -> IO Process
 beginProcess cmd path  = createProcess (newProcess cmd path)
 
 
 -- | trys to run the function. 
-tryIO ::(a -> IO b ) -> a -> IO(Either IOException b)
+tryIO ::(a -> IO b ) -> a -> IO ( Either IOException b )
 tryIO f arg = try $ f arg
 
        
@@ -73,7 +76,7 @@ tryIO f arg = try $ f arg
 -}
 send :: Process -> String -> IO String
 send (Just std_in, Just std_out,_,_) cmd =  do
-    let put_str = (flip hPutStr) cmd
+    let put_str = flip hPutStr  cmd
     resPut <-tryIO put_str std_in -- trys to write to std in 
     case resPut of
       --If there was an excepion writing then return the error 
@@ -84,7 +87,7 @@ send (Just std_in, Just std_out,_,_) cmd =  do
           --if there was an exception flushing then return the error 
           Left exception -> return $ "send2: "  ++ show exception
           --if it was succeful then start reading from the std out
-          Right _ -> readResponse (20) "" std_out 
+          Right _ -> readResponse (-1)  "" std_out 
 
 {-|
     Receive a inital time to wait for the process to write to the handle,
@@ -99,18 +102,18 @@ send (Just std_in, Just std_out,_,_) cmd =  do
 readResponse :: Int -> String -> Handle -> IO String
 readResponse time str handle = do
   -- if the process dosent write to std out this function will block.
-  let hWait =(flip hWaitForInput) time
+  let hWait = flip hWaitForInput time
   read <- tryIO hWait handle -- trys to wait for some output in std out.
   case read of
     -- if the wait gave an exception returns the error.
-    Left exception -> return $ "readResponse1:" ++ (show exception)
+    Left exception -> return $ "readResponse1:" ++ show exception
     Right False -> return str  -- returns the lines read until now.
     Right True -> do
       -- if there is something to read then trys to read a line.
       res_get <- tryIO hGetLine handle      
       case res_get of
         -- if there was an exception then return it.
-        Left exception -> return $ "readResponse2:" ++ (show exception)
+        Left exception -> return $ "readResponse2:" ++ show exception
         --  if some text was read then trys to read the pipe again.  
         Right text -> readResponse 10 (str++text) handle
 
@@ -141,10 +144,5 @@ sendContext = readProcess
   readProcess:
     http://hackage.haskell.org/package/process-1.1.0.1/docs/System-Process.html
 -}
-sendScript :: CmdPath -> Args -> FilePath-> Script -> IO String
-sendScript cmdPath args script_name script = do
-  handle <- openFile script_name WriteMode 
-  hPutStr handle script
-  hFlush handle
-  hClose handle
-  readProcess cmdPath (args ++ [script_name]) "" 
+sendScript :: CmdPath -> Args -> FilePath -> IO String
+sendScript cmdPath args script_name = readProcess cmdPath (args ++ [script_name]) "" 
