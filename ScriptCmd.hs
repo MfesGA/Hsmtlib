@@ -17,66 +17,66 @@ data Srcmd = Srcmd
     , filePath :: FilePath
     }
 
-scriptFun ::  Process -> Srcmd-> Command -> IO Result
-scriptFun proc srcmd cmd = do
+scriptFun ::  Srcmd-> Command -> IO Result
+scriptFun srcmd cmd = do
   let scmd = render ( pp  cmd ) ++ "\n" 
   hPutStr ( handle srcmd ) scmd
   hFlush ( handle srcmd )
   sendScript ( cmdPath srcmd ) ( args srcmd )  ( filePath srcmd )
 
-scriptSetLogic :: Process -> Srcmd -> Name -> IO Result
-scriptSetLogic proc srcmd name = scriptFun proc srcmd ( CmdSetLogic name )
+scriptSetLogic :: Srcmd -> Name -> IO Result
+scriptSetLogic srcmd name = scriptFun srcmd ( CmdSetLogic name )
 
-scriptSetOption :: Process ->  Srcmd -> Option -> IO Result
-scriptSetOption proc srcmd option = scriptFun proc srcmd ( CmdSetOption option)
+scriptSetOption :: Srcmd -> Option -> IO Result
+scriptSetOption srcmd option = scriptFun srcmd ( CmdSetOption option)
 
-scriptSetInfo :: Process -> Srcmd -> Attr -> IO Result
-scriptSetInfo proc srcmd attr  = scriptFun proc srcmd  (CmdSetInfo attr) 
+scriptSetInfo :: Srcmd -> Attr -> IO Result
+scriptSetInfo srcmd attr  = scriptFun srcmd  (CmdSetInfo attr) 
 
-scriptDeclareType :: Process -> Srcmd -> Name -> Integer -> IO Result
-scriptDeclareType proc srcmd name int = scriptFun proc srcmd ( CmdDeclareType name int)
+scriptDeclareType :: Srcmd -> Name -> Integer -> IO Result
+scriptDeclareType srcmd name int = scriptFun srcmd ( CmdDeclareType name int)
 
-scriptDefineType :: Process -> Srcmd  -> Name -> [Name] -> Type -> IO Result
-scriptDefineType proc srcmd name names t = scriptFun proc  srcmd ( CmdDefineType name names t )
+scriptDefineType :: Srcmd  -> Name -> [Name] -> Type -> IO Result
+scriptDefineType srcmd name names t = scriptFun srcmd ( CmdDefineType name names t )
 
-scriptDeclareFun :: Process -> Srcmd  -> Name -> [Type] -> Type -> IO Result
-scriptDeclareFun proc srcmd name lt t = scriptFun  proc srcmd ( CmdDeclareFun name lt t )
+scriptDeclareFun :: Srcmd  -> Name -> [Type] -> Type -> IO Result
+scriptDeclareFun srcmd name lt t = scriptFun srcmd ( CmdDeclareFun name lt t )
 
-scriptDefineFun :: Process -> Srcmd -> Name -> [Binder] -> Type -> Expr -> IO Result
-scriptDefineFun proc srcmd name binders t exp = scriptFun proc srcmd ( CmdDefineFun name binders t exp)
+scriptDefineFun :: Srcmd -> Name -> [Binder] -> Type -> Expr -> IO Result
+scriptDefineFun srcmd name binders t exp = scriptFun srcmd ( CmdDefineFun name binders t exp)
 
-scriptPush :: Process -> Srcmd -> Integer -> IO Result
-scriptPush proc  srcmd int = scriptFun proc srcmd ( CmdPush int )
+scriptPush :: Srcmd -> Integer -> IO Result
+scriptPush srcmd int = scriptFun srcmd ( CmdPush int )
 
-scriptPop :: Process ->  Srcmd -> Integer -> IO Result
-scriptPop proc srcmd int = scriptFun proc srcmd ( CmdPop int )
+scriptPop :: Srcmd -> Integer -> IO Result
+scriptPop srcmd int = scriptFun srcmd ( CmdPop int )
 
-scriptAssert :: Process -> Srcmd -> Expr -> IO Result
-scriptAssert proc srcmd exp = scriptFun proc srcmd ( CmdAssert exp)
+scriptAssert :: Srcmd -> Expr -> IO Result
+scriptAssert srcmd exp = scriptFun srcmd ( CmdAssert exp)
 
-scriptCheckSat :: Process -> Srcmd -> IO Result
-scriptCheckSat proc srcmd = scriptFun proc srcmd CmdCheckSat
+scriptCheckSat :: Srcmd -> IO Result
+scriptCheckSat srcmd = scriptFun srcmd CmdCheckSat
 
-scriptGetAssertions :: Process -> Srcmd -> IO Result
-scriptGetAssertions proc srcmd = scriptFun proc srcmd  CmdGetAssertions 
+scriptGetAssertions :: Srcmd -> IO Result
+scriptGetAssertions srcmd = scriptFun srcmd  CmdGetAssertions 
 
-scriptGetValue :: Process -> Srcmd -> [Expr] -> IO Result
-scriptGetValue proc srcmd exprs = scriptFun proc srcmd ( CmdGetValue exprs)
+scriptGetValue :: Srcmd -> [Expr] -> IO Result
+scriptGetValue srcmd exprs = scriptFun srcmd ( CmdGetValue exprs)
 
-scriptGetProof :: Process -> Srcmd -> IO Result
-scriptGetProof proc srcmd  = scriptFun proc srcmd  CmdGetProof
+scriptGetProof :: Srcmd -> IO Result
+scriptGetProof srcmd  = scriptFun srcmd  CmdGetProof
 
-scriptGetUnsatCore :: Process -> Srcmd -> IO Result
-scriptGetUnsatCore proc srcmd = scriptFun proc srcmd CmdGetUnsatCore 
+scriptGetUnsatCore :: Srcmd -> IO Result
+scriptGetUnsatCore srcmd = scriptFun srcmd CmdGetUnsatCore 
 
-scriptGetInfo :: Process -> Srcmd-> InfoFlag -> IO Result
-scriptGetInfo proc srcmd info = scriptFun proc srcmd ( CmdGetInfo info )
+scriptGetInfo :: Srcmd-> InfoFlag -> IO Result
+scriptGetInfo srcmd info = scriptFun srcmd ( CmdGetInfo info )
 
-scriptGetOption :: Process -> Srcmd -> Name -> IO Result
-scriptGetOption proc srcmd name = scriptFun proc srcmd ( CmdGetOption name )
+scriptGetOption :: Srcmd -> Name -> IO Result
+scriptGetOption srcmd name = scriptFun srcmd ( CmdGetOption name )
 
-scriptExit :: Process -> Handle -> Srcmd -> IO Result
-scriptExit proc handle srcmd = do
-  result <- scriptFun proc srcmd CmdExit 
+scriptExit :: Handle -> Srcmd -> IO Result
+scriptExit handle srcmd = do
+  result <- scriptFun srcmd CmdExit 
   hClose handle
   return result
