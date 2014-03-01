@@ -16,8 +16,6 @@ type Error = String
 --type Result = (Sexp,Maybe Error)
 type Result = String
 
-
-
 data Solver = Solver
             { setLogic :: Name -> IO Result
             , setOption :: Option -> IO Result

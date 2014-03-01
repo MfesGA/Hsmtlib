@@ -16,15 +16,10 @@ z3Config = Config
                   , avaliableModes = ["Online", "Context", "Script"]
                   }
 
+startZ3 :: String -> Mode -> Maybe Config-> IO Solver
+startZ3 logic Online Nothing = startZ3Online logic
+startZ3 logic Script Noting = startz3Script logic
 
-
-
-startZ3 :: String -> Maybe Config-> IO Solver
-startZ3 logic Nothing = startZ3Online logic
-startZ3 logic (Just config) = 
-    case defaultMode config  of
-      "Online"  -> startZ3Online logic
-      "Script" -> startZ3Script logic
 
 startZ3Online :: String  ->  IO Solver
 startZ3Online logic = do
@@ -53,10 +48,10 @@ startZ3Online logic = do
 startZ3Script :: String  ->  IO Solver
 startZ3Script logic = do
     process <- beginProcess (path z3Config) (Config.args z3Config)
-    handle <- openFile "script.smtl2" AppendMode
+    handle <- openFile "script.smt2" AppendMode
     let srcmd = Srcmd{ handle = handle
                                     , cmdPath = path z3Config
-                                    , Cmd.args = Config.args z3Config
+                                    , Cmd.args = ["-smt2"]
                                     , filePath = "script.smt2"
                                   }
     scriptSetOption process srcmd (OptPrintSuccess True) >>= print
@@ -77,5 +72,5 @@ startZ3Script logic = do
                             , getUnsatCore = scriptGetUnsatCore process srcmd
                             , getInfo = scriptGetInfo process srcmd
                             , getOption = scriptGetOption process srcmd
-                            , exit = scriptExit process srcmd
+                            , exit = scriptExit process handle srcmd
                             }

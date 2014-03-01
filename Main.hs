@@ -19,10 +19,11 @@ main :: IO ()
 main = do
   solver <- startSolver Z3 "QF_LIA" Nothing
   (declareFun solver (N "a") [] tInt )>>= print
-  (declareFun solver (N "f") [tInt,tBool] tBool) >>= print
+  --(declareFun solver (N "f") [tInt,tBool] tBool) >>= print
   (declareFun solver (N "x") [] tInt) >>= print
   (declareFun solver (N "y") [] tInt) >>= print
  -- (assert solver $ app (I (N "x") [2])
   --(assert solver $ app I (N "x") [] === num (2 :: Integer)) >>= print
   --(assert solver $ app I (N "x") [] `nLt` app (N "y") []) >>= print
   (checkSat solver) >>= print
+  exit solver >>= print

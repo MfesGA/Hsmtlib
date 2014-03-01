@@ -4,7 +4,7 @@ import Process
 import SMTLib2
 import Solver(Result)
 import Text.PrettyPrint
-import System.IO(hPutStr,hFlush,Handle)
+import System.IO(hPutStr,hFlush,Handle,hClose)
 
 {-|
     Module where all the commands are defined with the script method from Process.hs
@@ -75,5 +75,8 @@ scriptGetInfo proc srcmd info = scriptFun proc srcmd ( CmdGetInfo info )
 scriptGetOption :: Process -> Srcmd -> Name -> IO Result
 scriptGetOption proc srcmd name = scriptFun proc srcmd ( CmdGetOption name )
 
-scriptExit :: Process -> Srcmd -> IO Result
-scriptExit proc srcmd = scriptFun proc srcmd CmdExit 
+scriptExit :: Process -> Handle -> Srcmd -> IO Result
+scriptExit proc handle srcmd = do
+  result <- scriptFun proc srcmd CmdExit 
+  hClose handle
+  return result
