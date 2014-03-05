@@ -14,7 +14,7 @@ data Config = Config
             , args :: [String]
             , defaultMode :: String
             , avaliableModes :: [String]
-            }deriving(Show, Read)
+            }deriving(Show)
 
 instance FromJSON Config where
   parseJSON (Object v) = 
