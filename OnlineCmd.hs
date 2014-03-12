@@ -9,7 +9,6 @@ import           Text.PrettyPrint
     Module where all the commands are defined with the send method from Process.hs
  -}
 
-
 onlineFun ::  Process  -> Command -> IO Result
 onlineFun proc cmd =  send proc ( render ( pp  cmd ) ++ "\n" )
 

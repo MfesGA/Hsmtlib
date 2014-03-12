@@ -11,7 +11,7 @@ import           System.IO
 z3Config :: Config
 z3Config =
   Config { path = "z3"
-         ,  Config.args = ["-smt2","-in"]
+         , Config.args = ["-smt2","-in"]
          , defaultMode = "Online"
          , avaliableModes = ["Online", "Context", "Script"]
          }
@@ -19,7 +19,7 @@ z3Config =
 z3ConfigScript :: Config
 z3ConfigScript =
   Config { path = "z3"
-         ,  Config.args = ["-smt2"]
+         , Config.args = ["-smt2"]
          , defaultMode = "Online"
          , avaliableModes = ["Online", "Context", "Script"]
          }
