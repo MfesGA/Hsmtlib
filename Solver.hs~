@@ -39,22 +39,22 @@ data Solver = Solver
             , exit          :: IO Result
             }
 	    | CtSolver
-            { setLogicCt      ::  Name ->  ContextArgs ->CtResult
-            , setOptionCt     ::  Option ->  ContextArgs ->CtResult
-            , setInfoCt       ::  Attr ->  ContextArgs ->CtResult
-            , declareTypeCt   ::  Name -> Integer ->ContextArgs ->  CtResult
-            , defineTypeCt    ::  Name -> [Name] -> Type ->ContextArgs ->  CtResult
-            , declareFunCt    ::  Name -> [Type] -> Type -> ContextArgs -> CtResult
-            , pushCt          ::  Integer ->  ContextArgs ->CtResult
-            , popCt           ::  Integer -> ContextArgs -> CtResult
-            , assertCt        ::  Expr -> ContextArgs -> CtResult
+            { setLogicCt      :: ContextArgs -> Name ->  CtResult
+            , setOptionCt     :: ContextArgs -> Option ->  CtResult
+            , setInfoCt       :: ContextArgs -> Attr ->  CtResult
+            , declareTypeCt   :: ContextArgs -> Name -> Integer ->  CtResult
+            , defineTypeCt    :: ContextArgs -> Name -> [Name] -> Type ->  CtResult
+            , declareFunCt    :: ContextArgs -> Name -> [Type] -> Type ->  CtResult
+            , pushCt          :: ContextArgs -> Integer ->  CtResult
+            , popCt           :: ContextArgs -> Integer ->  CtResult
+            , assertCt        :: ContextArgs -> Expr ->  CtResult
             , checkSatCt      ::  ContextArgs -> CtResult
             , getAssertionsCt ::  ContextArgs -> CtResult
-            , getValueCt      ::  [Expr]->  ContextArgs ->CtResult
+            , getValueCt      :: ContextArgs -> [Expr]->  CtResult
             , getProofCt      ::  ContextArgs -> CtResult
             , getUnsatCoreCt  ::  ContextArgs -> CtResult
-            , getInfoCt       :: InfoFlag ->   ContextArgs ->CtResult
-            , getOptionCt     ::  Name -> ContextArgs -> CtResult
+            , getInfoCt       :: ContextArgs -> InfoFlag ->  CtResult
+            , getOptionCt     :: ContextArgs -> Name ->  CtResult
             , exitCt          ::  ContextArgs -> CtResult
             }
 

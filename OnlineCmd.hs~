@@ -10,7 +10,7 @@ import           Text.PrettyPrint
  -}
 
 onlineFun ::  Process  -> Command -> IO Result
-onlineFun proc cmd =  send proc ( (render ( pp  cmd ) ++ "\n") )
+onlineFun proc cmd =  send proc ( put (render ( pp  cmd ) ++ "\n") )
 
 onlineSetLogic :: Process -> Name -> IO Result
 onlineSetLogic proc name = onlineFun proc ( CmdSetLogic name )
