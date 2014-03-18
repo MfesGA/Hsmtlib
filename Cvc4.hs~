@@ -16,12 +16,9 @@ cvc4ConfigOnline =
            , defaultMode = "Script"
            , avaliableModes = ["Context", "Script"]
            }
-
 cvc4ConfigScript :: Config
 cvc4ConfigScript = cvc4ConfigOnline --its the same for now if it ever changes its already separeted
 
-cvc4ConfigContext :: Config
-cvc4ConfigContext = cvc4ConfigOnline -- the same as above
 
 
 startCvc4 :: String -> Mode -> Maybe Config ->  Maybe FilePath -> IO Solver

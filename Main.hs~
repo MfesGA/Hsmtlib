@@ -27,11 +27,6 @@ mainScript = do
 
 mainCvc4Online :: IO ()
 mainCvc4Online = do
-  solver <- startSolver Cvc4 "QF_LIA" Online Nothing (Just "teste.hs")
-  commands solver
-
-mainCvc4Script :: IO ()
-mainCvc4Script = do
   solver <- startSolver Cvc4 "QF_LIA" Conf.Script Nothing (Just "teste.hs")
   commands solver
 
