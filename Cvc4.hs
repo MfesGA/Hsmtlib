@@ -12,7 +12,7 @@ import           System.IO
 cvc4ConfigOnline :: Config
 cvc4ConfigOnline =
     Config { path = "cvc4"
-           , Config.args = ["--smtlib-strict", "--produce-models"] -- with theflag --status the process frezzes, investigate why the flag --interactive forces interactive cvc4 but it does not terminate
+           , Config.args = ["--smtlib-strict", "--interactive", "--quiet"] -- with theflag --status the process frezzes, investigate why the flag --interactive forces interactive cvc4 but it does not terminate
            , defaultMode = "Script"
            , avaliableModes = ["Context", "Script"]
            }

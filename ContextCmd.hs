@@ -95,12 +95,13 @@ contextGetOption  name proc = contextexecFun proc ( CmdGetOption name )
 contextExit :: ContextArgs -> CtResult
 contextExit proc = contextexecFun proc CmdExit
 
-
+{-
 (#) ::  CtResult -> (ContextArgs -> CtResult) -> CtResult
 (#)  ct f = do
 	print <- fst ct
 	   
 	f $ snd(ct)
+-}
 
 
 
