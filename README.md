@@ -1,4 +1,3 @@
-
 Hsmtl provides functions to interact with several smt solvers using SMT-LIB 2.
 
 Current supported solvers and avaliable interaction modes in each other.
@@ -136,7 +135,8 @@ data Solver = Solver
 
 {-
   This function should be used after the first function of context mode.
-  It passes an empty context to the first function and passes the result of the first function to the second.
+  It passes an empty context to the first function and passes the result
+  of the first function to the second.
 -}
 (|*|) :: (IO CtResult -> IO CtResult) -> (IO CtResult -> IO CtResult) -> IO CtResult
 
