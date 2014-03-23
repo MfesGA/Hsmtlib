@@ -1,0 +1,89 @@
+\haddockmoduleheading{Cmd.ProcCom.Process}
+\label{module:Cmd.ProcCom.Process}
+\haddockbeginheader
+{\haddockverb\begin{verbatim}
+module Cmd.ProcCom.Process (
+    beginProcess,  send,  endProcess,  sendContext,  sendScript,  Process, 
+    CmdPath,  Args
+  ) where\end{verbatim}}
+\haddockendheader
+
+The following module contains method that facilitate the comunication with
+  the SMTSolvers.
+\par
+
+\begin{haddockdesc}
+\item[\begin{tabular}{@{}l}
+beginProcess\ ::\ CmdPath\ ->\ Args\ ->\ IO\ Process
+\end{tabular}]\haddockbegindoc
+Creates a Process ready to be executed.
+\par
+
+\end{haddockdesc}
+\begin{haddockdesc}
+\item[\begin{tabular}{@{}l}
+send\ ::\ Process\ ->\ String\ ->\ IO\ String
+\end{tabular}]\haddockbegindoc
+Sends the desired input to the process std{\char '137}in and then reads from std out.
+    Working smt with this method:
+      - z3
+      - mathSat
+      - cvc4
+\par
+
+\end{haddockdesc}
+\begin{haddockdesc}
+\item[\begin{tabular}{@{}l}
+endProcess\ ::\ Process\ ->\ IO\ ExitCode
+\end{tabular}]\haddockbegindoc
+Sends the signal to terminate to the running process.
+\par
+
+\end{haddockdesc}
+\begin{haddockdesc}
+\item[\begin{tabular}{@{}l}
+sendContext\ ::\ CmdPath\ ->\ Args\ ->\ Context\ ->\ IO\ String
+\end{tabular}]\haddockbegindoc
+It's the same function as readProcess.
+\url{http://hackage.haskell.org/package/process-1.1.0.1/docs/System-Process.html}
+\par
+
+\end{haddockdesc}
+\begin{haddockdesc}
+\item[\begin{tabular}{@{}l}
+sendScript\ ::\ CmdPath\ ->\ Args\ ->\ FilePath\ ->\ IO\ String
+\end{tabular}]\haddockbegindoc
+Calls readProcess and pass as arguments the arguments given plus the name of
+the file with the context.
+An empty String is passed to the std{\char '137}in.
+\par
+It's the same function as readProcess.
+readProcess:
+\url{http://hackage.haskell.org/package/process-1.1.0.1/docs/System-Process.html}
+\par
+
+\end{haddockdesc}
+\begin{haddockdesc}
+\item[\begin{tabular}{@{}l}
+type\ Process\ =\ (Maybe\ Handle,\ Maybe\ Handle,\ Maybe\ Handle,\ ProcessHandle)
+\end{tabular}]\haddockbegindoc
+Type returned by CreateProcess
+\par
+
+\end{haddockdesc}
+\begin{haddockdesc}
+\item[\begin{tabular}{@{}l}
+type\ CmdPath\ =\ String
+\end{tabular}]\haddockbegindoc
+Path to the process
+\par
+
+\end{haddockdesc}
+\begin{haddockdesc}
+\item[\begin{tabular}{@{}l}
+type\ Args\ =\ {\char 91}String{\char 93}
+\end{tabular}]\haddockbegindoc
+Argumants passed to process
+\par
+
+\end{haddockdesc}

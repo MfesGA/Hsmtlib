@@ -1,8 +1,0 @@
-(set-option :print-success true)
-(set-logic QF_LIA)
-(declare-fun a () Int)
-(declare-fun x () Int)
-(declare-fun y () Int)
-(declare-fun f () Int)
-(check-sat)
-(exit)

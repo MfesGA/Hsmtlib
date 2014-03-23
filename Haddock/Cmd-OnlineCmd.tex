@@ -1,0 +1,75 @@
+\haddockmoduleheading{Cmd.OnlineCmd}
+\label{module:Cmd.OnlineCmd}
+\haddockbeginheader
+{\haddockverb\begin{verbatim}
+module Cmd.OnlineCmd (
+    onlineFun,  onlineSetLogic,  onlineSetOption,  onlineSetInfo, 
+    onlineDeclareType,  onlineDefineType,  onlineDeclareFun,  onlineDefineFun, 
+    onlinePush,  onlinePop,  onlineAssert,  onlineCheckSat, 
+    onlineGetAssertions,  onlineGetValue,  onlineGetProof,  onlineGetUnsatCore, 
+    onlineGetInfo,  onlineGetOption,  onlineExit
+  ) where\end{verbatim}}
+\haddockendheader
+
+Module with the functions used in online Mode.
+\par
+
+\begin{haddockdesc}
+\item[
+onlineFun\ ::\ Process\ ->\ Command\ ->\ IO\ Result
+]
+\item[
+onlineSetLogic\ ::\ Process\ ->\ Name\ ->\ IO\ Result
+]
+\item[
+onlineSetOption\ ::\ Process\ ->\ Option\ ->\ IO\ Result
+]
+\item[
+onlineSetInfo\ ::\ Process\ ->\ Attr\ ->\ IO\ Result
+]
+\item[
+onlineDeclareType\ ::\ Process\ ->\ Name\ ->\ Integer\ ->\ IO\ Result
+]
+\item[
+onlineDefineType\ ::\ Process\ ->\ Name\ ->\ {\char 91}Name{\char 93}\ ->\ Type\ ->\ IO\ Result
+]
+\item[
+onlineDeclareFun\ ::\ Process\ ->\ Name\ ->\ {\char 91}Type{\char 93}\ ->\ Type\ ->\ IO\ Result
+]
+\item[
+onlineDefineFun\ ::\ Process\\\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ->\ Name\ ->\ {\char 91}Binder{\char 93}\ ->\ Type\ ->\ Expr\ ->\ IO\ Result
+]
+\item[
+onlinePush\ ::\ Process\ ->\ Integer\ ->\ IO\ Result
+]
+\item[
+onlinePop\ ::\ Process\ ->\ Integer\ ->\ IO\ Result
+]
+\item[
+onlineAssert\ ::\ Process\ ->\ Expr\ ->\ IO\ Result
+]
+\item[
+onlineCheckSat\ ::\ Process\ ->\ IO\ Result
+]
+\item[
+onlineGetAssertions\ ::\ Process\ ->\ IO\ Result
+]
+\item[
+onlineGetValue\ ::\ Process\ ->\ {\char 91}Expr{\char 93}\ ->\ IO\ Result
+]
+\item[
+onlineGetProof\ ::\ Process\ ->\ IO\ Result
+]
+\item[
+onlineGetUnsatCore\ ::\ Process\ ->\ IO\ Result
+]
+\item[
+onlineGetInfo\ ::\ Process\ ->\ InfoFlag\ ->\ IO\ Result
+]
+\item[
+onlineGetOption\ ::\ Process\ ->\ Name\ ->\ IO\ Result
+]
+\item[
+onlineExit\ ::\ Process\ ->\ IO\ Result
+]
+\end{haddockdesc}

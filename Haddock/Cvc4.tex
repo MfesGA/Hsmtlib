@@ -1,0 +1,25 @@
+\haddockmoduleheading{Cvc4}
+\label{module:Cvc4}
+\haddockbeginheader
+{\haddockverb\begin{verbatim}
+module Cvc4 (
+    startCvc4
+  ) where\end{verbatim}}
+\haddockendheader
+
+Module wich has the standard configuration for all Cvc4 Modes and
+  provides the initilizing function.
+\par
+
+\begin{haddockdesc}
+\item[\begin{tabular}{@{}l}
+startCvc4\ ::\ Mode\\\ \ \ \ \ \ \ \ \ \ \ \ \ ->\ String\ ->\ Maybe\ SolverConfig\ ->\ Maybe\ FilePath\ ->\ IO\ Solver
+\end{tabular}]\haddockbegindoc
+Function that initialyzes a Cvc4 Solver.
+  It Receives a Mode, an SMT Logic, it can receive a diferent configuration
+  for the solver and an anternative path to create the script in Script Mode.
+\par
+In Context and Online Mode if a FilePath is passed then it's ignored.
+\par
+
+\end{haddockdesc}

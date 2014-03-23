@@ -1,4 +1,10 @@
-module Process
+{- |
+Module      : Process
+
+  The following module contains method that facilitate the comunication with
+  the SMTSolvers.
+-}
+module Cmd.ProcCom.Process
     ( beginProcess
     , send
     , endProcess
@@ -32,6 +38,8 @@ type Process =
 -- | Context is just a string wich will be sent to std_in
 type Context = String
 
+
+-- Functions used in Online Mode
 
 
 {- |
@@ -67,7 +75,7 @@ tryIO f arg = try $ f arg
     Working smt with this method:
       - z3
       - mathSat
-      - cvc4 gives the exception(Broken pipe) when trying to read from std out
+      - cvc4
 -}
 send :: Process -> String -> IO String
 send (Just hIn, Just  hOut,_,_) cmd =  do
@@ -84,6 +92,7 @@ send (Just hIn, Just  hOut,_,_) cmd =  do
           --if it was succeful then start reading from the std out
           Right _ -> readResponse (-1)  "" hOut
 
+
 {-|
     Receive a inital time to wait for the process to write to the handle,
     a String wich will be added the text read from the handle and the handle.
@@ -92,7 +101,7 @@ send (Just hIn, Just  hOut,_,_) cmd =  do
     Working smt with this methid:
       - z3
       - mathSat
-      - cvc4 gives the exception(Broken pipe) when trying to read from std out
+      - cvc4
 -}
 readResponse :: Int -> String -> Handle -> IO String
 readResponse time str procHandle = do
@@ -122,22 +131,26 @@ endProcess (_,_,_,processHandle) = do
 
 
 
+-- Function used in ContextMode
+
 {-|
   It's the same function as readProcess.
-  http://hackage.haskell.org/package/process-1.1.0.1/docs/System-Process.html
+<http://hackage.haskell.org/package/process-1.1.0.1/docs/System-Process.html>
  -}
 sendContext :: CmdPath -> Args -> Context -> IO String
 sendContext = readProcess
 
-{-|
-  Creates a file with the given file path, writes the script to the file then
-  close it.
-  After that it calls the function readProcess and pass as arguments the
-  arguments given plus the name of the file created.
-  An empty String is passed to the std_in.
 
-  readProcess:
-    http://hackage.haskell.org/package/process-1.1.0.1/docs/System-Process.html
+
+{-|
+Calls readProcess and pass as arguments the arguments given plus the name of
+the file with the context.
+An empty String is passed to the std_in.
+
+It's the same function as readProcess.
+readProcess:
+<http://hackage.haskell.org/package/process-1.1.0.1/docs/System-Process.html>
 -}
 sendScript :: CmdPath -> Args -> FilePath -> IO String
-sendScript cmdPath args script_name = readProcess cmdPath (args ++ [script_name]) ""
+sendScript cmdPath args script_name =
+    readProcess cmdPath (args ++ [script_name]) ""

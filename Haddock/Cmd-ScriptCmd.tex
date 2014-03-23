@@ -1,0 +1,94 @@
+\haddockmoduleheading{Cmd.ScriptCmd}
+\label{module:Cmd.ScriptCmd}
+\haddockbeginheader
+{\haddockverb\begin{verbatim}
+module Cmd.ScriptCmd (
+    ScriptConf(ScriptConf, sHandle, sCmdPath, sArgs, sFilePath), 
+    writeToScript,  scriptFun,  scriptFunExec,  scriptSetLogic, 
+    scriptSetOption,  scriptSetInfo,  scriptDeclareType,  scriptDefineType, 
+    scriptDeclareFun,  scriptDefineFun,  scriptPush,  scriptPop,  scriptAssert, 
+    scriptCheckSat,  scriptGetAssertions,  scriptGetValue,  scriptGetProof, 
+    scriptGetUnsatCore,  scriptGetInfo,  scriptGetOption,  scriptExit
+  ) where\end{verbatim}}
+\haddockendheader
+
+Module with the functions used in script Mode.
+\par
+
+\begin{haddockdesc}
+\item[\begin{tabular}{@{}l}
+data\ ScriptConf
+\end{tabular}]\haddockbegindoc
+\haddockbeginconstrs
+\haddockdecltt{=} & \haddockdecltt{ScriptConf} & \\
+                    \haddockdecltt{sHandle :: Handle} &
+                    \haddockdecltt{sCmdPath :: CmdPath} &
+                    \haddockdecltt{sArgs :: Args} &
+                    \haddockdecltt{sFilePath :: FilePath} &
+\end{tabulary}\par
+\end{haddockdesc}
+\begin{haddockdesc}
+\item[
+writeToScript\ ::\ ScriptConf\ ->\ Command\ ->\ IO\ ()
+]
+\item[
+scriptFun\ ::\ ScriptConf\ ->\ Command\ ->\ IO\ Result
+]
+\item[
+scriptFunExec\ ::\ ScriptConf\ ->\ Command\ ->\ IO\ Result
+]
+\item[
+scriptSetLogic\ ::\ ScriptConf\ ->\ Name\ ->\ IO\ Result
+]
+\item[
+scriptSetOption\ ::\ ScriptConf\ ->\ Option\ ->\ IO\ Result
+]
+\item[
+scriptSetInfo\ ::\ ScriptConf\ ->\ Attr\ ->\ IO\ Result
+]
+\item[
+scriptDeclareType\ ::\ ScriptConf\ ->\ Name\ ->\ Integer\ ->\ IO\ Result
+]
+\item[
+scriptDefineType\ ::\ ScriptConf\\\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ->\ Name\ ->\ {\char 91}Name{\char 93}\ ->\ Type\ ->\ IO\ Result
+]
+\item[
+scriptDeclareFun\ ::\ ScriptConf\\\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ->\ Name\ ->\ {\char 91}Type{\char 93}\ ->\ Type\ ->\ IO\ Result
+]
+\item[
+scriptDefineFun\ ::\ ScriptConf\\\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ->\ Name\ ->\ {\char 91}Binder{\char 93}\ ->\ Type\ ->\ Expr\ ->\ IO\ Result
+]
+\item[
+scriptPush\ ::\ ScriptConf\ ->\ Integer\ ->\ IO\ Result
+]
+\item[
+scriptPop\ ::\ ScriptConf\ ->\ Integer\ ->\ IO\ Result
+]
+\item[
+scriptAssert\ ::\ ScriptConf\ ->\ Expr\ ->\ IO\ Result
+]
+\item[
+scriptCheckSat\ ::\ ScriptConf\ ->\ IO\ Result
+]
+\item[
+scriptGetAssertions\ ::\ ScriptConf\ ->\ IO\ Result
+]
+\item[
+scriptGetValue\ ::\ ScriptConf\ ->\ {\char 91}Expr{\char 93}\ ->\ IO\ Result
+]
+\item[
+scriptGetProof\ ::\ ScriptConf\ ->\ IO\ Result
+]
+\item[
+scriptGetUnsatCore\ ::\ ScriptConf\ ->\ IO\ Result
+]
+\item[
+scriptGetInfo\ ::\ ScriptConf\ ->\ InfoFlag\ ->\ IO\ Result
+]
+\item[
+scriptGetOption\ ::\ ScriptConf\ ->\ Name\ ->\ IO\ Result
+]
+\item[
+scriptExit\ ::\ ScriptConf\ ->\ IO\ Result
+]
+\end{haddockdesc}
