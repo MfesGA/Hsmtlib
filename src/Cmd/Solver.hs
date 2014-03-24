@@ -143,10 +143,6 @@ main = do
       -> IO CtResult
 (|#|) f g = g f
 
-(|$|) :: IO CtResult
-      -> (IO CtResult -> IO CtResult)
-      -> IO CtResult
-(|$|) f g =   g f
 
 
 
