@@ -67,7 +67,7 @@ main = do
   declareFunCt solver (N "x") [] tInt |#|
   declareFunCt solver (N "y") [] tInt |#|
   checkSatCt solver |$|
-  exitCt solver
+  exitCt solver >>= print
 ```
 
 Important functions to use the library:
@@ -144,5 +144,5 @@ data Solver = Solver
 (|#|) :: IO CtResult -> (IO CtResult -> IO CtResult) -> IO CtResult
 
 --This function is used before the last one and prints the result of context.
-(|$|) :: IO CtResult -> (IO CtResult -> IO CtResult) -> IO ()
+(|$|) :: IO CtResult -> (IO CtResult -> IO CtResult) -> IO CtResult
 ```
