@@ -114,9 +114,7 @@ data Solver = Solver
 {-|
   The following combinators are used in context mode to write cleaner code.
 
-  The combinator |*| should be used only after the first command and  |$|  before the last command.
-
-  The other, |#| should be used in between.
+  The combinator |*| should be used only after the first command and  the other(|#|) should be used in between.
 
   e.g:
 @
