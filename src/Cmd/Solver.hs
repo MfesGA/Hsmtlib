@@ -145,8 +145,8 @@ main = do
 
 (|$|) :: IO CtResult
       -> (IO CtResult -> IO CtResult)
-      -> IO ()
-(|$|) f g =   g f >>= print
+      -> IO CtResult
+(|$|) f g =   g f
 
 
 

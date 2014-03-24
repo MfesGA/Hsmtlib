@@ -70,7 +70,7 @@ The operators and there uses can be found in 'Solver'
   >declareFunCt solver (N "x") [] tInt |#|
   >declareFunCt solver (N "y") [] tInt |#|
   >checkSatCt solver |$|
-  >exitCt solver
+  >exitCt solver >>= print
 
 
 -}
@@ -94,7 +94,6 @@ startSolver Cvc4 = startCvc4
 
 main :: IO ()
 main = z3Online
-
 
 z3Online :: IO ()
 z3Online = do
@@ -139,9 +138,10 @@ cvc4Context = do
 
 commandsScript :: Solver -> IO ()
 commandsScript solver =
+
   declareFunCt solver (N "a") [] tInt |*|
   declareFunCt solver (N "x") [] tInt |#|
   declareFunCt solver (N "y") [] tInt |#|
   checkSatCt solver |$|
-  exitCt solver
+  exitCt solver >>= print
 -}
