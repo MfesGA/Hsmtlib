@@ -124,8 +124,8 @@ main = do
   declareFunCt solver (N "a") [] tInt |*|
   declareFunCt solver (N "x") [] tInt |#|
   declareFunCt solver (N "y") [] tInt |#|
-  checkSatCt solver |$|
-  exitCt solver
+  checkSatCt solver |#|
+  exitCt solver >>= print
 @
 -}
 
