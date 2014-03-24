@@ -66,7 +66,7 @@ main = do
   declareFunCt solver (N "a") [] tInt |*|
   declareFunCt solver (N "x") [] tInt |#|
   declareFunCt solver (N "y") [] tInt |#|
-  checkSatCt solver |$|
+  checkSatCt solver |#|
   exitCt solver >>= print
 ```
 
@@ -143,6 +143,5 @@ data Solver = Solver
 -- This function is used between functions.
 (|#|) :: IO CtResult -> (IO CtResult -> IO CtResult) -> IO CtResult
 
---This function is used before the last one and prints the result of context.
-(|$|) :: IO CtResult -> (IO CtResult -> IO CtResult) -> IO CtResult
+
 ```
