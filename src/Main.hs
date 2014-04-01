@@ -10,6 +10,7 @@ import           Cvc4        (startCvc4)
 import           SMTLib2
 import           SMTLib2.Int
 import           Z3          (startZ3)
+import           Yices       (startYices)
 
 {- |  The function to initialialyze a solver.
 The solver can be initialized with a desired configuration, or a diferent
@@ -85,6 +86,7 @@ startSolver :: Solvers-- ^ Avaliable'Solvers'.
             -> IO Solver
 startSolver Z3 = startZ3
 startSolver Cvc4 = startCvc4
+startSolver Yices = startYices
 
 
 
@@ -93,12 +95,9 @@ startSolver Cvc4 = startCvc4
 
 
 main :: IO ()
-main = z3Online
+main = yicesScript
 
-z3Online :: IO ()
-z3Online = do
-  solver <- startSolver Z3 Online "QF_LIA"  Nothing Nothing
-  commands solver
+
 
 commands :: Solver -> IO ()
 commands solver = do
@@ -109,7 +108,25 @@ commands solver = do
   checkSat solver >>= print
   exit solver >>= print
 
+yicesOnline :: IO ()
+yicesOnline = do
+  solver <- startSolver Yices Online "QF_LIA"  Nothing Nothing
+  commands solver
+
+yicesScript :: IO ()
+yicesScript = do
+  solver <- startSolver Yices Slv.Script "QF_LIA"  Nothing (Just "teste.hs")
+  commands solver
+
+
+
+
 {-
+z3Online :: IO ()
+z3Online = do
+  solver <- startSolver Z3 Online "QF_LIA"  Nothing Nothing
+  commands solver
+
 z3Script :: IO ()
 z3Script = do
   solver <- startSolver Z3 Slv.Script  "QF_LIA" Nothing (Just "teste.hs")
@@ -142,6 +159,6 @@ commandsScript solver =
   declareFunCt solver (N "a") [] tInt |*|
   declareFunCt solver (N "x") [] tInt |#|
   declareFunCt solver (N "y") [] tInt |#|
-  checkSatCt solver |$|
+  checkSatCt solver |$
   exitCt solver >>= print
 -}
