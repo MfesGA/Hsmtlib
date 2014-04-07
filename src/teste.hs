@@ -4,4 +4,4 @@
 (declare-fun x () Int)
 (declare-fun y () Int)
 (declare-fun f () Int)
-(check-sat)
+(check)

@@ -5,7 +5,7 @@ Module      : Yices
 -}
 module Yices(startYices) where
 
-
+import           System.IO        (Handle, hClose, hFlush, hPutStr)
 import           Cmd.ContextCmd
 import           Cmd.OnlineCmd
 import           Cmd.ProcCom.Process
@@ -18,7 +18,7 @@ import           System.IO           (Handle, IOMode (WriteMode), openFile)
 yicesConfigOnline :: SolverConfig
 yicesConfigOnline =
     Config { path = "yices"
-           , args = ["-smt"]
+           , args = ["-smt", "-i"]
            }
 
 -- Both Script and Context configurations are the same but have diferent names
@@ -143,7 +143,7 @@ onlineSolver process =
          , push = onlinePush process
          , pop = onlinePop process
          , assert = onlineAssert process
-         , checkSat = onlineCheckSat process
+         , checkSat = yicescheck process
          , getAssertions = onlineGetAssertions process
          , getValue = onlineGetValue process
          , getProof = onlineGetProof process
@@ -152,6 +152,20 @@ onlineSolver process =
          , getOption = onlineGetOption process
          , exit = onlineExit process
          }
+
+yicescheck ::  Process  -> IO Result
+yicescheck proc  = send proc ("(check)" ++ "\n")
+
+writecheckscript sConf = do
+  let scmd = "(check)" ++ "\n"
+  hPutStr (sHandle sConf) scmd
+  hFlush (sHandle sConf)
+
+yicescheckscript :: ScriptConf  -> IO Result
+yicescheckscript sConf  = do
+  writecheckscript sConf 
+  res <- sendScript (sCmdPath sConf) (sArgs sConf) (sFilePath sConf)
+  return $ last $ lines res
 
 -- Creates the funtion for the script mode.
 -- The configuration of the file is passed.
@@ -167,7 +181,7 @@ scriptSolver srcmd =
          , push = scriptPush srcmd
          , pop = scriptPop srcmd
          , assert = scriptAssert srcmd
-         , checkSat = scriptCheckSat srcmd
+         , checkSat = yicescheckscript srcmd
          , getAssertions = scriptGetAssertions srcmd
          , getValue = scriptGetValue srcmd
          , getProof = scriptGetProof srcmd
@@ -176,6 +190,8 @@ scriptSolver srcmd =
          , getOption = scriptGetOption srcmd
          , exit = scriptExit srcmd
          }
+
+
 
 -- Creates the functions for the context mode.
 -- It receives the logic, path of the solver and its arguments.
