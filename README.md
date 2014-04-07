@@ -7,7 +7,9 @@ Current supported solvers and avaliable interaction modes in each other.
 |--------|--------|--------|---------|
 | Cvc4   | X      | X      | X       |
 | Z3     | X      | X      | X       |
-
+| Altergo|        |        | X       |
+| Yices  |        |        |         |
+| MathSat|        |        |         |
 
 There exists three modes to interact with a solver:
 
