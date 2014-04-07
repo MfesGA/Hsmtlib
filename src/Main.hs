@@ -11,6 +11,8 @@ import           SMTLib2
 import           SMTLib2.Int
 import           Z3          (startZ3)
 import           Yices       (startYices)
+import           MathSat     (startmathSat)
+import           Altergo     (startaltergo)
 
 {- |  The function to initialialyze a solver.
 The solver can be initialized with a desired configuration, or a diferent
@@ -87,6 +89,8 @@ startSolver :: Solvers-- ^ Avaliable'Solvers'.
 startSolver Z3 = startZ3
 startSolver Cvc4 = startCvc4
 startSolver Yices = startYices
+startSolver Mathsat= startmathSat
+startSolver Altergo= startaltergo
 
 
 
@@ -95,7 +99,7 @@ startSolver Yices = startYices
 
 
 main :: IO ()
-main = yicesScript
+main = mathScript
 
 
 
@@ -107,10 +111,43 @@ commands solver = do
   declareFun solver (N "f") [] tInt >>= print
   checkSat solver >>= print
   exit solver >>= print
+---------Altergo fuctions----------------------------------------------
+altOnline :: IO ()
+altOnline = do
+  solver <- startSolver Altergo Slv.Online "QF_LIA"  Nothing Nothing
+  commands solver
 
-yicesOnline :: IO ()
-yicesOnline = do
-  solver <- startSolver Yices Online "QF_LIA"  Nothing Nothing
+altScript :: IO ()
+altScript = do
+  solver <- startSolver Altergo Slv.Script "QF_LIA"  Nothing (Just "teste.smt2")
+  commands solver
+
+altContext :: IO ()
+altContext = do
+  solver <- startSolver Altergo Slv.Context "QF_LIA" Nothing Nothing
+  commandsScript solver
+
+-------mathsat fuctions-----------------------------------------------
+mathsatOnline :: IO ()
+mathsatOnline = do
+  solver <- startSolver Mathsat Slv.Online "QF_LIA"  Nothing Nothing
+  commands solver
+
+mathScript :: IO ()
+mathScript = do
+  solver <- startSolver Mathsat Slv.Script "QF_LIA"  Nothing (Just "teste.hs")
+  commands solver
+
+mathContext :: IO ()
+mathContext = do
+  solver <- startSolver Mathsat Slv.Context "QF_LIA" Nothing Nothing
+  commandsScript solver
+
+-----Yices functions------------------------------
+
+yicessatOnline :: IO ()
+yicessatOnline = do
+  solver <- startSolver Yices Slv.Online "QF_LIA"  Nothing Nothing
   commands solver
 
 yicesScript :: IO ()
@@ -118,10 +155,12 @@ yicesScript = do
   solver <- startSolver Yices Slv.Script "QF_LIA"  Nothing (Just "teste.hs")
   commands solver
 
+yicesContext :: IO ()
+yicesContext = do
+  solver <- startSolver Yices Slv.Context "QF_LIA" Nothing Nothing
+  commandsScript solver
 
-
-
-{-
+------Z3 functions ----------------------------
 z3Online :: IO ()
 z3Online = do
   solver <- startSolver Z3 Online "QF_LIA"  Nothing Nothing
@@ -140,7 +179,7 @@ z3Context = do
 cvc4Online :: IO ()
 cvc4Online = do
   solver <- startSolver Cvc4 Online "QF_LIA"  Nothing Nothing
-  commandsScript solver
+  commands solver
 
 cvc4Script :: IO ()
 cvc4Script = do
@@ -159,6 +198,6 @@ commandsScript solver =
   declareFunCt solver (N "a") [] tInt |*|
   declareFunCt solver (N "x") [] tInt |#|
   declareFunCt solver (N "y") [] tInt |#|
-  checkSatCt solver |$
+  checkSatCt solver |#|
   exitCt solver >>= print
--}
+
