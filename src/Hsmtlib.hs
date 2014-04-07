@@ -3,15 +3,13 @@ Module      : Main
   Main module which provides the function to initialyze a Solver.
 -}
 
-module Main(startSolver,main) where
+module Hsmtlib(startSolver) where
 
 import           Cmd.Solver  as Slv
 import           Cvc4        (startCvc4)
-import           SMTLib2
-import           SMTLib2.Int
 import           Z3          (startZ3)
 import           Yices       (startYices)
-import           MathSat     (startmathSat)
+import           MathSAT     (startmathSat)
 import           Altergo     (startaltergo)
 
 {- |  The function to initialialyze a solver.
@@ -92,112 +90,4 @@ startSolver Yices = startYices
 startSolver Mathsat= startmathSat
 startSolver Altergo= startaltergo
 
-
-
--- Exemple use cases.
-
-
-
-main :: IO ()
-main = mathScript
-
-
-
-commands :: Solver -> IO ()
-commands solver = do
-  declareFun solver (N "a") [] tInt >>= print
-  declareFun solver (N "x") [] tInt >>= print
-  declareFun solver (N "y") [] tInt >>= print
-  declareFun solver (N "f") [] tInt >>= print
-  checkSat solver >>= print
-  exit solver >>= print
----------Altergo fuctions----------------------------------------------
-altOnline :: IO ()
-altOnline = do
-  solver <- startSolver Altergo Slv.Online "QF_LIA"  Nothing Nothing
-  commands solver
-
-altScript :: IO ()
-altScript = do
-  solver <- startSolver Altergo Slv.Script "QF_LIA"  Nothing (Just "teste.smt2")
-  commands solver
-
-altContext :: IO ()
-altContext = do
-  solver <- startSolver Altergo Slv.Context "QF_LIA" Nothing Nothing
-  commandsScript solver
-
--------mathsat fuctions-----------------------------------------------
-mathsatOnline :: IO ()
-mathsatOnline = do
-  solver <- startSolver Mathsat Slv.Online "QF_LIA"  Nothing Nothing
-  commands solver
-
-mathScript :: IO ()
-mathScript = do
-  solver <- startSolver Mathsat Slv.Script "QF_LIA"  Nothing (Just "teste.hs")
-  commands solver
-
-mathContext :: IO ()
-mathContext = do
-  solver <- startSolver Mathsat Slv.Context "QF_LIA" Nothing Nothing
-  commandsScript solver
-
------Yices functions------------------------------
-
-yicessatOnline :: IO ()
-yicessatOnline = do
-  solver <- startSolver Yices Slv.Online "QF_LIA"  Nothing Nothing
-  commands solver
-
-yicesScript :: IO ()
-yicesScript = do
-  solver <- startSolver Yices Slv.Script "QF_LIA"  Nothing (Just "teste.hs")
-  commands solver
-
-yicesContext :: IO ()
-yicesContext = do
-  solver <- startSolver Yices Slv.Context "QF_LIA" Nothing Nothing
-  commandsScript solver
-
-------Z3 functions ----------------------------
-z3Online :: IO ()
-z3Online = do
-  solver <- startSolver Z3 Online "QF_LIA"  Nothing Nothing
-  commands solver
-
-z3Script :: IO ()
-z3Script = do
-  solver <- startSolver Z3 Slv.Script  "QF_LIA" Nothing (Just "teste.hs")
-  commands solver
-
-z3Context :: IO ()
-z3Context = do
-  solver <- startSolver Z3 Slv.Context "QF_LIA" Nothing Nothing
-  commandsScript solver
-
-cvc4Online :: IO ()
-cvc4Online = do
-  solver <- startSolver Cvc4 Online "QF_LIA"  Nothing Nothing
-  commands solver
-
-cvc4Script :: IO ()
-cvc4Script = do
-  solver <- startSolver Cvc4 Slv.Script "QF_LIA"  Nothing (Just "teste.hs")
-  commands solver
-
-cvc4Context :: IO ()
-cvc4Context = do
-  solver <- startSolver Cvc4 Slv.Context "QF_LIA"  Nothing Nothing
-  commandsScript solver
-
-
-commandsScript :: Solver -> IO ()
-commandsScript solver =
-
-  declareFunCt solver (N "a") [] tInt |*|
-  declareFunCt solver (N "x") [] tInt |#|
-  declareFunCt solver (N "y") [] tInt |#|
-  checkSatCt solver |#|
-  exitCt solver >>= print
 
