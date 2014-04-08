@@ -3,13 +3,13 @@ Hsmtl provides functions to interact with several smt solvers using SMT-LIB 2.
 Current supported solvers and avaliable interaction modes in each other.
 
 
-| Solver | Online | Script | Context |
-|--------|--------|--------|---------|
-| Cvc4   | X      | X      | X       |
-| Z3     | X      | X      | X       |
-| Alt-Ergo|        | X      | X       |
-| Yices* | X      | X      | X       |
-| MathSat| X      |        |         |
+| Solver | Online | Script |
+|--------|--------|--------|
+| Cvc4   | X      | X      |
+| Z3     | X      | X      |
+| Alt-Ergo|       | X      |
+| Yices* | X      | X      |
+| MathSat| X      |        |
 
 
  (* using yices-smt2 available in: http://yices.csl.sri.com/download-yices2.shtml)
