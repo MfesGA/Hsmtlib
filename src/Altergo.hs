@@ -9,8 +9,10 @@ import           Cmd.OnlineCmd
 import           Cmd.ProcCom.Process
 import           Cmd.ScriptCmd
 import           Cmd.Solver          as Slv
+import           Cmd.BatchCmd as B(executeBatch)
 import           SMTLib2
-import           System.IO           (Handle, IOMode (WriteMode), openFile)
+import           System.IO(Handle, IOMode (WriteMode), openFile)
+
 
 -- All the configurations are the same but have diferent names so if anything
 -- changes it's easy to alter its configuration.
@@ -28,6 +30,14 @@ altergoConfigScript =
                , args = ["-v"]
                }
 
+altergoConfigBatch :: SolverConfig
+altergoConfigBatch =
+        Config { path = "altergo"
+               , args = ["-v"]
+               }
+
+
+
 {- |
   Function that initialyzes a altergo Solver.
   It Receives a Mode, an SMT Logic, it can receive a diferent configuration
@@ -36,6 +46,7 @@ altergoConfigScript =
   In Online Mode if a FilePath is passed then it's ignored.
 -}
 startaltergo :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
+startaltergo Slv.Batch logic sConf _ = startaltergoBatch logic sConf
 startaltergo Slv.Online logic sConf _ = startaltergoOnline logic sConf
 startaltergo Slv.Script logic sConf scriptFilePath =
     startaltergoScript logic sConf scriptFilePath
@@ -97,6 +108,14 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              , sFilePath  = scriptFilePath
              }
 
+-- start Alt-Ergo Batch
+startaltergoBatch :: String -> Maybe SolverConfig -> IO Solver
+startaltergoBatch logic Nothing = startaltergoBatch' logic altergoConfigBatch
+startaltergoBatch logic (Just conf) = startaltergoBatch' logic conf
+
+startaltergoBatch' :: String -> SolverConfig -> IO Solver
+startaltergoBatch' logic config = return $ batchSolver logic config
+
 
 -- Creates the functions for online mode with the process already running.
 -- Each function will send the command to the solver and wait for the response.
@@ -145,3 +164,7 @@ scriptSolver srcmd =
          , getOption = scriptGetOption srcmd
          , exit = scriptExit srcmd
          }
+
+batchSolver :: String -> SolverConfig  -> Solver
+batchSolver logic config =
+  BSolver { Slv.executeBatch = B.executeBatch (path config) (args config) logic}

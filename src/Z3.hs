@@ -5,6 +5,7 @@ Module      : Z3
 -}
 module Z3(startZ3) where
 
+import           Cmd.BatchCmd        as B (executeBatch)
 import           Cmd.OnlineCmd
 import           Cmd.ProcCom.Process
 import           Cmd.ScriptCmd
@@ -27,6 +28,12 @@ z3ConfigScript =
                , args = ["-smt2"]
                }
 
+z3ConfigBatch :: SolverConfig
+z3ConfigBatch =
+        Config { path = "z3"
+               , args = ["-smt2"]
+               }
+
 {- |
   Function that initialyzes a Z3 Solver.
   It Receives a Mode, an SMT Logic, it can receive a diferent configuration
@@ -35,6 +42,7 @@ z3ConfigScript =
   In Online Mode if a FilePath is passed then it's ignored.
 -}
 startZ3 :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
+startZ3 Slv.Batch logic sConf _ = startZ3Batch logic sConf
 startZ3 Slv.Online logic sConf _ = startZ3Online logic sConf
 startZ3 Slv.Script logic sConf scriptFilePath =
     startZ3Script logic sConf scriptFilePath
@@ -97,6 +105,17 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              }
 
 
+-- Start z3 batch mode
+
+startZ3Batch :: String -> Maybe SolverConfig -> IO Solver
+startZ3Batch logic Nothing = startZ3Batch' logic z3ConfigBatch
+startZ3Batch logic (Just conf) = startZ3Batch' logic conf
+
+startZ3Batch' :: String -> SolverConfig -> IO Solver
+startZ3Batch' logic conf = return $ batchSolver logic conf
+
+
+
 
 -- Creates the functions for online mode with the process already running.
 -- Each function will send the command to the solver and wait for the response.
@@ -146,3 +165,6 @@ scriptSolver srcmd =
          , exit = scriptExit srcmd
          }
 
+batchSolver :: String -> SolverConfig -> Solver
+batchSolver logic config =
+  BSolver { Slv.executeBatch = B.executeBatch (path config) (args config) logic}

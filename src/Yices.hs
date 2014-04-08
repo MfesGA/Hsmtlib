@@ -5,6 +5,7 @@ Module      : Yices
 -}
 module Yices(startYices) where
 
+import           Cmd.BatchCmd        as B (executeBatch)
 import           Cmd.OnlineCmd
 import           Cmd.ProcCom.Process
 import           Cmd.ScriptCmd
@@ -28,6 +29,11 @@ yicesConfigScript =
            , args = []
            }
 
+yicesConfigBatch :: SolverConfig
+yicesConfigBatch =
+        Config { path = "yices-smt2"
+               , args = []
+               }
 
 {- |
   Function that initialyzes a Yices Solver.
@@ -37,6 +43,7 @@ yicesConfigScript =
   In Online Mode if a FilePath is passed then it's ignored.
 -}
 startYices :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
+startYices Slv.Batch logic sConf _ = startYicesBatch logic sConf
 startYices Slv.Online logic sConf _ = startYicesOnline logic sConf
 startYices Slv.Script logic sConf scriptFilePath =
     startYicesScript logic sConf scriptFilePath
@@ -107,6 +114,14 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              , sFilePath  = scriptFilePath
              }
 
+-- start Yices solver
+
+startYicesBatch :: String -> Maybe SolverConfig -> IO Solver
+startYicesBatch logic Nothing = startYicesBatch' logic yicesConfigBatch
+startYicesBatch logic (Just conf) = startYicesBatch' logic conf
+
+startYicesBatch' :: String -> SolverConfig -> IO Solver
+startYicesBatch' logic conf = return $ batchSolver logic conf
 
 
 -- Creates the functions for online mode with the process already running.
@@ -157,3 +172,7 @@ scriptSolver srcmd =
          , getOption = scriptGetOption srcmd
          , exit = scriptExit srcmd
          }
+
+batchSolver :: String -> SolverConfig -> Solver
+batchSolver logic config =
+  BSolver { Slv.executeBatch = B.executeBatch (path config) (args config) logic}

@@ -5,6 +5,7 @@ Module      : boolector
 -}
 module Boolector(startboolector) where
 
+import           Cmd.BatchCmd        as B (executeBatch)
 import           Cmd.OnlineCmd
 import           Cmd.ProcCom.Process
 import           Cmd.ScriptCmd
@@ -28,6 +29,11 @@ boolectorConfigScript =
                , args = ["--smt2", "-d2", "-o STDOUT"]
                }
 
+boolectorConfigBatch :: SolverConfig
+boolectorConfigBatch =
+        Config { path = "boolector"
+               , args = ["--smt2", "-d2", "-o STDOUT"]
+               }
 
 
 {- |
@@ -38,6 +44,7 @@ boolectorConfigScript =
   In Online Mode if a FilePath is passed then it's ignored.
 -}
 startboolector :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
+startboolector Slv.Batch logic sConf _ = startBoolectorBatch logic sConf
 startboolector Slv.Online logic sConf _ = startboolectorOnline logic sConf
 startboolector Slv.Script logic sConf scriptFilePath =
     startboolectorScript logic sConf scriptFilePath
@@ -99,7 +106,14 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              , sFilePath  = scriptFilePath
              }
 
+-- Start Booleactor batch
+startBoolectorBatch :: String -> Maybe SolverConfig -> IO Solver
+startBoolectorBatch logic Nothing =
+  startBoolectorBatch' logic boolectorConfigBatch
+startBoolectorBatch logic (Just conf) = startBoolectorBatch' logic conf
 
+startBoolectorBatch' :: String -> SolverConfig -> IO Solver
+startBoolectorBatch' logic conf = return $ batchSolver logic conf
 
 
 -- Creates the functions for online mode with the process already running.
@@ -149,3 +163,7 @@ scriptSolver srcmd =
          , getOption = scriptGetOption srcmd
          , exit = scriptExit srcmd
          }
+
+batchSolver :: String -> SolverConfig -> Solver
+batchSolver logic config =
+  BSolver { Slv.executeBatch = B.executeBatch (path config) (args config) logic}

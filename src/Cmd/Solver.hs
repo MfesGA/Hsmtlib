@@ -6,6 +6,7 @@ Module      : Solver
 module Cmd.Solver where
 
 import           SMTLib2
+import           Text.PrettyPrint
 
 {-|
  Placeholder type that later on will be changed to a more complex type.
@@ -33,7 +34,7 @@ type Result = String
 data Solvers = Z3 | Cvc4 | Yices | Mathsat | Altergo | Boolector
 
 -- | Avaliable modes to use a solver.
-data Mode = Online | Script
+data Mode = Online | Script | Batch
 
 
 {- |
@@ -62,17 +63,17 @@ data Solver = Solver
     , assert        :: Expr -> IO Result
     , checkSat      :: IO Result
     , getAssertions :: IO Result
-    , getValue      :: [Expr]-> IO Result
+    , getValue      :: [Expr] -> IO Result
     , getProof      :: IO Result
     , getUnsatCore  :: IO Result
     , getInfo       :: InfoFlag -> IO Result
     , getOption     :: Name -> IO Result
     , exit          :: IO Result
     }
+    | BSolver
+    { executeBatch  :: [Command] -> IO Result }
 
 
-{--
-executeBatch :: Script -> IO Result
-executeBatch  script =
---}
+
+
 

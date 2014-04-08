@@ -6,6 +6,7 @@ Module      : Cvc4
 module Cvc4(startCvc4) where
 
 
+import           Cmd.BatchCmd        as B (executeBatch)
 import           Cmd.OnlineCmd
 import           Cmd.ProcCom.Process
 import           Cmd.ScriptCmd
@@ -32,6 +33,11 @@ cvc4ConfigScript =
            , args = ["--lang=smt2"]
            }
 
+cvc4ConfigBatch :: SolverConfig
+cvc4ConfigBatch =
+        Config { path = "cvc4"
+               , args = ["--lang=smt2"]
+               }
 
 {- |
   Function that initialyzes a Cvc4 Solver.
@@ -41,6 +47,7 @@ cvc4ConfigScript =
   In Context and Online Mode if a FilePath is passed then it's ignored.
 -}
 startCvc4 :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
+startCvc4 Slv.Batch logic sConf _ = startCvc4Batch logic sConf
 startCvc4 Slv.Online logic sConf _ = startCvc4Online logic sConf
 startCvc4 Slv.Script logic sConf scriptFilePath =
     startCvc4Script logic sConf scriptFilePath
@@ -112,6 +119,15 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              }
 
 
+-- start Cvc4 Batch
+startCvc4Batch :: String -> Maybe SolverConfig -> IO Solver
+startCvc4Batch logic Nothing = startCvc4Batch' logic cvc4ConfigBatch
+startCvc4Batch logic (Just conf) = startCvc4Batch' logic conf
+
+startCvc4Batch' :: String -> SolverConfig -> IO Solver
+startCvc4Batch' logic conf = return $ batchSolver logic conf
+
+
 
 -- Creates the functions for online mode with the process already running.
 -- Each function will send the command to the solver and wait for the response.
@@ -160,3 +176,8 @@ scriptSolver srcmd =
          , getOption = scriptGetOption srcmd
          , exit = scriptExit srcmd
          }
+
+
+batchSolver :: String -> SolverConfig -> Solver
+batchSolver logic config =
+  BSolver { Slv.executeBatch = B.executeBatch (path config) (args config) logic}
