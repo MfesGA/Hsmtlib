@@ -1,65 +1,62 @@
 {- |
-Module      : Yices
-  Module wich has the standard configuration for all Yices Modes and
+Module      : mathSat
+  Module wich has the standard configuration for all mathSat Modes and
   provides the initilizing function.
 -}
-module Yices(startYices) where
+module MathSat(startmathSat) where
 
-import           System.IO        (Handle, hClose, hFlush, hPutStr)
 import           Cmd.ContextCmd
 import           Cmd.OnlineCmd
 import           Cmd.ProcCom.Process
 import           Cmd.ScriptCmd
 import           Cmd.Solver          as Slv
 import           SMTLib2
-import           System.IO           (Handle, IOMode (WriteMode), openFile)
+import           System.IO
+
+-- All the configurations are the same but have diferent names so if anything
+-- changes it's easy to alter its configuration.
 
 
-yicesConfigOnline :: SolverConfig
-yicesConfigOnline =
-    Config { path = "yices-smt2"
-           , args = [ "--interactive"]
-           }
+mathSatConfigOnline :: SolverConfig
+mathSatConfigOnline =
+        Config { path = "mathSat"
+               , args = []
+               }
 
--- Both Script and Context configurations are the same but have diferent names
--- so if anything  changes it's easy to alter its configuration.
+mathSatConfigScript :: SolverConfig
+mathSatConfigScript =
+        Config { path = "mathSat"
+               , args = []
+               }
 
-yicesConfigScript :: SolverConfig
-yicesConfigScript =
-    Config { path = "yices-smt2"
-           , args = []
-           }
-
-yicesConfigContext :: SolverConfig
-yicesConfigContext =
-    Config { path = "yices-smt2"
-           , args = []
-           }
+mathSatConfigContext :: SolverConfig
+mathSatConfigContext =
+         Config { path = "mathSat"
+                , args = []
+                }
 
 {- |
-  Function that initialyzes a Yices Solver.
+  Function that initialyzes a mathSat Solver.
   It Receives a Mode, an SMT Logic, it can receive a diferent configuration
   for the solver and an anternative path to create the script in Script Mode.
 
   In Context and Online Mode if a FilePath is passed then it's ignored.
 -}
-startYices :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
-startYices Slv.Online logic sConf _ = startYicesOnline logic sConf
-startYices Slv.Context logic sConf _ = startYicesContext logic sConf
-startYices Slv.Script logic sConf scriptFilePath =
-    startYicesScript logic sConf scriptFilePath
+startmathSat :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
+startmathSat Slv.Context logic sConf _ = startmathSatContext logic sConf
+startmathSat Slv.Online logic sConf _ = startmathSatOnline logic sConf
+startmathSat Slv.Script logic sConf scriptFilePath =
+    startmathSatScript logic sConf scriptFilePath
 
+-- Start mathSat Online.
 
+startmathSatOnline :: String -> Maybe SolverConfig -> IO Solver
+startmathSatOnline logic Nothing = startmathSatOnline' logic mathSatConfigOnline
+startmathSatOnline logic (Just conf) = startmathSatOnline' logic conf
 
--- Start Yices Online.
-
-startYicesOnline :: String -> Maybe SolverConfig -> IO Solver
-startYicesOnline logic Nothing =  startYicesOnline' logic yicesConfigOnline
-startYicesOnline logic (Just conf) = startYicesOnline' logic conf
-
-startYicesOnline':: String -> SolverConfig -> IO Solver
-startYicesOnline' logic conf = do
-  -- Starts a Yices Process.
+startmathSatOnline' :: String -> SolverConfig -> IO Solver
+startmathSatOnline' logic conf = do
+  -- Starts a Z4 Process.
   process <- beginProcess (path conf) (args conf)
   --Set Option to print success after accepting a Command.
   onlineSetOption process (OptPrintSuccess True)
@@ -68,18 +65,17 @@ startYicesOnline' logic conf = do
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 
+--Start mathSat Script.
 
---Start Yices Script.
-
-startYicesScript :: String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
-startYicesScript logic Nothing Nothing =
-    startYicesScript' logic yicesConfigScript "temp.smt2"
-startYicesScript logic (Just conf) Nothing =
-    startYicesScript' logic conf "temp.smt2"
-startYicesScript  logic Nothing (Just scriptFilePath) =
-    startYicesScript' logic yicesConfigScript scriptFilePath
-startYicesScript logic (Just conf) (Just scriptFilePath) =
-    startYicesScript' logic conf scriptFilePath
+startmathSatScript :: String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
+startmathSatScript logic Nothing Nothing =
+    startmathSatScript' logic mathSatConfigScript "temp.smt2"
+startmathSatScript logic (Just conf) Nothing =
+    startmathSatScript' logic conf "temp.smt2"
+startmathSatScript logic Nothing (Just scriptFilePath) =
+    startmathSatScript' logic mathSatConfigScript scriptFilePath
+startmathSatScript logic (Just conf) (Just scriptFilePath) =
+    startmathSatScript' logic conf scriptFilePath
 
 {-
   In this function a file is created where the commands are kept.
@@ -92,17 +88,11 @@ startYicesScript logic (Just conf) (Just scriptFilePath) =
   - sFilePath: The file path of the script so it can be passed to the solver
                when started.
 -}
-startYicesScript' :: String -> SolverConfig -> FilePath -> IO Solver
-startYicesScript' logic conf scriptFilePath = do
-  -- Create a file with the give file path.
-  -- Since the handle is created with WriteMode it overrides a file if it
-  -- already exists.
+startmathSatScript' :: String -> SolverConfig -> FilePath -> IO Solver
+startmathSatScript' logic conf scriptFilePath = do
   scriptHandle <- openFile scriptFilePath WriteMode
-  -- Creates the arguments for the functions in ScriptCmd
   let srcmd = newScriptArgs conf scriptHandle scriptFilePath
-  --Set Option to print success after accepting a Command.
   scriptSetOption srcmd (OptPrintSuccess True)
-  -- Initialize the solver Functions and return them.
   scriptSetLogic srcmd (N logic)
   return $ scriptSolver srcmd
 
@@ -116,17 +106,15 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              }
 
 
--- Start Yices Context.
+-- Start mathSat Context.
 
 
-startYicesContext :: String -> Maybe SolverConfig -> IO Solver
-startYicesContext logic Nothing = startYicesContext' logic yicesConfigContext
-startYicesContext logic (Just conf) = startYicesContext' logic conf
+startmathSatContext :: String -> Maybe SolverConfig -> IO Solver
+startmathSatContext logic Nothing = startmathSatContext' logic mathSatConfigContext
+startmathSatContext logic (Just conf) = startmathSatContext' logic conf
 
-
-startYicesContext' :: String -> SolverConfig -> IO Solver
-startYicesContext' logic conf =
-    return $ ctxSolver logic (path conf) (args conf)
+startmathSatContext' :: String -> SolverConfig -> IO Solver
+startmathSatContext' logic conf = return $ ctxSolver logic (path conf) (args conf)
 
 
 -- Creates the functions for online mode with the process already running.
@@ -153,20 +141,6 @@ onlineSolver process =
          , exit = onlineExit process
          }
 
-yicescheck ::  Process  -> IO Result
-yicescheck proc  = send proc ("(check)" ++ "\n")
-
-writecheckscript sConf = do
-  let scmd = "(check)" ++ "\n"
-  hPutStr (sHandle sConf) scmd
-  hFlush (sHandle sConf)
-
-yicescheckscript :: ScriptConf  -> IO Result
-yicescheckscript sConf  = do
-  writecheckscript sConf 
-  res <- sendScript (sCmdPath sConf) (sArgs sConf) (sFilePath sConf)
-  return $ last $ lines res
-
 -- Creates the funtion for the script mode.
 -- The configuration of the file is passed.
 scriptSolver :: ScriptConf -> Solver
@@ -191,8 +165,6 @@ scriptSolver srcmd =
          , exit = scriptExit srcmd
          }
 
-
-
 -- Creates the functions for the context mode.
 -- It receives the logic, path of the solver and its arguments.
 ctxSolver :: String -> CmdPath -> Args -> Solver
@@ -202,8 +174,8 @@ ctxSolver logic cmd solvArgs =
            , setInfoCt = ctxSetInfo
            , declareTypeCt = ctxDeclareType logic
            , defineTypeCt = ctxDefineType logic
-           , defineFunCt = ctxDefineFun logic
            , declareFunCt = ctxDeclareFun logic
+           , defineFunCt = ctxDefineFun logic
            , pushCt = ctxPush
            , popCt = ctxPop
            , assertCt = ctxAssert
