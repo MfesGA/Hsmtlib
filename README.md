@@ -7,7 +7,7 @@ Current supported solvers and avaliable interaction modes in each other.
 |--------|--------|--------|---------|
 | Cvc4   | X      | X      | X       |
 | Z3     | X      | X      | X       |
-| Altergo|        | X      | X       |
+| Alt-Ergo|        | X      | X       |
 | Yices* | X      | X      | X       |
 | MathSat|        |        |         |
 
