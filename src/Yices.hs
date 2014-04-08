@@ -5,8 +5,6 @@ Module      : Yices
 -}
 module Yices(startYices) where
 
-import           System.IO        (Handle, hClose, hFlush, hPutStr)
-import           Cmd.ContextCmd
 import           Cmd.OnlineCmd
 import           Cmd.ProcCom.Process
 import           Cmd.ScriptCmd
@@ -21,7 +19,7 @@ yicesConfigOnline =
            , args = [ "--interactive"]
            }
 
--- Both Script and Context configurations are the same but have diferent names
+-- Script configurations is the same but has diferent names
 -- so if anything  changes it's easy to alter its configuration.
 
 yicesConfigScript :: SolverConfig
@@ -30,22 +28,16 @@ yicesConfigScript =
            , args = []
            }
 
-yicesConfigContext :: SolverConfig
-yicesConfigContext =
-    Config { path = "yices-smt2"
-           , args = []
-           }
 
 {- |
   Function that initialyzes a Yices Solver.
   It Receives a Mode, an SMT Logic, it can receive a diferent configuration
   for the solver and an anternative path to create the script in Script Mode.
 
-  In Context and Online Mode if a FilePath is passed then it's ignored.
+  In Online Mode if a FilePath is passed then it's ignored.
 -}
 startYices :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
 startYices Slv.Online logic sConf _ = startYicesOnline logic sConf
-startYices Slv.Context logic sConf _ = startYicesContext logic sConf
 startYices Slv.Script logic sConf scriptFilePath =
     startYicesScript logic sConf scriptFilePath
 
@@ -116,18 +108,6 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              }
 
 
--- Start Yices Context.
-
-
-startYicesContext :: String -> Maybe SolverConfig -> IO Solver
-startYicesContext logic Nothing = startYicesContext' logic yicesConfigContext
-startYicesContext logic (Just conf) = startYicesContext' logic conf
-
-
-startYicesContext' :: String -> SolverConfig -> IO Solver
-startYicesContext' logic conf =
-    return $ ctxSolver logic (path conf) (args conf)
-
 
 -- Creates the functions for online mode with the process already running.
 -- Each function will send the command to the solver and wait for the response.
@@ -177,29 +157,3 @@ scriptSolver srcmd =
          , getOption = scriptGetOption srcmd
          , exit = scriptExit srcmd
          }
-
-
-
--- Creates the functions for the context mode.
--- It receives the logic, path of the solver and its arguments.
-ctxSolver :: String -> CmdPath -> Args -> Solver
-ctxSolver logic cmd solvArgs =
-  CtSolver { setLogicCt = ctxSetLogic
-           , setOptionCt = ctxSetOption
-           , setInfoCt = ctxSetInfo
-           , declareTypeCt = ctxDeclareType logic
-           , defineTypeCt = ctxDefineType logic
-           , defineFunCt = ctxDefineFun logic
-           , declareFunCt = ctxDeclareFun logic
-           , pushCt = ctxPush
-           , popCt = ctxPop
-           , assertCt = ctxAssert
-           , checkSatCt = ctxCheckSat cmd solvArgs
-           , getAssertionsCt = ctxGetAssertions cmd solvArgs
-           , getValueCt = ctxGetValue cmd solvArgs
-           , getProofCt = ctxGetProof cmd solvArgs
-           , getUnsatCoreCt = ctxGetUnsatCore cmd solvArgs
-           , getInfoCt = ctxGetInfo cmd solvArgs
-           , getOptionCt = ctxGetOption cmd solvArgs
-           , exitCt = ctxExit cmd solvArgs
-           }

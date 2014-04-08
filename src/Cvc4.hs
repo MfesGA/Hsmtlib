@@ -6,7 +6,6 @@ Module      : Cvc4
 module Cvc4(startCvc4) where
 
 
-import           Cmd.ContextCmd
 import           Cmd.OnlineCmd
 import           Cmd.ProcCom.Process
 import           Cmd.ScriptCmd
@@ -24,7 +23,7 @@ cvc4ConfigOnline =
            , args = ["--interactive", "--lang=smt2", "--quiet"]
            }
 
--- Both Script and Context configurations are the same but have diferent names
+-- Both Script configurations are the same but have diferent names
 -- so if anything  changes it's easy to alter its configuration.
 
 cvc4ConfigScript :: SolverConfig
@@ -33,11 +32,6 @@ cvc4ConfigScript =
            , args = ["--lang=smt2"]
            }
 
-cvc4ConfigContext :: SolverConfig
-cvc4ConfigContext =
-    Config { path = "cvc4"
-           , args = ["--lang=smt2"]
-           }
 
 {- |
   Function that initialyzes a Cvc4 Solver.
@@ -48,7 +42,6 @@ cvc4ConfigContext =
 -}
 startCvc4 :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
 startCvc4 Slv.Online logic sConf _ = startCvc4Online logic sConf
-startCvc4 Slv.Context logic sConf _ = startCvc4Context logic sConf
 startCvc4 Slv.Script logic sConf scriptFilePath =
     startCvc4Script logic sConf scriptFilePath
 
@@ -119,18 +112,6 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              }
 
 
--- Start Cvc4 Context.
-
-
-startCvc4Context :: String -> Maybe SolverConfig -> IO Solver
-startCvc4Context logic Nothing = startCvc4Context' logic cvc4ConfigContext
-startCvc4Context logic (Just conf) = startCvc4Context' logic conf
-
-
-startCvc4Context' :: String -> SolverConfig -> IO Solver
-startCvc4Context' logic conf =
-    return $ ctxSolver logic (path conf) (args conf)
-
 
 -- Creates the functions for online mode with the process already running.
 -- Each function will send the command to the solver and wait for the response.
@@ -179,27 +160,3 @@ scriptSolver srcmd =
          , getOption = scriptGetOption srcmd
          , exit = scriptExit srcmd
          }
-
--- Creates the functions for the context mode.
--- It receives the logic, path of the solver and its arguments.
-ctxSolver :: String -> CmdPath -> Args -> Solver
-ctxSolver logic cmd solvArgs =
-  CtSolver { setLogicCt = ctxSetLogic
-           , setOptionCt = ctxSetOption
-           , setInfoCt = ctxSetInfo
-           , declareTypeCt = ctxDeclareType logic
-           , defineTypeCt = ctxDefineType logic
-           , defineFunCt = ctxDefineFun logic
-           , declareFunCt = ctxDeclareFun logic
-           , pushCt = ctxPush
-           , popCt = ctxPop
-           , assertCt = ctxAssert
-           , checkSatCt = ctxCheckSat cmd solvArgs
-           , getAssertionsCt = ctxGetAssertions cmd solvArgs
-           , getValueCt = ctxGetValue cmd solvArgs
-           , getProofCt = ctxGetProof cmd solvArgs
-           , getUnsatCoreCt = ctxGetUnsatCore cmd solvArgs
-           , getInfoCt = ctxGetInfo cmd solvArgs
-           , getOptionCt = ctxGetOption cmd solvArgs
-           , exitCt = ctxExit cmd solvArgs
-           }

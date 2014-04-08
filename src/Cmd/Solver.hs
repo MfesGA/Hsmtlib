@@ -33,7 +33,7 @@ type Result = String
 data Solvers = Z3 | Cvc4 | Yices | Mathsat | Altergo | Boolector
 
 -- | Avaliable modes to use a solver.
-data Mode = Online | Context | Script
+data Mode = Online | Script
 
 
 {- |
@@ -47,27 +47,7 @@ data SolverConfig =
 
 
 {-|
-  The alternative Result given by a solver using the context Mode.
--}
-data CtResult = CtxRes
-              { context :: [String] -- ^ List with all the commands.
-              , result :: Result -- ^ Result of the last command.
-              }
-
-instance Show CtResult where
-    show =  head.lines.result
-
-
-{-|
  Solver data type that has all the functions.
- There exists two Constructors Solver and CtSolver, Solver is used for Online
- and Script mode. CtSolver is only used in ContextMode.
-
- The types of both are similar the only diferenc is that in CtSolver we need
- too keep the list of all commands used, so each commands needs to receive
- the list of the last command.
-
- To facilitate this there existis some combinators further bellow,
 -}
 data Solver = Solver
     { setLogic      :: Name -> IO Result
@@ -89,58 +69,10 @@ data Solver = Solver
     , getOption     :: Name -> IO Result
     , exit          :: IO Result
     }
-    | CtSolver
-    { setLogicCt      :: Name -> IO CtResult -> IO CtResult
-    , setOptionCt     :: Option -> IO CtResult -> IO CtResult
-    , setInfoCt       :: Attr -> IO CtResult -> IO CtResult
-    , declareTypeCt   :: Name -> Integer -> IO CtResult -> IO CtResult
-    , defineTypeCt    :: Name -> [Name] -> Type -> IO CtResult -> IO CtResult
-    , declareFunCt    :: Name -> [Type] -> Type -> IO CtResult -> IO CtResult
-    , defineFunCt     :: Name -> [Binder] -> Type -> Expr -> IO CtResult -> IO CtResult
-    , pushCt          :: Integer -> IO CtResult -> IO CtResult
-    , popCt           :: Integer -> IO CtResult -> IO CtResult
-    , assertCt        :: Expr -> IO CtResult -> IO CtResult
-    , checkSatCt      :: IO CtResult -> IO CtResult
-    , getAssertionsCt :: IO CtResult -> IO CtResult
-    , getValueCt      :: [Expr] -> IO CtResult -> IO CtResult
-    , getProofCt      :: IO CtResult -> IO CtResult
-    , getUnsatCoreCt  :: IO CtResult -> IO CtResult
-    , getInfoCt       :: InfoFlag -> IO CtResult -> IO CtResult
-    , getOptionCt     :: Name -> IO CtResult -> IO CtResult
-    , exitCt          :: IO CtResult -> IO CtResult
-    }
 
 
-{-|
-  The following combinators are used in context mode to write cleaner code.
-
-  The combinator |*| should be used only after the first command and  the other(|#|) should be used in between.
-
-  e.g:
-@
-main :: IO ()
-main = do
-  solver <- startSolver Cvc4 Slv.Context "QF_LIA"  Nothing Nothing
-  declareFunCt solver (N "a") [] tInt |*|
-  declareFunCt solver (N "x") [] tInt |#|
-  declareFunCt solver (N "y") [] tInt |#|
-  checkSatCt solver |#|
-  exitCt solver >>= print
-@
--}
-
-
-(|*|) :: (IO CtResult -> IO CtResult)
-      -> (IO CtResult -> IO CtResult)
-      -> IO CtResult
-(|*|)  f g = g  (f  (return CtxRes {context = [], result = ""}))
-
-
-(|#|) :: IO CtResult
-      -> (IO CtResult -> IO CtResult)
-      -> IO CtResult
-(|#|) f g = g f
-
-
-
+{--
+executeBatch :: Script -> IO Result
+executeBatch  script =
+--}
 

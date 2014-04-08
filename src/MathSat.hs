@@ -3,15 +3,14 @@ Module      : mathSat
   Module wich has the standard configuration for all mathSat Modes and
   provides the initilizing function.
 -}
-module MathSat(startmathSat) where
+module MathSAT(startmathSat) where
 
-import           Cmd.ContextCmd
 import           Cmd.OnlineCmd
 import           Cmd.ProcCom.Process
 import           Cmd.ScriptCmd
 import           Cmd.Solver          as Slv
 import           SMTLib2
-import           System.IO
+import           System.IO           (Handle, IOMode (WriteMode), openFile)
 
 -- All the configurations are the same but have diferent names so if anything
 -- changes it's easy to alter its configuration.
@@ -29,21 +28,15 @@ mathSatConfigScript =
                , args = []
                }
 
-mathSatConfigContext :: SolverConfig
-mathSatConfigContext =
-         Config { path = "mathSat"
-                , args = []
-                }
 
 {- |
   Function that initialyzes a mathSat Solver.
   It Receives a Mode, an SMT Logic, it can receive a diferent configuration
   for the solver and an anternative path to create the script in Script Mode.
 
-  In Context and Online Mode if a FilePath is passed then it's ignored.
+  In Online Mode if a FilePath is passed then it's ignored.
 -}
 startmathSat :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
-startmathSat Slv.Context logic sConf _ = startmathSatContext logic sConf
 startmathSat Slv.Online logic sConf _ = startmathSatOnline logic sConf
 startmathSat Slv.Script logic sConf scriptFilePath =
     startmathSatScript logic sConf scriptFilePath
@@ -106,15 +99,6 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              }
 
 
--- Start mathSat Context.
-
-
-startmathSatContext :: String -> Maybe SolverConfig -> IO Solver
-startmathSatContext logic Nothing = startmathSatContext' logic mathSatConfigContext
-startmathSatContext logic (Just conf) = startmathSatContext' logic conf
-
-startmathSatContext' :: String -> SolverConfig -> IO Solver
-startmathSatContext' logic conf = return $ ctxSolver logic (path conf) (args conf)
 
 
 -- Creates the functions for online mode with the process already running.
@@ -164,27 +148,3 @@ scriptSolver srcmd =
          , getOption = scriptGetOption srcmd
          , exit = scriptExit srcmd
          }
-
--- Creates the functions for the context mode.
--- It receives the logic, path of the solver and its arguments.
-ctxSolver :: String -> CmdPath -> Args -> Solver
-ctxSolver logic cmd solvArgs =
-  CtSolver { setLogicCt = ctxSetLogic
-           , setOptionCt = ctxSetOption
-           , setInfoCt = ctxSetInfo
-           , declareTypeCt = ctxDeclareType logic
-           , defineTypeCt = ctxDefineType logic
-           , declareFunCt = ctxDeclareFun logic
-           , defineFunCt = ctxDefineFun logic
-           , pushCt = ctxPush
-           , popCt = ctxPop
-           , assertCt = ctxAssert
-           , checkSatCt = ctxCheckSat cmd solvArgs
-           , getAssertionsCt = ctxGetAssertions cmd solvArgs
-           , getValueCt = ctxGetValue cmd solvArgs
-           , getProofCt = ctxGetProof cmd solvArgs
-           , getUnsatCoreCt = ctxGetUnsatCore cmd solvArgs
-           , getInfoCt = ctxGetInfo cmd solvArgs
-           , getOptionCt = ctxGetOption cmd solvArgs
-           , exitCt = ctxExit cmd solvArgs
-           }

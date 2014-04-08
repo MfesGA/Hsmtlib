@@ -5,7 +5,6 @@ Module      : altergo
 -}
 module Altergo(startaltergo) where
 
-import           Cmd.ContextCmd
 import           Cmd.OnlineCmd
 import           Cmd.ProcCom.Process
 import           Cmd.ScriptCmd
@@ -29,21 +28,14 @@ altergoConfigScript =
                , args = ["-v"]
                }
 
-altergoConfigContext :: SolverConfig
-altergoConfigContext =
-         Config { path = "altergo"
-                , args = ["-v"]
-                }
-
 {- |
   Function that initialyzes a altergo Solver.
   It Receives a Mode, an SMT Logic, it can receive a diferent configuration
   for the solver and an anternative path to create the script in Script Mode.
 
-  In Context and Online Mode if a FilePath is passed then it's ignored.
+  In Online Mode if a FilePath is passed then it's ignored.
 -}
 startaltergo :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
-startaltergo Slv.Context logic sConf _ = startaltergoContext logic sConf
 startaltergo Slv.Online logic sConf _ = startaltergoOnline logic sConf
 startaltergo Slv.Script logic sConf scriptFilePath =
     startaltergoScript logic sConf scriptFilePath
@@ -106,17 +98,6 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              }
 
 
--- Start altergo Context.
-
-
-startaltergoContext :: String -> Maybe SolverConfig -> IO Solver
-startaltergoContext logic Nothing = startaltergoContext' logic altergoConfigContext
-startaltergoContext logic (Just conf) = startaltergoContext' logic conf
-
-startaltergoContext' :: String -> SolverConfig -> IO Solver
-startaltergoContext' logic conf = return $ ctxSolver logic (path conf) (args conf)
-
-
 -- Creates the functions for online mode with the process already running.
 -- Each function will send the command to the solver and wait for the response.
 onlineSolver :: Process -> Solver
@@ -164,27 +145,3 @@ scriptSolver srcmd =
          , getOption = scriptGetOption srcmd
          , exit = scriptExit srcmd
          }
-
--- Creates the functions for the context mode.
--- It receives the logic, path of the solver and its arguments.
-ctxSolver :: String -> CmdPath -> Args -> Solver
-ctxSolver logic cmd solvArgs =
-  CtSolver { setLogicCt = ctxSetLogic
-           , setOptionCt = ctxSetOption
-           , setInfoCt = ctxSetInfo
-           , declareTypeCt = ctxDeclareType logic
-           , defineTypeCt = ctxDefineType logic
-           , declareFunCt = ctxDeclareFun logic
-           , defineFunCt = ctxDefineFun logic
-           , pushCt = ctxPush
-           , popCt = ctxPop
-           , assertCt = ctxAssert
-           , checkSatCt = ctxCheckSat cmd solvArgs
-           , getAssertionsCt = ctxGetAssertions cmd solvArgs
-           , getValueCt = ctxGetValue cmd solvArgs
-           , getProofCt = ctxGetProof cmd solvArgs
-           , getUnsatCoreCt = ctxGetUnsatCore cmd solvArgs
-           , getInfoCt = ctxGetInfo cmd solvArgs
-           , getOptionCt = ctxGetOption cmd solvArgs
-           , exitCt = ctxExit cmd solvArgs
-           }

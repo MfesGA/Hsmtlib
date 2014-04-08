@@ -5,7 +5,6 @@ Module      : boolector
 -}
 module Boolector(startboolector) where
 
-import           Cmd.ContextCmd
 import           Cmd.OnlineCmd
 import           Cmd.ProcCom.Process
 import           Cmd.ScriptCmd
@@ -29,21 +28,16 @@ boolectorConfigScript =
                , args = ["--smt2", "-d2", "-o STDOUT"]
                }
 
-boolectorConfigContext :: SolverConfig
-boolectorConfigContext =
-         Config { path = "boolector"
-                , args = ["--smt2", "-d2", "-o STDOUT"]
-                }
+
 
 {- |
   Function that initialyzes a boolector Solver.
   It Receives a Mode, an SMT Logic, it can receive a diferent configuration
   for the solver and an anternative path to create the script in Script Mode.
 
-  In Context and Online Mode if a FilePath is passed then it's ignored.
+  In Online Mode if a FilePath is passed then it's ignored.
 -}
 startboolector :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
-startboolector Slv.Context logic sConf _ = startboolectorContext logic sConf
 startboolector Slv.Online logic sConf _ = startboolectorOnline logic sConf
 startboolector Slv.Script logic sConf scriptFilePath =
     startboolectorScript logic sConf scriptFilePath
@@ -106,15 +100,6 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              }
 
 
--- Start boolector Context.
-
-
-startboolectorContext :: String -> Maybe SolverConfig -> IO Solver
-startboolectorContext logic Nothing = startboolectorContext' logic boolectorConfigContext
-startboolectorContext logic (Just conf) = startboolectorContext' logic conf
-
-startboolectorContext' :: String -> SolverConfig -> IO Solver
-startboolectorContext' logic conf = return $ ctxSolver logic (path conf) (args conf)
 
 
 -- Creates the functions for online mode with the process already running.
@@ -164,27 +149,3 @@ scriptSolver srcmd =
          , getOption = scriptGetOption srcmd
          , exit = scriptExit srcmd
          }
-
--- Creates the functions for the context mode.
--- It receives the logic, path of the solver and its arguments.
-ctxSolver :: String -> CmdPath -> Args -> Solver
-ctxSolver logic cmd solvArgs =
-  CtSolver { setLogicCt = ctxSetLogic
-           , setOptionCt = ctxSetOption
-           , setInfoCt = ctxSetInfo
-           , declareTypeCt = ctxDeclareType logic
-           , defineTypeCt = ctxDefineType logic
-           , declareFunCt = ctxDeclareFun logic
-           , defineFunCt = ctxDefineFun logic
-           , pushCt = ctxPush
-           , popCt = ctxPop
-           , assertCt = ctxAssert
-           , checkSatCt = ctxCheckSat cmd solvArgs
-           , getAssertionsCt = ctxGetAssertions cmd solvArgs
-           , getValueCt = ctxGetValue cmd solvArgs
-           , getProofCt = ctxGetProof cmd solvArgs
-           , getUnsatCoreCt = ctxGetUnsatCore cmd solvArgs
-           , getInfoCt = ctxGetInfo cmd solvArgs
-           , getOptionCt = ctxGetOption cmd solvArgs
-           , exitCt = ctxExit cmd solvArgs
-           }

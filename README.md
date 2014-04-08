@@ -10,43 +10,43 @@ Current supported solvers and avaliable interaction modes in each other.
 | Alt-Ergo|        | X      | X       |
 | Yices* | X      | X      | X       |
 | MathSat| X      |        |         |
-| Boolector|      |        |         |
+
 
  (* using yices-smt2 available in: http://yices.csl.sri.com/download-yices2.shtml)
- 
+
 There exists three modes to interact with a solver:
 
 * Online:
- 
+
   > In online Mode a solver is creted and kept running.
-  Commands are sent via pipe one by one and every time one 
+  Commands are sent via pipe one by one and every time one
    is sent it also reads the answer of the solver.
 
 * Script:
 
-    >In script Mode a file is created in a desired file path, 
-    if Nothing is passed then its created in the current directory 
+    >In script Mode a file is created in a desired file path,
+    if Nothing is passed then its created in the current directory
     with the name temp.smt2. If a file already exists then it's overwriten.
-    
-    >The functions in this mode behave in the following manner: 
-    If it's a funcion where something is declared, for example declareFun or 
-    assert then it's only writen to the file. In functions where some feedback 
-    is expected such as checkSat, this are writen to the file, a solver is 
-    created and the file is given to solver, and it waits for the result. 
+
+    >The functions in this mode behave in the following manner:
+    If it's a funcion where something is declared, for example declareFun or
+    assert then it's only writen to the file. In functions where some feedback
+    is expected such as checkSat, this are writen to the file, a solver is
+    created and the file is given to solver, and it waits for the result.
     The result is the result of the last function.
 
 * Context:
 
     >In context Mode two lists are kept, a list with all the commands given and
-    a list that has the results of commands that demand some output 
+    a list that has the results of commands that demand some output
     from the solver.
 
-    >The functions in this mode behave has in script Mode being the diference 
+    >The functions in this mode behave has in script Mode being the diference
     that instead of a file the commands are kept in the list.
-    
+
     >In order to use the context mode it's nedded some special operators that
     aren't nedded in other modes.
-    
+
 
 Example of Online Mode:
 

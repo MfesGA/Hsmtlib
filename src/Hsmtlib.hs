@@ -1,9 +1,9 @@
 {- |
-Module      : Main
+Module      : Hsmtlib
   Main module which provides the function to initialyze a Solver.
 -}
 
-module Hsmtlib(startSolver) where
+module Hsmtlib(startSolver,main) where
 
 import           Cmd.Solver  as Slv
 import           Cvc4        (startCvc4)
@@ -11,6 +11,7 @@ import           Z3          (startZ3)
 import           Yices       (startYices)
 import           MathSAT     (startmathSat)
 import           Altergo     (startaltergo)
+import           Boolector   (startboolector)
 
 {- |  The function to initialialyze a solver.
 The solver can be initialized with a desired configuration, or a diferent
@@ -20,7 +21,7 @@ the default settings.
 There exists three 'Mode's that a solver can be used, Online,
 Context and Script.
 
-In online Mode a solver is creted and kept running. Commands are sent
+In online Mode a solver is created and kept running. Commands are sent
 via pipe one by one and every time one is sent it also reads the answer of the
 solver.
 
@@ -89,5 +90,6 @@ startSolver Cvc4 = startCvc4
 startSolver Yices = startYices
 startSolver Mathsat= startmathSat
 startSolver Altergo= startaltergo
+startSolver Boolector= startboolector
 
 
