@@ -9,7 +9,7 @@ Current supported solvers and avaliable interaction modes in each other.
 | Z3     | X      | X      | X       |
 | Alt-Ergo|        | X      | X       |
 | Yices* | X      | X      | X       |
-| MathSat|        |        |         |
+| MathSat| X      |        |         |
 
  (* using yices-smt2 available in: http://yices.csl.sri.com/download-yices2.shtml)
  
