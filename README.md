@@ -10,6 +10,7 @@ Current supported solvers and avaliable interaction modes in each other.
 | Alt-Ergo|        | X      | X       |
 | Yices* | X      | X      | X       |
 | MathSat| X      |        |         |
+| Boolector|      |        |         |
 
  (* using yices-smt2 available in: http://yices.csl.sri.com/download-yices2.shtml)
  
