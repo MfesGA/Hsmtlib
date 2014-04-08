@@ -10,7 +10,7 @@ import           Cmd.ProcCom.Process
 import           Cmd.ScriptCmd
 import           Cmd.Solver          as Slv
 import           SMTLib2
-import           System.IO
+import           System.IO           (Handle, IOMode (WriteMode), openFile)
 
 -- All the configurations are the same but have diferent names so if anything
 -- changes it's easy to alter its configuration.

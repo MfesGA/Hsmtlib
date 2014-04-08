@@ -3,7 +3,7 @@ Module      : Hsmtlib
   Main module which provides the function to initialyze a Solver.
 -}
 
-module Hsmtlib(startSolver,main) where
+module Hsmtlib(startSolver) where
 
 import           Cmd.Solver  as Slv
 import           Cvc4        (startCvc4)
