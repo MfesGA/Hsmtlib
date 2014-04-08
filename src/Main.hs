@@ -22,7 +22,7 @@ the default settings.
 There exists three 'Mode's that a solver can be used, Online,
 Context and Script.
 
-In online Mode a solver is creted and kept running. Commands are sent
+In online Mode a solver is created and kept running. Commands are sent
 via pipe one by one and every time one is sent it also reads the answer of the
 solver.
 

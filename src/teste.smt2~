@@ -5,3 +5,4 @@
 (declare-fun y () Int)
 (declare-fun f () Int)
 (check-sat)
+(exit)

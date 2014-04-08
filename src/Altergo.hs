@@ -20,19 +20,19 @@ import           System.IO
 altergoConfigOnline :: SolverConfig
 altergoConfigOnline =
         Config { path = "altergo"
-               , args = []
+               , args = ["-v"]
                }
 
 altergoConfigScript :: SolverConfig
 altergoConfigScript =
         Config { path = "altergo"
-               , args = []
+               , args = ["-v"]
                }
 
 altergoConfigContext :: SolverConfig
 altergoConfigContext =
          Config { path = "altergo"
-                , args = []
+                , args = ["-v"]
                 }
 
 {- |

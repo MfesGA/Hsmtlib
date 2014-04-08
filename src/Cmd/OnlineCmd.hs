@@ -14,7 +14,7 @@ import           Text.PrettyPrint
 
 --Uses the function  send from Cmd.Solver to send the command.
 onlineFun ::  Process  -> Command -> IO Result
-onlineFun proc cmd = send proc (render (pp  cmd) ++ "\n")
+onlineFun proc cmd = send proc (render (pp  cmd) ++ "\n\n")
 
 
 --SMT Commands.

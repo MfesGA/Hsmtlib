@@ -19,13 +19,13 @@ import           System.IO
 
 mathSatConfigOnline :: SolverConfig
 mathSatConfigOnline =
-        Config { path = "mathSat"
+        Config { path = "mathsat"
                , args = []
                }
 
 mathSatConfigScript :: SolverConfig
 mathSatConfigScript =
-        Config { path = "mathSat"
+        Config { path = "mathsat"
                , args = []
                }
 

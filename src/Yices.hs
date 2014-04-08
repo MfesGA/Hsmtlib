@@ -153,19 +153,6 @@ onlineSolver process =
          , exit = onlineExit process
          }
 
-yicescheck ::  Process  -> IO Result
-yicescheck proc  = send proc ("(check)" ++ "\n")
-
-writecheckscript sConf = do
-  let scmd = "(check)" ++ "\n"
-  hPutStr (sHandle sConf) scmd
-  hFlush (sHandle sConf)
-
-yicescheckscript :: ScriptConf  -> IO Result
-yicescheckscript sConf  = do
-  writecheckscript sConf 
-  res <- sendScript (sCmdPath sConf) (sArgs sConf) (sFilePath sConf)
-  return $ last $ lines res
 
 -- Creates the funtion for the script mode.
 -- The configuration of the file is passed.
