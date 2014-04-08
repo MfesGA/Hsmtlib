@@ -20,19 +20,19 @@ import           System.IO
 boolectorConfigOnline :: SolverConfig
 boolectorConfigOnline =
         Config { path = "boolector"
-               , args = ["--smt2", "-d2"]
+               , args = ["--smt2", "-d2", "-o STDOUT"]
                }
 
 boolectorConfigScript :: SolverConfig
 boolectorConfigScript =
         Config { path = "boolector"
-               , args = ["--smt2", "-d2"]
+               , args = ["--smt2", "-d2", "-o STDOUT"]
                }
 
 boolectorConfigContext :: SolverConfig
 boolectorConfigContext =
          Config { path = "boolector"
-                , args = ["--smt2", "-d2"]
+                , args = ["--smt2", "-d2", "-o STDOUT"]
                 }
 
 {- |
@@ -59,7 +59,7 @@ startboolectorOnline' logic conf = do
   -- Starts a Z4 Process.
   process <- beginProcess (path conf) (args conf)
   --Set Option to print success after accepting a Command.
-  onlineSetOption process (OptPrintSuccess True)
+  --onlineSetOption process (OptPrintSuccess True)
   -- Sets the SMT Logic.
   onlineSetLogic process (N logic)
   -- Initialize the solver Functions and return them.

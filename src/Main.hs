@@ -9,6 +9,7 @@ import           Cmd.Solver  as Slv
 import           Cvc4        (startCvc4)
 import           SMTLib2
 import           SMTLib2.Int
+import           SMTLib2.BitVector
 import           Z3          (startZ3)
 import           Yices       (startYices)
 import           MathSat     (startmathSat)
@@ -113,6 +114,15 @@ commands solver = do
   declareFun solver (N "f") [] tInt >>= print
   checkSat solver >>= print
   exit solver >>= print
+
+commandsbool :: Solver -> IO ()
+commandsbool solver = do
+  declareFun solver (N "b") [] (tBitVec 5) >>= print
+  declareFun solver (N "c") [] (tBitVec 5) >>= print
+  declareFun solver (N "d") [] (tBitVec 5) >>= print
+  declareFun solver (N "e") [] (tBitVec 5) >>= print
+  checkSat solver >>= print
+  exit solver >>= print
 ---------Boolector fuctions--------------------------------------------
 boolOnline :: IO ()
 boolOnline = do
@@ -132,12 +142,12 @@ boolContext = do
 altOnline :: IO ()
 altOnline = do
   solver <- startSolver Altergo Slv.Online "QF_LIA"  Nothing Nothing
-  commands solver
+  commandsbool solver
 
 altScript :: IO ()
 altScript = do
   solver <- startSolver Altergo Slv.Script "QF_LIA"  Nothing (Just "teste.smt2")
-  commands solver
+  commandsbool solver
 
 altContext :: IO ()
 altContext = do
@@ -158,7 +168,7 @@ mathScript = do
 mathContext :: IO ()
 mathContext = do
   solver <- startSolver Mathsat Slv.Context "QF_LIA" Nothing Nothing
-  commandsScript solver
+  commandsScriptBool solver
 
 -----Yices functions------------------------------
 
@@ -215,6 +225,15 @@ commandsScript solver =
   declareFunCt solver (N "a") [] tInt |*|
   declareFunCt solver (N "x") [] tInt |#|
   declareFunCt solver (N "y") [] tInt |#|
+  checkSatCt solver |#|
+  exitCt solver >>= print
+
+commandsScriptBool :: Solver -> IO ()
+commandsScriptBool solver =
+
+  declareFunCt solver (N "b") [] (tBitVec 5) |*|
+  declareFunCt solver (N "c") [] (tBitVec 5) |#|
+  declareFunCt solver (N "d") [] (tBitVec 5) |#|
   checkSatCt solver |#|
   exitCt solver >>= print
 
