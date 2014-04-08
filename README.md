@@ -14,7 +14,7 @@ Current supported solvers and avaliable interaction modes in each other.
 
  (* using yices-smt2 available in: http://yices.csl.sri.com/download-yices2.shtml)
 
-There exists three modes to interact with a solver:
+There exists two modes to interact with a solver:
 
 * Online:
 
@@ -35,7 +35,7 @@ There exists three modes to interact with a solver:
     created and the file is given to solver, and it waits for the result.
     The result is the result of the last function.
 
-
+* Batch executiton allows the solver to read an entire context and execute it  
 
 
 Example of Online Mode:
