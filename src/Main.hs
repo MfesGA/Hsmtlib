@@ -13,6 +13,7 @@ import           Z3          (startZ3)
 import           Yices       (startYices)
 import           MathSat     (startmathSat)
 import           Altergo     (startaltergo)
+import           Boolector   (startboolector)
 
 {- |  The function to initialialyze a solver.
 The solver can be initialized with a desired configuration, or a diferent
@@ -91,6 +92,7 @@ startSolver Cvc4 = startCvc4
 startSolver Yices = startYices
 startSolver Mathsat= startmathSat
 startSolver Altergo= startaltergo
+startSolver Boolector= startboolector
 
 
 
@@ -111,6 +113,21 @@ commands solver = do
   declareFun solver (N "f") [] tInt >>= print
   checkSat solver >>= print
   exit solver >>= print
+---------Boolector fuctions--------------------------------------------
+boolOnline :: IO ()
+boolOnline = do
+  solver <- startSolver Boolector Slv.Online "QF_BV"  Nothing Nothing
+  commands solver
+
+boolScript :: IO ()
+boolScript = do
+  solver <- startSolver Boolector Slv.Script "QF_BV"  Nothing (Just "teste.smt2")
+  commands solver
+
+boolContext :: IO ()
+boolContext = do
+  solver <- startSolver Boolector Slv.Context "QF_BV" Nothing Nothing
+  commandsScript solver
 ---------Altergo fuctions----------------------------------------------
 altOnline :: IO ()
 altOnline = do

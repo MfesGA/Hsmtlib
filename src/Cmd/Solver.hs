@@ -30,7 +30,7 @@ type Error = String -- We will change the error to a more informative type.
 type Result = String
 
 -- | Sovler's that are currently supported.
-data Solvers = Z3 | Cvc4 | Yices | Mathsat | Altergo
+data Solvers = Z3 | Cvc4 | Yices | Mathsat | Altergo | Boolector
 
 -- | Avaliable modes to use a solver.
 data Mode = Online | Context | Script
