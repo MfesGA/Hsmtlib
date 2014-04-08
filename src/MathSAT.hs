@@ -3,7 +3,7 @@ Module      : mathSat
   Module wich has the standard configuration for all mathSat Modes and
   provides the initilizing function.
 -}
-module MathSat(startmathSat) where
+module MathSAT(startmathSat) where
 
 import           Cmd.ContextCmd
 import           Cmd.OnlineCmd
