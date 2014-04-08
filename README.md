@@ -8,10 +8,11 @@ Current supported solvers and avaliable interaction modes in each other.
 | Cvc4   | X      | X      | X       |
 | Z3     | X      | X      | X       |
 | Altergo|        | X      | X       |
-| Yices* |        | X      | X       |
+| Yices* | X      | X      | X       |
 | MathSat|        |        |         |
 
-* using yices-smt2 available in: http://yices.csl.sri.com/download-yices2.shtml
+ (* using yices-smt2 available in: http://yices.csl.sri.com/download-yices2.shtml)
+ 
 There exists three modes to interact with a solver:
 
 * Online:
