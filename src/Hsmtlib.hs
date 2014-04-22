@@ -14,7 +14,7 @@ import           Hsmtlib.Solvers.Yices     (startYices)
 import           Hsmtlib.Solvers.Z3        (startZ3)
 import           SMTLib2
 import           SMTLib2.Int
-import           HighLevel
+import           Hsmtlib.HighLevel
 
 
 
