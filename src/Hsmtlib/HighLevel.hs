@@ -10,6 +10,7 @@ this function hides the application of a function on the SMT syntax receives the
 functionArg :: Name -> [Expr] -> Expr
 functionArg fun args = (App (I fun []) (Nothing) args)
 
+
 {- |
 this function hides the application of a constant function on the SMT syntax receives the name of the function and gives the corresponding SMT2Lib syntax, the function must be already declared using declareFun
 -}
@@ -28,5 +29,20 @@ this function hides Integers on the SMT syntax receives a integer and gives the 
 literal :: Integer -> Expr
 literal a = (Lit(LitNum a)) 
 
+{- |
+this function allows the user to given a list of expressions make a assert of them giving the SMTLib2 syntax corespondant (auxiliary function for maping)
+-}
+mapassert :: Solver -> [Expr] -> IO ()
+mapassert solver [] = do
+	return () 
+
+mapassert solver (a:as) = do 
+	assert solver a 
+	mapassert solver as
+ {- |
+  this function when giving a solver and a function that gives an Expr and a list of the input type of that function, asserts the map of expressions its particulary useful to say that some set variables are all for example greater than zero 
+-}
+maping :: Solver -> (a -> Expr) -> [a] -> IO ()
+maping solver expr a = mapassert solver  (map expr a) 
 
 
