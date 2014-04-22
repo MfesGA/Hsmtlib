@@ -1,14 +1,6 @@
 module Hsmtlib.HighLevel where
 
-
-
 import           Hsmtlib.Solver            as Slv
-import           Hsmtlib.Solvers.Altergo   (startAltErgo)
-import           Hsmtlib.Solvers.Boolector (startBoolector)
-import           Hsmtlib.Solvers.Cvc4      (startCvc4)
-import           Hsmtlib.Solvers.MathSAT   (startMathSat)
-import           Hsmtlib.Solvers.Yices     (startYices)
-import           Hsmtlib.Solvers.Z3        (startZ3)
 import           SMTLib2
 import           SMTLib2.Int
 
