@@ -1,11 +1,11 @@
-module CmdResponseParser where
+ module Hsmtlib.Solvers.Cmd.Parser.Parsers where
 
-import           CmdResponse                   as CmdRsp
-import           Control.Applicative           as Ctr hiding ((<|>))
+import           Control.Applicative               as Ctr hiding ((<|>))
 import           Control.Monad
 import           Data.Functor.Identity
-import           Text.Parsec.Prim              as Prim
-import           Text.ParserCombinators.Parsec as Pc
+import           Hsmtlib.Solvers.Cmd.Parser.Syntax as CmdRsp
+import           Text.Parsec.Prim                  as Prim
+import           Text.ParserCombinators.Parsec     as Pc
 
 
 
@@ -226,7 +226,7 @@ parseAttribute = do
 -- Parse terms
 
 -- -- Parse Qual identifier
-parseQualIdentifier :: ParsecT [Char] u Identity QualIdentifier
+parseQualIdentifier :: ParsecT String u Identity QualIdentifier
 parseQualIdentifier = Pc.try parseQID <|> parseQIAs
 
 parseQID :: ParsecT String u Identity QualIdentifier
@@ -247,7 +247,7 @@ parseQIAs = do
 
 
 -- -- Parse Var Binding
-parseVarBinding :: ParsecT [Char] u Identity VarBinding
+parseVarBinding :: ParsecT String u Identity VarBinding
 parseVarBinding = do
     aspO
     spaces
@@ -368,11 +368,18 @@ parseCmdGenResponse :: ParsecT String u Identity CmdResponse
 parseCmdGenResponse =
         (string "unsupported" >> return (CmdGenResponse Unsupported))
     <|> (string "success" >> return (CmdGenResponse Success))
-    <|> do string "error"
-           space
-           err <- str
-           return $ CmdGenResponse $ CmdRsp.Error err
+    <|> parseCmdGenRepError
 
+parseCmdGenRepError :: ParsecT String u Identity CmdResponse
+parseCmdGenRepError = do
+                  aspO
+                  string "error"
+                  space
+                  char '"'
+                  cont <- Pc.many (alphaNum<|> char ':'<|> char ' ')
+                  char '"'
+                  aspC
+                  return $ CmdGenResponse $ CmdRsp.Error cont
 
 -- Parsers for CmdGetInfoResponse
 
@@ -389,7 +396,7 @@ parseGetInfoResponse = do
     return infoResp
 
 
-parseInfoResponse :: ParsecT [Char] u Identity InfoResponse
+parseInfoResponse :: ParsecT String u Identity InfoResponse
 parseInfoResponse =
     Pc.try parseResponseName <|>
     Pc.try parseResponseErrorBehavior <|>
@@ -408,6 +415,7 @@ parseResponseName = string "name"  *> space *> liftM ResponseName str
 parseResponseErrorBehavior :: ParsecT String u Identity InfoResponse
 parseResponseErrorBehavior = string "error-behavior" *> space *>
                     liftM ResponseErrorBehavior parseErrorBehavior
+
 parseErrorBehavior :: ParsecT String u Identity ErrorBehavior
 parseErrorBehavior =
     (string "immediate-exit" >> return ImmediateExit) <|>
@@ -432,7 +440,6 @@ parseResponseAttribute = liftM ResponseAttribute parseAttribute
 
 
 -- Parser for check sat response
-
 parseCheckSatResponse :: ParsecT String u Identity CheckSatResponse
 parseCheckSatResponse =
         (string "sat" >> return Sat) <|>
@@ -526,6 +533,6 @@ resultParser = parseCmdGenResponse
 main :: IO a
 main = forever $ do putStrLn "Enter a string: "
                     input <- getLine
-                    parseTest parseGetInfoResponse input
+                    parseTest parseCmdGenResponse input
                     --parseIdentifier
                     --parseTest parseTerm input

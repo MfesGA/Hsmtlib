@@ -5,13 +5,17 @@ Module      : Hsmtlib
 
 module Hsmtlib(startSolver) where
 
-import           Cmd.Solver  as Slv
-import           Cvc4        (startCvc4)
-import           Z3          (startZ3)
-import           Yices       (startYices)
-import           MathSAT     (startmathSat)
-import           Altergo     (startaltergo)
-import           Boolector   (startboolector)
+import           Hsmtlib.Solver            as Slv
+import           Hsmtlib.Solvers.Altergo   (startAltErgo)
+import           Hsmtlib.Solvers.Boolector (startBoolector)
+import           Hsmtlib.Solvers.Cvc4      (startCvc4)
+import           Hsmtlib.Solvers.MathSAT   (startMathSat)
+import           Hsmtlib.Solvers.Yices     (startYices)
+import           Hsmtlib.Solvers.Z3        (startZ3)
+import           SMTLib2
+import           SMTLib2.Int
+
+
 
 {- |  The function to initialialyze a solver.
 The solver can be initialized with a desired configuration, or a diferent
@@ -88,8 +92,19 @@ startSolver :: Solvers-- ^ Avaliable'Solvers'.
 startSolver Z3 = startZ3
 startSolver Cvc4 = startCvc4
 startSolver Yices = startYices
-startSolver Mathsat= startmathSat
-startSolver Altergo= startaltergo
-startSolver Boolector= startboolector
+startSolver Mathsat= startMathSat
+startSolver Altergo= startAltErgo
+startSolver Boolector= startBoolector
 
 
+main :: IO ()
+main = do
+  solver <- startSolver Z3 Online "QF_LIA"  Nothing Nothing
+  setLogic solver (N "QF_LIA") >>= print
+  declareFun solver (N "a") [] tInt >>= print
+  declareFun solver (N "x") [] tInt >>= print
+  declareFun solver (N "y") [] tInt >>= print
+  declareFun solver (N "f") [] tInt >>= print
+  getAssertions solver >>= print
+  checkSat solver >>= print
+  exit solver >>= print

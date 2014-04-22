@@ -10,7 +10,7 @@ name:                Hsmtlib
 -- PVP summary:      +-+------- breaking API changes
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
-version:             0.1.1.0
+version:             0.2.0.0
 
 -- A short (one-line) description of the package.
 synopsis:            Haskell library for easy interaction with SMT-LIB 2 compliant solvers.
@@ -32,12 +32,12 @@ author:              Nuno Laranjo and Rogerio Pontes
 
 -- An email address to which users can send suggestions, bug reports, and
 -- patches.
-maintainer:          numicola@gmail.com rogeriop062@gmail.com
+maintainer:          numicola@gmail.com and rogeriop062@gmail.com
 
 -- A copyright notice.
 -- copyright:
 
-category:            SMT
+-- category:
 
 build-type:          Simple
 
@@ -47,10 +47,10 @@ cabal-version:       >=1.8
 
 library
   -- Modules exported by the library.
-  exposed-modules:     Z3, Yices, MathSAT, Hsmtlib, Cvc4, Boolector, Altergo, Cmd.BatchCmd, Cmd.Solver, Cmd.ScriptCmd, Cmd.OnlineCmd, Cmd.ProcCom.Process
+  exposed-modules:     Hsmtlib, Hsmtlib.Solver, Hsmtlib.Solvers.Z3, Hsmtlib.Solvers.Yices, Hsmtlib.Solvers.MathSAT, Hsmtlib.Solvers.Cvc4, Hsmtlib.Solvers.Boolector, Hsmtlib.Solvers.Altergo, Hsmtlib.Solvers.Cmd.ScriptCmd, Hsmtlib.Solvers.Cmd.OnlineCmd, Hsmtlib.Solvers.Cmd.BatchCmd, Hsmtlib.Solvers.Cmd.ProcCom.Process, Hsmtlib.Solvers.Cmd.Parser.Syntax, Hsmtlib.Solvers.Cmd.Parser.Parsers, Hsmtlib.Solvers.Cmd.Parser.CmdResult
 
   -- Modules included in this library but not exported.
   -- other-modules:
 
   -- Other library packages from which modules are imported.
-  build-depends:       base ==4.6.*, smtLib ==1.0.*, pretty ==1.1.*, process ==1.1.*
+  build-depends:       base ==4.6.*, smtLib ==1.0.*, pretty ==1.1.*, process ==1.1.*, transformers ==0.3.*, parsec ==3.1.*

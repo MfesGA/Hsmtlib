@@ -1,82 +1,86 @@
 {- |
-Module      : boolector
-  Module wich has the standard configuration for all boolector Modes and
+Module      : Yices
+  Module wich has the standard configuration for all Yices Modes and
   provides the initilizing function.
 -}
-module Boolector(startboolector) where
+module Hsmtlib.Solvers.Yices(startYices) where
 
-import           Cmd.BatchCmd        as B (executeBatch)
-import           Cmd.OnlineCmd
-import           Cmd.ProcCom.Process
-import           Cmd.ScriptCmd
-import           Cmd.Solver          as Slv
+import           Hsmtlib.Solver                      as Slv
+import           Hsmtlib.Solvers.Cmd.BatchCmd        as B (executeBatch)
+import           Hsmtlib.Solvers.Cmd.OnlineCmd
+import           Hsmtlib.Solvers.Cmd.ProcCom.Process
+import           Hsmtlib.Solvers.Cmd.ScriptCmd
 import           SMTLib2
-import           System.IO           (Handle, IOMode (WriteMode), openFile)
+import           System.IO                           (Handle,
+                                                      IOMode (WriteMode),
+                                                      openFile)
 
--- All the configurations are the same but have diferent names so if anything
--- changes it's easy to alter its configuration.
 
+yicesConfigOnline :: SolverConfig
+yicesConfigOnline =
+    Config { path = "yices-smt2"
+           , args = [ "--interactive"]
+           }
 
-boolectorConfigOnline :: SolverConfig
-boolectorConfigOnline =
-        Config { path = "boolector"
-               , args = ["--smt2", "-d2", "-o STDOUT"]
+-- Script configurations is the same but has diferent names
+-- so if anything  changes it's easy to alter its configuration.
+
+yicesConfigScript :: SolverConfig
+yicesConfigScript =
+    Config { path = "yices-smt2"
+           , args = []
+           }
+
+yicesConfigBatch :: SolverConfig
+yicesConfigBatch =
+        Config { path = "yices-smt2"
+               , args = []
                }
-
-boolectorConfigScript :: SolverConfig
-boolectorConfigScript =
-        Config { path = "boolector"
-               , args = ["--smt2", "-d2", "-o STDOUT"]
-               }
-
-boolectorConfigBatch :: SolverConfig
-boolectorConfigBatch =
-        Config { path = "boolector"
-               , args = ["--smt2", "-d2", "-o STDOUT"]
-               }
-
 
 {- |
-  Function that initialyzes a boolector Solver.
+  Function that initialyzes a Yices Solver.
   It Receives a Mode, an SMT Logic, it can receive a diferent configuration
   for the solver and an anternative path to create the script in Script Mode.
 
   In Online Mode if a FilePath is passed then it's ignored.
 -}
-startboolector :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
-startboolector Slv.Batch logic sConf _ = startBoolectorBatch logic sConf
-startboolector Slv.Online logic sConf _ = startboolectorOnline logic sConf
-startboolector Slv.Script logic sConf scriptFilePath =
-    startboolectorScript logic sConf scriptFilePath
+startYices :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
+startYices Slv.Batch logic sConf _ = startYicesBatch logic sConf
+startYices Slv.Online logic sConf _ = startYicesOnline logic sConf
+startYices Slv.Script logic sConf scriptFilePath =
+    startYicesScript logic sConf scriptFilePath
 
--- Start boolector Online.
 
-startboolectorOnline :: String -> Maybe SolverConfig -> IO Solver
-startboolectorOnline logic Nothing = startboolectorOnline' logic boolectorConfigOnline
-startboolectorOnline logic (Just conf) = startboolectorOnline' logic conf
 
-startboolectorOnline' :: String -> SolverConfig -> IO Solver
-startboolectorOnline' logic conf = do
-  -- Starts a Z4 Process.
+-- Start Yices Online.
+
+startYicesOnline :: String -> Maybe SolverConfig -> IO Solver
+startYicesOnline logic Nothing =  startYicesOnline' logic yicesConfigOnline
+startYicesOnline logic (Just conf) = startYicesOnline' logic conf
+
+startYicesOnline':: String -> SolverConfig -> IO Solver
+startYicesOnline' logic conf = do
+  -- Starts a Yices Process.
   process <- beginProcess (path conf) (args conf)
   --Set Option to print success after accepting a Command.
-  --onlineSetOption process (OptPrintSuccess True)
+  onlineSetOption process (OptPrintSuccess True)
   -- Sets the SMT Logic.
   onlineSetLogic process (N logic)
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 
---Start boolector Script.
 
-startboolectorScript :: String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
-startboolectorScript logic Nothing Nothing =
-    startboolectorScript' logic boolectorConfigScript "temp.smt2"
-startboolectorScript logic (Just conf) Nothing =
-    startboolectorScript' logic conf "temp.smt2"
-startboolectorScript logic Nothing (Just scriptFilePath) =
-    startboolectorScript' logic boolectorConfigScript scriptFilePath
-startboolectorScript logic (Just conf) (Just scriptFilePath) =
-    startboolectorScript' logic conf scriptFilePath
+--Start Yices Script.
+
+startYicesScript :: String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
+startYicesScript logic Nothing Nothing =
+    startYicesScript' logic yicesConfigScript "temp.smt2"
+startYicesScript logic (Just conf) Nothing =
+    startYicesScript' logic conf "temp.smt2"
+startYicesScript  logic Nothing (Just scriptFilePath) =
+    startYicesScript' logic yicesConfigScript scriptFilePath
+startYicesScript logic (Just conf) (Just scriptFilePath) =
+    startYicesScript' logic conf scriptFilePath
 
 {-
   In this function a file is created where the commands are kept.
@@ -89,11 +93,17 @@ startboolectorScript logic (Just conf) (Just scriptFilePath) =
   - sFilePath: The file path of the script so it can be passed to the solver
                when started.
 -}
-startboolectorScript' :: String -> SolverConfig -> FilePath -> IO Solver
-startboolectorScript' logic conf scriptFilePath = do
+startYicesScript' :: String -> SolverConfig -> FilePath -> IO Solver
+startYicesScript' logic conf scriptFilePath = do
+  -- Create a file with the give file path.
+  -- Since the handle is created with WriteMode it overrides a file if it
+  -- already exists.
   scriptHandle <- openFile scriptFilePath WriteMode
+  -- Creates the arguments for the functions in ScriptCmd
   let srcmd = newScriptArgs conf scriptHandle scriptFilePath
+  --Set Option to print success after accepting a Command.
   scriptSetOption srcmd (OptPrintSuccess True)
+  -- Initialize the solver Functions and return them.
   scriptSetLogic srcmd (N logic)
   return $ scriptSolver srcmd
 
@@ -106,14 +116,14 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              , sFilePath  = scriptFilePath
              }
 
--- Start Booleactor batch
-startBoolectorBatch :: String -> Maybe SolverConfig -> IO Solver
-startBoolectorBatch logic Nothing =
-  startBoolectorBatch' logic boolectorConfigBatch
-startBoolectorBatch logic (Just conf) = startBoolectorBatch' logic conf
+-- start Yices solver
 
-startBoolectorBatch' :: String -> SolverConfig -> IO Solver
-startBoolectorBatch' logic conf = return $ batchSolver logic conf
+startYicesBatch :: String -> Maybe SolverConfig -> IO Solver
+startYicesBatch logic Nothing = startYicesBatch' logic yicesConfigBatch
+startYicesBatch logic (Just conf) = startYicesBatch' logic conf
+
+startYicesBatch' :: String -> SolverConfig -> IO Solver
+startYicesBatch' logic conf = return $ batchSolver logic conf
 
 
 -- Creates the functions for online mode with the process already running.
@@ -139,6 +149,7 @@ onlineSolver process =
          , getOption = onlineGetOption process
          , exit = onlineExit process
          }
+
 
 -- Creates the funtion for the script mode.
 -- The configuration of the file is passed.

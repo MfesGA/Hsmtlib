@@ -1,68 +1,73 @@
 {- |
-Module      : Cvc4
-  Module wich has the standard configuration for all Cvc4 Modes and
+Module      : altergo
+  Module wich has the standard configuration for all altergo Modes and
   provides the initilizing function.
 -}
-module Cvc4(startCvc4) where
+module Hsmtlib.Solvers.Altergo(startAltErgo) where
 
-
-import           Cmd.BatchCmd        as B (executeBatch)
-import           Cmd.OnlineCmd
-import           Cmd.ProcCom.Process
-import           Cmd.ScriptCmd
-import           Cmd.Solver          as Slv
+import           Hsmtlib.Solver                      as Slv
+import           Hsmtlib.Solvers.Cmd.BatchCmd        as B (executeBatch)
+import           Hsmtlib.Solvers.Cmd.OnlineCmd
+import           Hsmtlib.Solvers.Cmd.ProcCom.Process
+import           Hsmtlib.Solvers.Cmd.ScriptCmd
 import           SMTLib2
-import           System.IO           (Handle, IOMode (WriteMode), openFile)
+import           System.IO                           (Handle,
+                                                      IOMode (WriteMode),
+                                                      openFile)
 
-{-
-    TODO: Why the flag --status frezzes the process.
--}
 
-cvc4ConfigOnline :: SolverConfig
-cvc4ConfigOnline =
-    Config { path = "cvc4"
-           , args = ["--interactive", "--lang=smt2", "--quiet"]
-           }
+-- All the configurations are the same but have diferent names so if anything
+-- changes it's easy to alter its configuration.
 
--- Both Script configurations are the same but have diferent names
--- so if anything  changes it's easy to alter its configuration.
 
-cvc4ConfigScript :: SolverConfig
-cvc4ConfigScript =
-    Config { path = "cvc4"
-           , args = ["--lang=smt2"]
-           }
-
-cvc4ConfigBatch :: SolverConfig
-cvc4ConfigBatch =
-        Config { path = "cvc4"
-               , args = ["--lang=smt2"]
+altErgoConfigOnline :: SolverConfig
+altErgoConfigOnline =
+        Config { path = "altergo"
+               , args = ["-v"]
                }
 
+altErgoConfigScript :: SolverConfig
+altErgoConfigScript =
+        Config { path = "altergo"
+               , args = ["-v"]
+               }
+
+altErgoConfigBatch :: SolverConfig
+altErgoConfigBatch =
+        Config { path = "altergo"
+               , args = ["-v"]
+               }
+
+
+
 {- |
-  Function that initialyzes a Cvc4 Solver.
+  Function that initialyzes a altergo Solver.
   It Receives a Mode, an SMT Logic, it can receive a diferent configuration
   for the solver and an anternative path to create the script in Script Mode.
 
-  In Context and Online Mode if a FilePath is passed then it's ignored.
+  In Online Mode if a FilePath is passed then it's ignored.
 -}
-startCvc4 :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
-startCvc4 Slv.Batch logic sConf _ = startCvc4Batch logic sConf
-startCvc4 Slv.Online logic sConf _ = startCvc4Online logic sConf
-startCvc4 Slv.Script logic sConf scriptFilePath =
-    startCvc4Script logic sConf scriptFilePath
+startAltErgo :: Mode
+             -> String
+             -> Maybe SolverConfig
+             -> Maybe FilePath
+             -> IO Solver
 
+startAltErgo Slv.Batch logic sConf _ = startAltErgoBatch logic sConf
+startAltErgo Slv.Online logic sConf _ = startAltErgoOnline logic sConf
+startAltErgo Slv.Script logic sConf scriptFilePath =
+    startAltErgoScript logic sConf scriptFilePath
 
+-- Start altergo Online.
 
--- Start Cvc4 Online.
+startAltErgoOnline :: String -> Maybe SolverConfig -> IO Solver
+startAltErgoOnline logic Nothing =
+  startAltErgoOnline' logic altErgoConfigOnline
+startAltErgoOnline logic (Just conf) = startAltErgoOnline' logic conf
 
-startCvc4Online :: String -> Maybe SolverConfig -> IO Solver
-startCvc4Online logic Nothing =  startCvc4Online' logic cvc4ConfigOnline
-startCvc4Online logic (Just conf) = startCvc4Online' logic conf
-
-startCvc4Online':: String -> SolverConfig -> IO Solver
-startCvc4Online' logic conf = do
-  -- Starts a Cvc4 Process.
+startAltErgoOnline' :: String -> SolverConfig -> IO Solver
+startAltErgoOnline' logic conf = do
+  -- Starts a Z4 Process.
   process <- beginProcess (path conf) (args conf)
   --Set Option to print success after accepting a Command.
   onlineSetOption process (OptPrintSuccess True)
@@ -71,18 +76,17 @@ startCvc4Online' logic conf = do
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 
+--Start altergo Script.
 
---Start Cvc4 Script.
-
-startCvc4Script :: String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
-startCvc4Script logic Nothing Nothing =
-    startCvc4Script' logic cvc4ConfigScript "temp.smt2"
-startCvc4Script logic (Just conf) Nothing =
-    startCvc4Script' logic conf "temp.smt2"
-startCvc4Script  logic Nothing (Just scriptFilePath) =
-    startCvc4Script' logic cvc4ConfigScript scriptFilePath
-startCvc4Script logic (Just conf) (Just scriptFilePath) =
-    startCvc4Script' logic conf scriptFilePath
+startAltErgoScript :: String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
+startAltErgoScript logic Nothing Nothing =
+    startAltErgoScript' logic altErgoConfigScript "temp.smt2"
+startAltErgoScript logic (Just conf) Nothing =
+    startAltErgoScript' logic conf "temp.smt2"
+startAltErgoScript logic Nothing (Just scriptFilePath) =
+    startAltErgoScript' logic altErgoConfigScript scriptFilePath
+startAltErgoScript logic (Just conf) (Just scriptFilePath) =
+    startAltErgoScript' logic conf scriptFilePath
 
 {-
   In this function a file is created where the commands are kept.
@@ -95,17 +99,11 @@ startCvc4Script logic (Just conf) (Just scriptFilePath) =
   - sFilePath: The file path of the script so it can be passed to the solver
                when started.
 -}
-startCvc4Script' :: String -> SolverConfig -> FilePath -> IO Solver
-startCvc4Script' logic conf scriptFilePath = do
-  -- Create a file with the give file path.
-  -- Since the handle is created with WriteMode it overrides a file if it
-  -- already exists.
+startAltErgoScript' :: String -> SolverConfig -> FilePath -> IO Solver
+startAltErgoScript' logic conf scriptFilePath = do
   scriptHandle <- openFile scriptFilePath WriteMode
-  -- Creates the arguments for the functions in ScriptCmd
   let srcmd = newScriptArgs conf scriptHandle scriptFilePath
-  --Set Option to print success after accepting a Command.
   scriptSetOption srcmd (OptPrintSuccess True)
-  -- Initialize the solver Functions and return them.
   scriptSetLogic srcmd (N logic)
   return $ scriptSolver srcmd
 
@@ -118,15 +116,13 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              , sFilePath  = scriptFilePath
              }
 
+-- start Alt-Ergo Batch
+startAltErgoBatch :: String -> Maybe SolverConfig -> IO Solver
+startAltErgoBatch logic Nothing = startAltErgoBatch' logic altErgoConfigBatch
+startAltErgoBatch logic (Just conf) = startAltErgoBatch' logic conf
 
--- start Cvc4 Batch
-startCvc4Batch :: String -> Maybe SolverConfig -> IO Solver
-startCvc4Batch logic Nothing = startCvc4Batch' logic cvc4ConfigBatch
-startCvc4Batch logic (Just conf) = startCvc4Batch' logic conf
-
-startCvc4Batch' :: String -> SolverConfig -> IO Solver
-startCvc4Batch' logic conf = return $ batchSolver logic conf
-
+startAltErgoBatch' :: String -> SolverConfig -> IO Solver
+startAltErgoBatch' logic config = return $ batchSolver logic config
 
 
 -- Creates the functions for online mode with the process already running.
@@ -177,7 +173,6 @@ scriptSolver srcmd =
          , exit = scriptExit srcmd
          }
 
-
-batchSolver :: String -> SolverConfig -> Solver
+batchSolver :: String -> SolverConfig  -> Solver
 batchSolver logic config =
   BSolver { Slv.executeBatch = B.executeBatch (path config) (args config) logic}

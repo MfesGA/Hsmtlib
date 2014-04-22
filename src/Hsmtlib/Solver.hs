@@ -3,10 +3,9 @@ Module      : Solver
   This module has most types,data and functions that a user might need to
   utilize the library.
 -}
-module Cmd.Solver where
+module Hsmtlib.Solver where
 
 import           SMTLib2
-import           Text.PrettyPrint
 
 {-|
  Placeholder type that later on will be changed to a more complex type.
@@ -28,14 +27,23 @@ type Error = String -- We will change the error to a more informative type.
   We still aren't sure what should  be the correct result, maybe a tuple:
   (Sexp, [Error])
 -}
-type Result = String
+
+
+data Result = Success
+            | Unsupported
+            | Error String
+            | Sat
+            | Unsat
+            | Unknown
+            | UError String
+            deriving (Show)
+
 
 -- | Sovler's that are currently supported.
 data Solvers = Z3 | Cvc4 | Yices | Mathsat | Altergo | Boolector
 
 -- | Avaliable modes to use a solver.
 data Mode = Online | Script | Batch
-
 
 {- |
   Alternative configuration of a solver which can be passed in the function
@@ -62,16 +70,16 @@ data Solver = Solver
     , pop           :: Integer -> IO Result
     , assert        :: Expr -> IO Result
     , checkSat      :: IO Result
-    , getAssertions :: IO Result
-    , getValue      :: [Expr] -> IO Result
-    , getProof      :: IO Result
-    , getUnsatCore  :: IO Result
-    , getInfo       :: InfoFlag -> IO Result
-    , getOption     :: Name -> IO Result
-    , exit          :: IO Result
+    , getAssertions :: IO String
+    , getValue      :: [Expr] -> IO String
+    , getProof      :: IO String
+    , getUnsatCore  :: IO String
+    , getInfo       :: InfoFlag -> IO String
+    , getOption     :: Name -> IO String
+    , exit          :: IO String
     }
     | BSolver
-    { executeBatch  :: [Command] -> IO Result }
+    { executeBatch  :: [Command] -> IO String }
 
 
 

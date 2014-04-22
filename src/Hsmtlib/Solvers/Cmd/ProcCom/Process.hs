@@ -4,7 +4,7 @@ Module      : Process
   The following module contains method that facilitate the comunication with
   the SMTSolvers.
 -}
-module Cmd.ProcCom.Process
+module Hsmtlib.Solvers.Cmd.ProcCom.Process
     ( beginProcess
     , send
     , endProcess

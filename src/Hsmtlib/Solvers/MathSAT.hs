@@ -1,64 +1,70 @@
 {- |
-Module      : altergo
-  Module wich has the standard configuration for all altergo Modes and
+Module      : mathSat
+  Module wich has the standard configuration for all mathSat Modes and
   provides the initilizing function.
 -}
-module Altergo(startaltergo) where
+module Hsmtlib.Solvers.MathSAT(startMathSat) where
 
-import           Cmd.OnlineCmd
-import           Cmd.ProcCom.Process
-import           Cmd.ScriptCmd
-import           Cmd.Solver          as Slv
-import           Cmd.BatchCmd as B(executeBatch)
+import           Hsmtlib.Solver                      as Slv
+import           Hsmtlib.Solvers.Cmd.BatchCmd        as B (executeBatch)
+import           Hsmtlib.Solvers.Cmd.OnlineCmd
+import           Hsmtlib.Solvers.Cmd.ProcCom.Process
+import           Hsmtlib.Solvers.Cmd.ScriptCmd
 import           SMTLib2
-import           System.IO(Handle, IOMode (WriteMode), openFile)
-
+import           System.IO                           (Handle,
+                                                      IOMode (WriteMode),
+                                                      openFile)
 
 -- All the configurations are the same but have diferent names so if anything
 -- changes it's easy to alter its configuration.
 
 
-altergoConfigOnline :: SolverConfig
-altergoConfigOnline =
-        Config { path = "altergo"
-               , args = ["-v"]
+mathSatConfigOnline :: SolverConfig
+mathSatConfigOnline =
+        Config { path = "mathsat"
+               , args = []
                }
 
-altergoConfigScript :: SolverConfig
-altergoConfigScript =
-        Config { path = "altergo"
-               , args = ["-v"]
+mathSatConfigScript :: SolverConfig
+mathSatConfigScript =
+        Config { path = "mathsat"
+               , args = []
                }
 
-altergoConfigBatch :: SolverConfig
-altergoConfigBatch =
-        Config { path = "altergo"
-               , args = ["-v"]
+mathSatConfigBatch :: SolverConfig
+mathSatConfigBatch =
+        Config { path = "mathsat"
+               , args = []
                }
-
-
 
 {- |
-  Function that initialyzes a altergo Solver.
+  Function that initialyzes a mathSat Solver.
   It Receives a Mode, an SMT Logic, it can receive a diferent configuration
   for the solver and an anternative path to create the script in Script Mode.
 
   In Online Mode if a FilePath is passed then it's ignored.
 -}
-startaltergo :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
-startaltergo Slv.Batch logic sConf _ = startaltergoBatch logic sConf
-startaltergo Slv.Online logic sConf _ = startaltergoOnline logic sConf
-startaltergo Slv.Script logic sConf scriptFilePath =
-    startaltergoScript logic sConf scriptFilePath
+startMathSat :: Mode
+             -> String
+             -> Maybe SolverConfig
+             -> Maybe FilePath
+             -> IO Solver
 
--- Start altergo Online.
+startMathSat Slv.Batch logic sConf _ = startMathSatBatch logic sConf
+startMathSat Slv.Online logic sConf _ = startMathSatOnline logic sConf
+startMathSat Slv.Script logic sConf scriptFilePath =
+    startMathSatScript logic sConf scriptFilePath
 
-startaltergoOnline :: String -> Maybe SolverConfig -> IO Solver
-startaltergoOnline logic Nothing = startaltergoOnline' logic altergoConfigOnline
-startaltergoOnline logic (Just conf) = startaltergoOnline' logic conf
+-- Start mathSat Online.
 
-startaltergoOnline' :: String -> SolverConfig -> IO Solver
-startaltergoOnline' logic conf = do
+startMathSatOnline :: String -> Maybe SolverConfig -> IO Solver
+startMathSatOnline logic Nothing =
+  startMathSatOnline' logic mathSatConfigOnline
+
+startMathSatOnline logic (Just conf) = startMathSatOnline' logic conf
+
+startMathSatOnline' :: String -> SolverConfig -> IO Solver
+startMathSatOnline' logic conf = do
   -- Starts a Z4 Process.
   process <- beginProcess (path conf) (args conf)
   --Set Option to print success after accepting a Command.
@@ -68,17 +74,17 @@ startaltergoOnline' logic conf = do
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 
---Start altergo Script.
+--Start mathSat Script.
 
-startaltergoScript :: String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
-startaltergoScript logic Nothing Nothing =
-    startaltergoScript' logic altergoConfigScript "temp.smt2"
-startaltergoScript logic (Just conf) Nothing =
-    startaltergoScript' logic conf "temp.smt2"
-startaltergoScript logic Nothing (Just scriptFilePath) =
-    startaltergoScript' logic altergoConfigScript scriptFilePath
-startaltergoScript logic (Just conf) (Just scriptFilePath) =
-    startaltergoScript' logic conf scriptFilePath
+startMathSatScript :: String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
+startMathSatScript logic Nothing Nothing =
+    startMathSatScript' logic mathSatConfigScript "temp.smt2"
+startMathSatScript logic (Just conf) Nothing =
+    startMathSatScript' logic conf "temp.smt2"
+startMathSatScript logic Nothing (Just scriptFilePath) =
+    startMathSatScript' logic mathSatConfigScript scriptFilePath
+startMathSatScript logic (Just conf) (Just scriptFilePath) =
+    startMathSatScript' logic conf scriptFilePath
 
 {-
   In this function a file is created where the commands are kept.
@@ -91,8 +97,8 @@ startaltergoScript logic (Just conf) (Just scriptFilePath) =
   - sFilePath: The file path of the script so it can be passed to the solver
                when started.
 -}
-startaltergoScript' :: String -> SolverConfig -> FilePath -> IO Solver
-startaltergoScript' logic conf scriptFilePath = do
+startMathSatScript' :: String -> SolverConfig -> FilePath -> IO Solver
+startMathSatScript' logic conf scriptFilePath = do
   scriptHandle <- openFile scriptFilePath WriteMode
   let srcmd = newScriptArgs conf scriptHandle scriptFilePath
   scriptSetOption srcmd (OptPrintSuccess True)
@@ -108,13 +114,19 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              , sFilePath  = scriptFilePath
              }
 
--- start Alt-Ergo Batch
-startaltergoBatch :: String -> Maybe SolverConfig -> IO Solver
-startaltergoBatch logic Nothing = startaltergoBatch' logic altergoConfigBatch
-startaltergoBatch logic (Just conf) = startaltergoBatch' logic conf
 
-startaltergoBatch' :: String -> SolverConfig -> IO Solver
-startaltergoBatch' logic config = return $ batchSolver logic config
+-- Start MathSat batch mode
+
+startMathSatBatch :: String -> Maybe SolverConfig -> IO Solver
+startMathSatBatch logic Nothing = startMathSatBatch' logic mathSatConfigBatch
+startMathSatBatch logic (Just conf) = startMathSatBatch' logic conf
+
+startMathSatBatch' :: String -> SolverConfig -> IO Solver
+startMathSatBatch' logic conf = return $ batchSolver logic conf
+
+
+
+
 
 
 -- Creates the functions for online mode with the process already running.
@@ -165,6 +177,7 @@ scriptSolver srcmd =
          , exit = scriptExit srcmd
          }
 
-batchSolver :: String -> SolverConfig  -> Solver
+
+batchSolver :: String -> SolverConfig -> Solver
 batchSolver logic config =
   BSolver { Slv.executeBatch = B.executeBatch (path config) (args config) logic}
