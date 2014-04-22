@@ -14,6 +14,7 @@ import           Hsmtlib.Solvers.Yices     (startYices)
 import           Hsmtlib.Solvers.Z3        (startZ3)
 import           SMTLib2
 import           SMTLib2.Int
+import           HighLevel
 
 
 
@@ -22,8 +23,8 @@ The solver can be initialized with a desired configuration, or a diferent
 Path to keep the script in Script Mode, if Nothing is passed then it will use
 the default settings.
 
-There exists three 'Mode's that a solver can be used, Online,
-Context and Script.
+There exists two'Mode's that a solver can be used, Online,
+ and Script.
 
 In online Mode a solver is created and kept running. Commands are sent
 via pipe one by one and every time one is sent it also reads the answer of the
@@ -33,7 +34,7 @@ In script 'Mode' a file is created in a desired file path, if Nothing is passed
 then its created in the current directory with the name temp.smt2.
 If a file already exists then it's overwriten.
 
-The functions in this mode behave in the following manner:
+The functions in this mode (Script) behave in the following manner:
 If it's a funcion where something is declared, for example declareFun or assert
 then it's only writen to the file. In functions where some feedback is expected
 such as checkSat, this are writen to the file, a solver is created and the
