@@ -3,6 +3,8 @@ module Sudoku where
 
 import           SMTLib2
 import           SMTLib2.Int
+import           SMTLib2.Array
+import           SMTLib2.Core
 import           Hsmtlib
 import           Hsmtlib.HighLevel
 import           Hsmtlib.Solver     as Slv
@@ -13,51 +15,36 @@ import           Hsmtlib.Solvers.MathSAT   (startMathSat)
 import           Hsmtlib.Solvers.Yices     (startYices)
 import           Hsmtlib.Solvers.Z3        (startZ3)
 
+ct a = constant a
 
-mapassert solver [] = do
-	return () 
 
-mapassert solver (a:as) = do 
-	assert solver a 
-	mapassert solver as
- 
-maping :: Solver -> (a -> Expr) -> [a] -> IO ()
-maping solver expr a = mapassert solver  (map expr a) 
+
 
 mapeia2 :: Solver -> (a -> Expr) -> [a] -> IO ([IO (Result)])
 mapeia2 solver expr a = return $ map (assert solver) (map expr a)
 
-testa:: IO()
-testa = do 
-	solver <- startZ3 Slv.Script "QF_AUFLIA" Nothing (Just "test.hs")
-	declareFun solver (N "a") [] tInt >>= print
-  	declareFun solver (N "x") [] tInt >>= print
-  	declareFun solver (N "y") [] tInt >>= print
-  	declareFun solver (N "f") [] tInt >>= print	
-	maping solver (nGeq (literal 0)) [constant "a", constant "x"] >>= print 
-	exit solver >>=print
 
 
 cria:: IO()
 cria = do 
-	solver <- startZ3 Slv.Script "QF_NIA" Nothing (Just "te.smt2")
+	solver <- startYices Slv.Script "QF_NIA" Nothing (Just "te.smt2")
 	setOption solver (OptProduceModels True)
-	declareFun solver (N "x11") [] tInt 
-	declareFun solver (N "x12") [] tInt 
-	declareFun solver (N "x13") [] tInt
-	declareFun solver (N "x14") [] tInt
-	declareFun solver (N "x21") [] tInt 
-	declareFun solver (N "x22") [] tInt 
-	declareFun solver (N "x23") [] tInt
-	declareFun solver (N "x24") [] tInt
-	declareFun solver (N "x31") [] tInt 
-	declareFun solver (N "x32") [] tInt 
-	declareFun solver (N "x33") [] tInt
-	declareFun solver (N "x34") [] tInt
-	declareFun solver (N "x41") [] tInt 
-	declareFun solver (N "x42") [] tInt 
-	declareFun solver (N "x43") [] tInt
-	declareFun solver (N "x44") [] tInt  
+	declConst solver "x11" tInt 
+	declConst solver "x12" tInt 
+	declConst solver "x13" tInt
+	declConst solver "x14" tInt
+	declConst solver "x21" tInt 
+	declConst solver "x22" tInt 
+	declConst solver "x23" tInt
+	declConst solver "x24" tInt
+	declConst solver "x31" tInt 
+	declConst solver "x32" tInt 
+	declConst solver "x33" tInt
+	declConst solver "x34" tInt
+	declConst solver "x41" tInt 
+	declConst solver "x42" tInt 
+	declConst solver "x43" tInt
+	declConst solver "x44" tInt  
   	assertDistinct solver [constant "x11", constant "x12", constant "x13", constant "x14"] >>=print 
 	assertDistinct solver [constant "x21", constant "x22", constant "x23", constant "x24"] >>=print 
 	assertDistinct solver [constant "x31", constant "x32", constant "x33", constant "x34"] >>=print 

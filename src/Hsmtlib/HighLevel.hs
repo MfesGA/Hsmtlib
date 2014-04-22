@@ -45,4 +45,23 @@ mapassert solver (a:as) = do
 maping :: Solver -> (a -> Expr) -> [a] -> IO ()
 maping solver expr a = mapassert solver  (map expr a) 
 
+{- |
+this function hides the name creation on the SMT syntax receives a string  and gives the corresponding SMT2Lib syntax for declaring a function 
+-}
+declFun :: Solver -> String -> [Type] -> Type -> IO Result
+declFun solver name args tipe = declareFun solver (N name) args tipe
+
+{- |
+this function hides Constants implemnted as functions without arguments  on the SMT syntax receives a String and a type  and gives the corresponding SMT2Lib syntax for declaring a constant function
+-}
+declConst solver name tipe = declareFun solver (N name ) [] tipe
+
+{- |
+this function hides the way to access an array (Hammered version)  on the SMT syntax receives a integer and gives the corresponding SMT2Lib syntax 
+-}
+getPos solver arr pos= let name = arr ++" " ++show (pos) in  
+		getValue solver [App (I (N name ) []) (Nothing) []]   
+
+
+
 
