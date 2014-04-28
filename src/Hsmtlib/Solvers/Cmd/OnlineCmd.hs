@@ -23,6 +23,8 @@ onlineGenResponse proc cmd  = liftA genResponse (onlineFun proc cmd)
 onlineCheckSatResponse :: Process -> Command -> IO Result
 onlineCheckSatResponse proc cmd = liftA checkSatResponse (onlineFun proc cmd)
 
+onlineGetValueResponse :: Process -> Command -> IO Result
+onlineGetValueResponse proc cmd = liftA getValueResponse (onlineFun proc cmd)
 
 
 --SMT Commands.
@@ -67,8 +69,8 @@ onlineCheckSat proc = onlineCheckSatResponse proc CmdCheckSat
 onlineGetAssertions :: Process -> IO String
 onlineGetAssertions proc = onlineFun proc  CmdGetAssertions
 
-onlineGetValue :: Process -> [Expr] -> IO String
-onlineGetValue proc exprs = onlineFun proc ( CmdGetValue exprs)
+onlineGetValue :: Process -> [Expr] -> IO Result
+onlineGetValue proc exprs = onlineGetValueResponse proc (CmdGetValue exprs)
 
 onlineGetProof :: Process -> IO String
 onlineGetProof proc = onlineFun proc  CmdGetProof

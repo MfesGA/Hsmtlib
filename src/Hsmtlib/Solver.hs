@@ -6,6 +6,7 @@ Module      : Solver
 module Hsmtlib.Solver where
 
 import           SMTLib2
+import           Data.Map
 
 {-|
  Placeholder type that later on will be changed to a more complex type.
@@ -28,6 +29,14 @@ type Error = String -- We will change the error to a more informative type.
   (Sexp, [Error])
 -}
 
+type Array = Map Integer Value
+
+type Arrays = Map String Array
+
+data  Value = VInt Integer
+            | VRatio Rational
+            | VBool Bool
+            deriving (Show)
 
 data Result = Success
             | Unsupported
@@ -35,6 +44,10 @@ data Result = Success
             | Sat
             | Unsat
             | Unknown
+            | Res Value
+            | Var String Value
+            | VArrays Arrays
+            | Several [Result]
             | UError String
             deriving (Show)
 
@@ -71,7 +84,7 @@ data Solver = Solver
     , assert        :: Expr -> IO Result
     , checkSat      :: IO Result
     , getAssertions :: IO String
-    , getValue      :: [Expr] -> IO String
+    , getValue      :: [Expr] -> IO Result
     , getProof      :: IO String
     , getUnsatCore  :: IO String
     , getInfo       :: InfoFlag -> IO String

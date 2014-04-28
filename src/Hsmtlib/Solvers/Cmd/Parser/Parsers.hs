@@ -95,10 +95,10 @@ parseDecimal :: ParsecT String u Identity SpecConstant
 parseDecimal = liftM SpecConstantDecimal decimal
 
 parseHexadecimal :: ParsecT String u Identity SpecConstant
-parseHexadecimal = liftM SpecContantHexadecimal hexadecimal
+parseHexadecimal = liftM SpecConstantHexadecimal hexadecimal
 
 parseBinary :: ParsecT String u Identity SpecConstant
-parseBinary = liftM SpecContantBinary (read <$> binary)
+parseBinary = liftM SpecConstantBinary (read <$> binary)
 
 parseString :: ParsecT String u Identity SpecConstant
 parseString = liftM SpecConstantString str
@@ -472,7 +472,7 @@ parseGetUnsatCoreResp = do
 
 -- parse Get Value response
 parseGetValueResponse :: ParsecT String u Identity [ValuationPair]
-parseGetValueResponse = sepBy1 parseValuationPair spaces
+parseGetValueResponse = aspO *> sepBy1 parseValuationPair spaces <* aspC
 
 parseValuationPair :: ParsecT String u Identity ValuationPair
 parseValuationPair = do
@@ -533,6 +533,6 @@ resultParser = parseCmdGenResponse
 main :: IO a
 main = forever $ do putStrLn "Enter a string: "
                     input <- getLine
-                    parseTest parseCmdGenResponse input
+                    parseTest parseGetValueResponse input
                     --parseIdentifier
                     --parseTest parseTerm input

@@ -12,9 +12,7 @@ import           Hsmtlib.Solvers.Cvc4      (startCvc4)
 import           Hsmtlib.Solvers.MathSAT   (startMathSat)
 import           Hsmtlib.Solvers.Yices     (startYices)
 import           Hsmtlib.Solvers.Z3        (startZ3)
-import           SMTLib2
-import           SMTLib2.Int
-import           Hsmtlib.HighLevel
+
 
 
 
@@ -90,7 +88,7 @@ startSolver :: Solvers-- ^ Avaliable'Solvers'.
             -> Maybe SolverConfig-- ^ A customized Configuration for the Solver.
             -> Maybe FilePath-- ^  A possible alternate path to save the Script.
             -> IO Solver
-startSolver Z3 = startZ3
+startSolver Z3 = startZ3   
 startSolver Cvc4 = startCvc4
 startSolver Yices = startYices
 startSolver Mathsat= startMathSat
@@ -98,14 +96,4 @@ startSolver Altergo= startAltErgo
 startSolver Boolector= startBoolector
 
 
-main :: IO ()
-main = do
-  solver <- startSolver Z3 Online "QF_LIA"  Nothing Nothing
-  setLogic solver (N "QF_LIA") >>= print
-  declareFun solver (N "a") [] tInt >>= print
-  declareFun solver (N "x") [] tInt >>= print
-  declareFun solver (N "y") [] tInt >>= print
-  declareFun solver (N "f") [] tInt >>= print
-  getAssertions solver >>= print
-  checkSat solver >>= print
-  exit solver >>= print
+

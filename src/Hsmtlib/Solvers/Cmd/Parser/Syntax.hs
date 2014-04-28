@@ -5,8 +5,8 @@ module Hsmtlib.Solvers.Cmd.Parser.Syntax where
 
 data SpecConstant = SpecConstantNumeral Integer
                   | SpecConstantDecimal String
-                  | SpecContantHexadecimal String
-                  | SpecContantBinary Integer
+                  | SpecConstantHexadecimal String
+                  | SpecConstantBinary Integer
                   | SpecConstantString String
                   deriving (Show)
 
@@ -21,7 +21,8 @@ data Sexpr = SexprSpecConstant SpecConstant
 
 -- Identifiers
 
-data Identifier =  ISymbol String | I_Symbol  String [String] deriving (Show)
+data Identifier = ISymbol String
+                | I_Symbol  String [String] deriving (Show)
 
 
 
@@ -48,9 +49,7 @@ data Attribute = Attribute String
 -- Terms
 
 data QualIdentifier = QIdentifier Identifier
-
                     | QIdentifierAs Identifier Sort
-
                     deriving (Show)
 
 

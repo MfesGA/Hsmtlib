@@ -52,6 +52,10 @@ scriptCheckSatResponse :: ScriptConf -> Command -> IO Result
 scriptCheckSatResponse conf cmd =
   liftA checkSatResponse  (scriptFunExec conf cmd)
 
+scriptGetValueResponse :: ScriptConf  -> Command -> IO Result
+scriptGetValueResponse conf cmd =
+  liftA getValueResponse (scriptFunExec conf cmd)
+
 
 --SMT Commands.
 
@@ -103,8 +107,8 @@ scriptCheckSat sConf = scriptCheckSatResponse sConf CmdCheckSat
 scriptGetAssertions :: ScriptConf -> IO String
 scriptGetAssertions sConf = scriptFunExec sConf  CmdGetAssertions
 
-scriptGetValue :: ScriptConf -> [Expr] -> IO String
-scriptGetValue sConf exprs = scriptFunExec sConf ( CmdGetValue exprs)
+scriptGetValue :: ScriptConf -> [Expr] -> IO Result
+scriptGetValue sConf exprs = scriptGetValueResponse sConf ( CmdGetValue exprs)
 
 scriptGetProof :: ScriptConf -> IO String
 scriptGetProof sConf  = scriptFunExec sConf  CmdGetProof
