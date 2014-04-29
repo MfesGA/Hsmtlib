@@ -441,10 +441,10 @@ z3Script= do
 --BVexaple
 testbv :: IO()
 testbv = do 
-	solver <- startBoolector Slv.Online "QF_BV" Nothing (Just "te.smt2")
+	solver <- startBoolector Slv.Script "QF_BV" Nothing (Just "te.smt2")
 	declConst solver  "x" (tBitVec 64)
 	declConst solver "y" (tBitVec 64)
-	assert solver (functionArg (N "not") [(bvand (bvnot (constant "x")) (bvnot (constant "y"))) === (bvnot (bvor (constant "x") (constant "y")))]  )>>= print
+	assert solver (SMTLib2.Core.not ((bvand (bvnot (constant "x")) (bvnot (constant "y"))) === (bvnot (bvor (constant "x") (constant "y"))))  )>>= print
 	checkSat solver >>=print
 	exit solver >>=print
 

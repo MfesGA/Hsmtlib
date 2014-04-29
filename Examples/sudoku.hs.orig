@@ -61,7 +61,5 @@ cria = do
 	maping solver (nGeq (literal 4)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
   	checkSat solver >>= print
 	getValue solver [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print
-	declType solver "edc" 5 >>= print
+	declType solver "edc" 5 >>= print	
 	exit solver >>= print 
-
-
