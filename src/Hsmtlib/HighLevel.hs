@@ -62,6 +62,10 @@ this function hides the way to access an array (Hammered version)  on the SMT sy
 getPos solver arr pos= let name = arr ++" " ++show (pos) in  
 		getValue solver [App (I (N name ) []) (Nothing) []]   
 
-
+{- |
+this function hides the Name Type in the declare type comand  
+-}
+declType :: Solver-> String ->Integer -> IO(Result)
+declType sol name int = declareType sol (N name) int
 
 
