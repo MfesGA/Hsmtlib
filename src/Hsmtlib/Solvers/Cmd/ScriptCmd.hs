@@ -44,15 +44,15 @@ scriptFunExec sConf cmd = do
 
 
 
-scriptGenResponse :: ScriptConf -> Command -> IO Result
+scriptGenResponse :: ScriptConf -> Command -> IO GenResult
 scriptGenResponse sConf cmd = writeToScript sConf cmd >> return Success
 
 
-scriptCheckSatResponse :: ScriptConf -> Command -> IO Result
+scriptCheckSatResponse :: ScriptConf -> Command -> IO SatResult
 scriptCheckSatResponse conf cmd =
   liftA checkSatResponse  (scriptFunExec conf cmd)
 
-scriptGetValueResponse :: ScriptConf  -> Command -> IO Result
+scriptGetValueResponse :: ScriptConf  -> Command -> IO GValResult
 scriptGetValueResponse conf cmd =
   liftA getValueResponse (scriptFunExec conf cmd)
 
@@ -65,49 +65,49 @@ scriptGetValueResponse conf cmd =
 --All above functions use ScriptFunExc the rest use scriptFun.
 
 
-scriptSetLogic :: ScriptConf -> Name -> IO Result
+scriptSetLogic :: ScriptConf -> Name -> IO GenResult
 scriptSetLogic sConf name = scriptGenResponse sConf (CmdSetLogic name )
 
-scriptSetOption :: ScriptConf -> Option -> IO Result
+scriptSetOption :: ScriptConf -> Option -> IO GenResult
 scriptSetOption sConf option = scriptGenResponse sConf (CmdSetOption option)
 
-scriptSetInfo :: ScriptConf -> Attr -> IO Result
+scriptSetInfo :: ScriptConf -> Attr -> IO GenResult
 scriptSetInfo sConf attr  = scriptGenResponse sConf  (CmdSetInfo attr)
 
-scriptDeclareType :: ScriptConf -> Name -> Integer -> IO Result
+scriptDeclareType :: ScriptConf -> Name -> Integer -> IO GenResult
 scriptDeclareType sConf name number =
     scriptGenResponse sConf (CmdDeclareType name number)
 
-scriptDefineType :: ScriptConf  -> Name -> [Name] -> Type -> IO Result
+scriptDefineType :: ScriptConf  -> Name -> [Name] -> Type -> IO GenResult
 scriptDefineType sConf name names t =
     scriptGenResponse sConf (CmdDefineType name names t)
 
-scriptDeclareFun :: ScriptConf  -> Name -> [Type] -> Type -> IO Result
+scriptDeclareFun :: ScriptConf  -> Name -> [Type] -> Type -> IO GenResult
 scriptDeclareFun sConf name lt t =
     scriptGenResponse sConf (CmdDeclareFun name lt t)
 
-scriptDefineFun :: ScriptConf -> Name -> [Binder] -> Type -> Expr -> IO Result
+scriptDefineFun :: ScriptConf -> Name -> [Binder] -> Type -> Expr -> IO GenResult
 scriptDefineFun sConf name binders t expression =
     scriptGenResponse sConf (CmdDefineFun name binders t expression)
 
-scriptPush :: ScriptConf -> Integer -> IO Result
+scriptPush :: ScriptConf -> Integer -> IO GenResult
 scriptPush sConf number = scriptGenResponse sConf (CmdPush number)
 
-scriptPop :: ScriptConf -> Integer -> IO Result
+scriptPop :: ScriptConf -> Integer -> IO GenResult
 scriptPop sConf number =
  scriptGenResponse sConf (CmdPop number)
 
-scriptAssert :: ScriptConf -> Expr -> IO Result
+scriptAssert :: ScriptConf -> Expr -> IO GenResult
 scriptAssert sConf expression =
     scriptGenResponse sConf (CmdAssert expression)
 
-scriptCheckSat :: ScriptConf -> IO Result
+scriptCheckSat :: ScriptConf -> IO SatResult
 scriptCheckSat sConf = scriptCheckSatResponse sConf CmdCheckSat
 
 scriptGetAssertions :: ScriptConf -> IO String
 scriptGetAssertions sConf = scriptFunExec sConf  CmdGetAssertions
 
-scriptGetValue :: ScriptConf -> [Expr] -> IO Result
+scriptGetValue :: ScriptConf -> [Expr] -> IO GValResult
 scriptGetValue sConf exprs = scriptGetValueResponse sConf ( CmdGetValue exprs)
 
 scriptGetProof :: ScriptConf -> IO String

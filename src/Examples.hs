@@ -1,4 +1,4 @@
-module Examples(array, example1) where
+module Examples(array, example1, example2) where
 
 import           SMTLib2
 import           SMTLib2.Int
@@ -11,8 +11,8 @@ import           Hsmtlib.Solver as Slv
 
 
 
-pt :: Result -> IO ()
-pt (UError str) = putStrLn str
+pt :: GValResult -> IO ()
+pt (GVUError str) = putStrLn str
 pt _ = print "ola"
 
 
@@ -32,7 +32,7 @@ array = do
   getValue solver [ct "a1"] >>= print
   getValue solver [ct "a2 2"] >>= print
   getValue solver [ct "a3 1"] >>= print
-  getValue solver [ct"x",ct "a2 2", ct "a1 1", ct "a3 2", ct "a2 4"]  >>= print
+  getValue solver [ct "x",ct "a2 2", ct "a1 1", ct "a3 2", ct "a2 4"]  >>= print
   exit solver
   print "fin"
 
@@ -50,6 +50,25 @@ example1 = do
   getValue solver [ct "(f 3 true)", ct "a"] >>= print
   exit solver
   print "fin"
+
+example2 :: IO ()
+example2 = do
+  solver <- startSolver Z3 Online "QF_AUFLIA" Nothing Nothing
+  produceModels solver
+  declareFun solver (N "a") [] tInt
+  declareFun solver (N "f") [tInt, tBool] tInt
+  declareFun solver (N "a1") [] $ tArray tInt tInt
+  declareFun solver (N "a2") [] $ tArray tInt tInt
+  declareFun solver (N "a3") [] $ tArray tInt tInt
+  assert solver $ nGeq (ct "a") 10
+  assert solver $ nGeq (ct "(f a true)")  (literal 100)
+  checkSat solver
+  getValue solver [ct "a"] >>= pt
+  getValue solver [ct "(select a1 a)"] >>= pt
+  getValue solver [ct "(select a3 2)", ct "a", ct "(f a true)", ct "(select a1 a)"] >>= pt
+  exit solver
+  print "fin"
+
 
 {--
 

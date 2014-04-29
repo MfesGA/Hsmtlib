@@ -18,7 +18,7 @@ ct x = App (I (N x) []) Nothing []
 {- |
 this function hides the application of distinct on the SMT syntax receives the solver and a list of the expressions which must be distinct and  gives the corresponding SMT2Lib syntax 
 -}
-assertDistinct :: Solver -> [Expr] -> IO Result
+assertDistinct :: Solver -> [Expr] -> IO GenResult
 assertDistinct solver aexp = assert solver (App (I (N "distinct") []) (Nothing) aexp)
 
 {- |
@@ -31,7 +31,7 @@ literal a = (Lit(LitNum a))
 {-|
 	This function simplifies the command to set the option to Produce Models
 -}
-produceModels :: Solver -> IO Result
+produceModels :: Solver -> IO GenResult
 produceModels solver = setOption solver (OptProduceModels True)	
 
 

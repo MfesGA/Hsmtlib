@@ -5,8 +5,8 @@ Module      : Solver
 -}
 module Hsmtlib.Solver where
 
-import           SMTLib2
 import           Data.Map
+import           SMTLib2
 
 {-|
  Placeholder type that later on will be changed to a more complex type.
@@ -29,27 +29,43 @@ type Error = String -- We will change the error to a more informative type.
   (Sexp, [Error])
 -}
 
-type Array = Map Integer Value
+
+
+
+data GenResult = Success 
+               | Unsupported 
+               | Error String 
+               | GUError String 
+               deriving (Show)
+
+data SatResult = Sat 
+               | Unsat 
+               | Unknown 
+               | SUError String
+               deriving (Show)
+
+
+
+
+
+data Array = MS (Map String Integer)
+           | MI (Map Integer Integer)
+           deriving(Show)
 
 type Arrays = Map String Array
 
-data  Value = VInt Integer
-            | VRatio Rational
-            | VBool Bool
+data Value = VInt Integer
+           | VRatio Rational
+           | VBool Bool
             deriving (Show)
 
-data Result = Success
-            | Unsupported
-            | Error String
-            | Sat
-            | Unsat
-            | Unknown
-            | Res Value
-            | Var String Value
-            | VArrays Arrays
-            | Several [Result]
-            | UError String
-            deriving (Show)
+data GValResult = Res Value
+                | Fun String Integer
+                | Var String Value
+                | VArrays Arrays
+                | Results [GValResult]
+                | GVUError String
+                deriving (Show)
 
 
 -- | Sovler's that are currently supported.
@@ -62,29 +78,28 @@ data Mode = Online | Script | Batch
   Alternative configuration of a solver which can be passed in the function
   startSolver in 'Main'
 -}
-data SolverConfig =
-    Config { path :: String
-           , args :: [String]
-           }
+data SolverConfig = Config { path :: String
+                           , args :: [String]
+                           }
 
 
 {-|
  Solver data type that has all the functions.
 -}
 data Solver = Solver
-    { setLogic      :: Name -> IO Result
-    , setOption     :: Option -> IO Result
-    , setInfo       :: Attr -> IO Result
-    , declareType   :: Name -> Integer -> IO Result
-    , defineType    :: Name -> [Name] -> Type -> IO Result
-    , declareFun    :: Name -> [Type] -> Type -> IO Result
-    , defineFun     :: Name -> [Binder] -> Type -> Expr -> IO Result
-    , push          :: Integer -> IO Result
-    , pop           :: Integer -> IO Result
-    , assert        :: Expr -> IO Result
-    , checkSat      :: IO Result
+    { setLogic      :: Name -> IO GenResult
+    , setOption     :: Option -> IO GenResult
+    , setInfo       :: Attr -> IO GenResult
+    , declareType   :: Name -> Integer -> IO GenResult
+    , defineType    :: Name -> [Name] -> Type -> IO GenResult
+    , declareFun    :: Name -> [Type] -> Type -> IO GenResult
+    , defineFun     :: Name -> [Binder] -> Type -> Expr -> IO GenResult
+    , push          :: Integer -> IO GenResult
+    , pop           :: Integer -> IO GenResult
+    , assert        :: Expr -> IO GenResult
+    , checkSat      :: IO SatResult
     , getAssertions :: IO String
-    , getValue      :: [Expr] -> IO Result
+    , getValue      :: [Expr] -> IO GValResult
     , getProof      :: IO String
     , getUnsatCore  :: IO String
     , getInfo       :: InfoFlag -> IO String
@@ -92,7 +107,7 @@ data Solver = Solver
     , exit          :: IO String
     }
     | BSolver
-    { executeBatch  :: [Command] -> IO String }
+    { executeBatch :: [Command] -> IO String }
 
 
 
