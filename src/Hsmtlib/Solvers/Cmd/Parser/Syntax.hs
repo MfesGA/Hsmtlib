@@ -6,7 +6,7 @@ module Hsmtlib.Solvers.Cmd.Parser.Syntax where
 data SpecConstant = SpecConstantNumeral Integer
                   | SpecConstantDecimal String
                   | SpecConstantHexadecimal String
-                  | SpecConstantBinary Integer
+                  | SpecConstantBinary String
                   | SpecConstantString String
                   deriving (Show)
 

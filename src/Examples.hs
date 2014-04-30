@@ -1,21 +1,24 @@
-module Examples(array, example1, example2) where
+module Examples(testbv) where
 
-import           SMTLib2
-import           SMTLib2.Int
-import           SMTLib2.Array
-import           SMTLib2.Core
-import           Hsmtlib.HighLevel
 import           Hsmtlib
-import           Hsmtlib.Solver as Slv
-
+import           Hsmtlib.HighLevel
+import           Hsmtlib.Solver    as Slv
+import           SMTLib2
+import           SMTLib2.Array
+import           SMTLib2.Array
+import           SMTLib2.BitVector
+import           SMTLib2.Core
+import           SMTLib2.Core
+import           SMTLib2.Int
+import           SMTLib2.Int
 
 
 
 pt :: GValResult -> IO ()
 pt (GVUError str) = putStrLn str
-pt _ = print "ola"
+pt x = print x 
 
-
+{--
 array :: IO ()
 array = do
   solver <- startSolver Z3 Online "AUFLIA" Nothing Nothing
@@ -26,15 +29,16 @@ array = do
   declareFun solver (N "a1") [] $ tArray tInt tInt
   declareFun solver (N "a2") [] $ tArray tInt tInt
   declareFun solver (N "a3") [] $ tArray tInt tInt
-  assert solver $ select (ct "a1") (ct "x") === (ct "x")
-  assert solver $ store (ct "a1") (ct "x") (ct "y") ===  (ct "a1")
+  assert solver $ seleconstant (constant "a1") (constant "x") === (constant "x")
+  assert solver $ store (constant "a1") (constant "x") (constant "y") ===  (constant "a1")
   checkSat solver >>= print
-  getValue solver [ct "a1"] >>= print
-  getValue solver [ct "a2 2"] >>= print
-  getValue solver [ct "a3 1"] >>= print
-  getValue solver [ct "x",ct "a2 2", ct "a1 1", ct "a3 2", ct "a2 4"]  >>= print
+  getValue solver [constant "a1"] >>= print
+  getValue solver [constant "a2 2"] >>= print
+  getValue solver [constant "a3 1"] >>= print
+  getValue solver [constant "x",constant "a2 2", constant "a1 1", constant "a3 2", constant "a2 4"]  >>= print
   exit solver
   print "fin"
+-}
 
 example1 :: IO ()
 example1 = do
@@ -42,12 +46,12 @@ example1 = do
   produceModels solver
   declareFun solver (N "a") [] tInt
   declareFun solver (N "f") [tInt, tBool] tInt
-  assert solver $ nGeq (ct "a") 10
-  assert solver $ nGeq (ct "(f a true)")  (literal 100)
+  assert solver $ nGeq (constant "a") 10
+  assert solver $ nGeq (constant "(f a true)")  (literal 100)
   checkSat solver
-  getValue solver [ct "a"] >>= print
-  getValue solver [ct "(f 2 false)"] >>= print
-  getValue solver [ct "(f 3 true)", ct "a"] >>= print
+  getValue solver [constant "a"] >>= print
+  getValue solver [constant "(f 2 false)"] >>= print
+  getValue solver [constant "(f 3 true)", constant "a"] >>= print
   exit solver
   print "fin"
 
@@ -60,16 +64,27 @@ example2 = do
   declareFun solver (N "a1") [] $ tArray tInt tInt
   declareFun solver (N "a2") [] $ tArray tInt tInt
   declareFun solver (N "a3") [] $ tArray tInt tInt
-  assert solver $ nGeq (ct "a") 10
-  assert solver $ nGeq (ct "(f a true)")  (literal 100)
+  assert solver $ nGeq (constant "a") 10
+  assert solver $ nGeq (constant "(f a true)")  (literal 100)
   checkSat solver
-  getValue solver [ct "a"] >>= pt
-  getValue solver [ct "(select a1 a)"] >>= pt
-  getValue solver [ct "(select a3 2)", ct "a", ct "(f a true)", ct "(select a1 a)"] >>= pt
+  getValue solver [constant "a"]
+  getValue solver [constant "(select a1 a)"] >>= pt
+  getValue solver [constant "(f a true)"] >>= pt
+  getValue solver [constant "(select a3 2)", constant "a", constant "(f a true)", constant "(select a1 a)"] >>= pt
   exit solver
   print "fin"
 
 
+testbv :: IO()
+testbv = do
+  solver <- startSolver Z3 Online "QF_BV" Nothing (Just "te.smt2")
+  produceModels solver
+  declConst solver  "x" (tBitVec 64)
+  declConst solver "y" (tBitVec 64)
+  assert solver (((bvand (bvnot (constant "x")) (bvnot (constant "y"))) === (bvnot (bvor (constant "x") (constant "y"))))  )>>= print
+  checkSat solver 
+  getValue solver [constant "x", constant "y"] >>= print
+  exit solver >>= print
 {--
 
 main :: IO ()

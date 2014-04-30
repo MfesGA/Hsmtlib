@@ -2,70 +2,83 @@ module Hsmtlib.HighLevel where
 
 import           Hsmtlib.Solver            as Slv
 import           SMTLib2
-import           SMTLib2.Int
 
-{- |
-this function hides the application of a function on the SMT syntax receives the name of the function and the args and gives the corresponding SMT2Lib syntax 
+{- | This function hides the application of a function on the SMT syntax
+    receives the name of the function and the args and gives the corresponding 
+    SMT2Lib syntax.
 -}
 functionArg :: Name -> [Expr] -> Expr
-functionArg fun args = (App (I fun []) (Nothing) args)
+functionArg fun fargs = App (I fun []) (Nothing) fargs
 
 
-{- |
-this function hides the application of a constant function on the SMT syntax receives the name of the function and gives the corresponding SMT2Lib syntax, the function must be already declared using declareFun
+{- | This function hides the application of a constant function on the
+     SMT syntax receives the name of the function and gives the corresponding 
+     SMT2Lib syntax, the function must be already declared using declareFun.
 -}
 constant :: String -> Expr 
 constant x =(App (I (N x) []) (Nothing) [])
 
-{- |
-this function hides the application of distinct on the SMT syntax receives the solver and a list of the expressions which must be distinct and  gives the corresponding SMT2Lib syntax 
+{- | This function hides the application of distinct on the SMT syntax receives
+     the solver and a list of the expressions which must be distinct and 
+     gives the corresponding SMT2Lib syntax.
 -}
-assertDistinct :: Solver -> [Expr] -> IO(Result) 
-assertDistinct solver exp = assert solver (App (I (N "distinct") []) (Nothing) exp)
+assertDistinct :: Solver -> [Expr] -> IO( GenResult) 
+assertDistinct solver dexp = 
+    assert solver (App (I (N "distinct") []) (Nothing) dexp)
 
-{- |
-this function hides Integers on the SMT syntax receives a integer and gives the corresponding SMT2Lib syntax 
+{- | This function hides Integers on the SMT syntax receives a integer
+     and gives the corresponding SMT2Lib syntax.
 -}
 literal :: Integer -> Expr
-literal a = (Lit(LitNum a)) 
+literal a = Lit $ LitNum a
 
-{- |
-this function allows the user to given a list of expressions make a assert of them giving the SMTLib2 syntax corespondant (auxiliary function for maping)
+
+{- | This function allows the user to given a list of expressions make a 
+     assert of them giving the SMTLib2 syntax corespondant 
+     (auxiliary function for maping).
 -}
-mapassert :: Solver -> [Expr] -> IO ()
-mapassert solver [] = do
-	return () 
+mapAssert :: Solver -> [Expr] -> IO ()
+mapAssert _ [] = return () 
+mapAssert solver (a:as) = assert solver a >>  mapAssert solver as
 
-mapassert solver (a:as) = do 
-	assert solver a 
-	mapassert solver as
- {- |
-  this function when giving a solver and a function that gives an Expr and a list of the input type of that function, asserts the map of expressions its particulary useful to say that some set variables are all for example greater than zero 
+{- | This function when giving a solver and a function that gives an Expr and a
+     list of the input type of that function, asserts the map of expressions 
+     its particulary useful to say that some set variables are all 
+     for example greater than zero.
 -}
 maping :: Solver -> (a -> Expr) -> [a] -> IO ()
-maping solver expr a = mapassert solver  (map expr a) 
+maping solver expr a = mapAssert solver  (map expr a) 
 
-{- |
-this function hides the name creation on the SMT syntax receives a string  and gives the corresponding SMT2Lib syntax for declaring a function 
+{- | This function hides the name creation on the SMT syntax receives a string
+     and gives the corresponding SMT2Lib syntax for declaring a function.
 -}
-declFun :: Solver -> String -> [Type] -> Type -> IO Result
-declFun solver name args tipe = declareFun solver (N name) args tipe
+declFun :: Solver -> String -> [Type] -> Type -> IO GenResult
+declFun solver name dargs tipe = declareFun solver (N name) dargs tipe
 
-{- |
-this function hides Constants implemnted as functions without arguments  on the SMT syntax receives a String and a type  and gives the corresponding SMT2Lib syntax for declaring a constant function
+{- | This function hides Constants implemnted as functions without arguments 
+     on the SMT syntax receives a String and a type  and gives the 
+     corresponding SMT2Lib syntax for declaring a constant function.
 -}
+declConst :: Solver -> String -> Type -> IO GenResult
 declConst solver name tipe = declareFun solver (N name ) [] tipe
 
-{- |
-this function hides the way to access an array (Hammered version)  on the SMT syntax receives a integer and gives the corresponding SMT2Lib syntax 
+{- | This function hides the way to access an array (Hammered version)
+     on the SMT syntax receives a integer and gives the corresponding 
+     SMT2Lib syntax.
 -}
+getPos :: Show a => Solver -> [Char] -> a -> IO GValResult
 getPos solver arr pos= let name = arr ++" " ++show (pos) in  
 		getValue solver [App (I (N name ) []) (Nothing) []]   
 
 {- |
 this function hides the Name Type in the declare type comand  
 -}
-declType :: Solver-> String ->Integer -> IO(Result)
+declType :: Solver-> String ->Integer -> IO(GenResult)
 declType sol name int = declareType sol (N name) int
 
 
+{-|
+    This function simplifies the command to set the option to Produce Models
+-}
+produceModels :: Solver -> IO GenResult
+produceModels solver = setOption solver (OptProduceModels True) 

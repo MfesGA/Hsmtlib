@@ -48,15 +48,13 @@ data SatResult = Sat
 
 
 
-data Array = MS (Map String Integer)
-           | MI (Map Integer Integer)
-           deriving(Show)
 
-type Arrays = Map String Array
+type Arrays = Map String (Map String Integer)
 
 data Value = VInt Integer
            | VRatio Rational
            | VBool Bool
+           | VHex String
             deriving (Show)
 
 data GValResult = Res Value

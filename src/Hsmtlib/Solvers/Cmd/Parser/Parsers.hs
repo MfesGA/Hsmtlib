@@ -98,7 +98,7 @@ parseHexadecimal :: ParsecT String u Identity SpecConstant
 parseHexadecimal = liftM SpecConstantHexadecimal hexadecimal
 
 parseBinary :: ParsecT String u Identity SpecConstant
-parseBinary = liftM SpecConstantBinary (read <$> binary)
+parseBinary = liftM SpecConstantBinary binary
 
 parseString :: ParsecT String u Identity SpecConstant
 parseString = liftM SpecConstantString str

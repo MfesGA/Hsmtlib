@@ -1,13 +1,15 @@
 module  Hsmtlib.Solvers.Cmd.Parser.CmdResult where
 
---import           Control.Applicative                    hiding (empty)
+import           Control.Applicative                    ((<|>))
 import           Control.Monad
-import           Data.List                              (intercalate)
-import           Data.Map
+--import           Data.List                              (intercalate)
+import           Data.Map                               as M
+import           Data.Maybe                             (isJust)
 import           Hsmtlib.Solver                         as Solv
 import           Hsmtlib.Solvers.Cmd.Parser.Parsers     hiding (numeral, symbol)
 import           Hsmtlib.Solvers.Cmd.Parser.Syntax      as S
 import           Hsmtlib.Solvers.Cmd.Parser.Visualizers
+import           Prelude                                as P
 import           Text.ParserCombinators.Parsec.Prim     (parse)
 
 genResponse :: String -> GenResult
@@ -32,7 +34,7 @@ checkSatResponse stg =
     where result = parse parseCheckSatResponse "" stg
 
 
-
+{-
 getValueResponse :: String -> GValResult
 getValueResponse stg = GVUError  $ stg ++ "\n" ++ tree
     where result = parse parseGetValueResponse "" stg
@@ -45,18 +47,96 @@ getVR' result =
     Left err -> show err
     Right vals -> intercalate "\n" (fmap (showValuationPair 0) vals)
 
+-}
+
+getValueResponse :: String -> GValResult
+getValueResponse stg = case result of
+                        Left err -> GVUError $ show err
+                        Right vals -> getVR' $ getValResponse vals
+    where result = parse parseGetValueResponse "" stg
+
+
+getVR' :: [GValResult] -> GValResult
+getVR' xs | length xs == 1 = head xs
+          | otherwise = Results $ xs
+
+getValResponse::[ValuationPair] -> [GValResult]
+getValResponse vp = arrays ++ errors
+                      -- gets the results in a Maybe GValResult.
+                where res = getValResponses vp 
+                      --Produes UErrors from the results that gave Nothing.
+                      errors = valErrors' vp res
+                      cRes = P.filter isJust res -- Removes the Nothings.
+                      -- Joins all arrays in one and 
+                      --removes the Just from all results.
+                      arrays = joinArrays cRes 
 
 
 
+valErrors' :: [ValuationPair] -> [Maybe GValResult] -> [GValResult]
+valErrors' [] [] = []
+valErrors' (x:xs) (Nothing:gs) = 
+  (GVUError (showValuationPair 0 x)) :valErrors' xs gs
+valErrors' (_:xs) (_:gs) = valErrors' xs  gs  
+
+ 
+
+joinArrays :: [Maybe GValResult] -> [GValResult]
+joinArrays = joinArrays' $ VArrays empty
+
+
+joinArrays' :: GValResult -> [Maybe GValResult] -> [GValResult]
+-- if there was no array in the result then don't put an empty one.
+joinArrays' (VArrays n) [] | M.null n = [] 
+                           | otherwise = [VArrays n]
+joinArrays' res (x:xs) = case nVal of
+                          (VArrays _) -> joinArrays' nVal xs
+                          _ -> nVal : joinArrays' res xs
+                         where nVal = checkGVal res x 
+
+checkGVal :: GValResult ->  Maybe GValResult -> GValResult
+checkGVal (VArrays oarr) (Just(VArrays arr)) = 
+  VArrays $ unionWith union oarr arr
+checkGVal _ (Just x) = x
+
+
+getValResponses :: [ValuationPair] -> [Maybe GValResult]
+getValResponses = fmap getGValResult
+
+getGValResult :: ValuationPair -> Maybe GValResult
+getGValResult vp =  getVar vp
+               <|> getArray vp
+               <|> getFun vp
+               <|> getBitVec vp
+
+{- | Retrives the value of a BitVector.
+     Works with:
+     - Z3.
+-}
+getBitVec :: ValuationPair -> Maybe GValResult
+getBitVec vp = getBitVec' name vhex
+               where name = getVarName vp
+                     vhex = getHexVal vp
+
+
+-- auxiliar function to getBitVec
+getBitVec' :: Maybe String -> Maybe String -> Maybe GValResult
+getBitVec' (Just name) (Just vhex) = Just $ Var name $ VHex vhex
+getBitVec' _ _ = Nothing
+
+{- | Retrives the value of a function.
+     Works with:
+     - Z3.
+-}
 getFun :: ValuationPair -> Maybe GValResult
 getFun vp = getFun' name value
             where name = getFunName vp
                   value = getFunResultInt vp
 
-
+-- auxiliar function to getFun
 getFun' :: Maybe String -> Maybe Integer -> Maybe GValResult
 getFun' (Just name) (Just res) = Just $  Fun name res
-
+getFun' _ _ = Nothing
 
 
 {- | Retrives the value of a variable.
@@ -83,14 +163,17 @@ getVar' (Just name) (Just value) = Just $ Var name $ VInt value
 -}
 getArray :: ValuationPair -> Maybe GValResult
 getArray vp =
-    case res of
-         Just arr -> Just $ VArrays arr
-         Nothing -> Nothing
-    
+  case isArr of
+    Nothing -> Nothing
+    Just _ -> case res of
+                Just arr -> Just $ VArrays arr
+                Nothing -> Nothing
+
     where name = arrayName vp
           posInt = arrayIntPos vp
           posVar = arrayVarPos vp
           val = arrayVal vp
+          isArr = isArray vp
           res = getArray' name posInt posVar val
 
 
@@ -101,9 +184,9 @@ getArray' :: Maybe String
           -> Maybe Integer
           -> Maybe Arrays
 getArray' (Just name) (Just pos) Nothing (Just val) =
-    Just $ singleton name $ MI $ singleton pos val
+    Just $ singleton name $  singleton (show pos) val
 getArray' (Just name) Nothing (Just pos) (Just val) =
-    Just $ singleton name $ MS $ singleton pos val
+    Just $ singleton name $ singleton (pos) val
 getArray' _ _ _ _ = Nothing
 
 
@@ -111,6 +194,27 @@ getArray' _ _ _ _ = Nothing
 
 -- Auxiliar functions to get values from constructed ast.
 
+
+
+
+
+isArray :: ValuationPair -> Maybe Bool
+isArray = isArray' 
+      <=< symbol 
+      <=< qIdentifier 
+      <=< fstTermQualIdentierT 
+      <=< fstTerm
+
+
+{- | Verifies if the string correspond to a certain notation that indicates
+     that is an Array.
+     For example Z3 would have the keyword select therefor it's an array.
+     If it isn't an array then returns nothing
+
+-}
+isArray' :: String -> Maybe Bool
+isArray' "select" = Just True
+isArray' _ = Nothing
 
 
 -- Auxliar functions to work with arrays.
@@ -199,6 +303,12 @@ getFunName = symbol <=< qIdentifier <=< fstTermQualIdentierT <=< fstTerm
 getFunResultInt :: ValuationPair -> Maybe Integer
 getFunResultInt = numeral <=< getTermSpecConstant <=< sndTerm
 
+{- | Retrives the result of a bitvector.
+     Works with:
+     - Z3
+-}
+getHexVal :: ValuationPair -> Maybe String
+getHexVal = hex <=< getTermSpecConstant <=< fstTerm
 
 
 -- Auxiliar functions to get specific value from ast.
@@ -246,3 +356,7 @@ symbol _ = Nothing
 numeral :: SpecConstant -> Maybe Integer
 numeral (SpecConstantNumeral n) = Just n
 numeral _ = Nothing
+
+hex :: SpecConstant -> Maybe String
+hex (SpecConstantHexadecimal shex) = Just shex
+hex  _ = Nothing

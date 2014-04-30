@@ -446,6 +446,7 @@ testbv = do
 	declConst solver "y" (tBitVec 64)
 	assert solver (SMTLib2.Core.not ((bvand (bvnot (constant "x")) (bvnot (constant "y"))) === (bvnot (bvor (constant "x") (constant "y"))))  )>>= print
 	checkSat solver >>=print
+	getValue solver [constant "x", constant "y", extract 0 1 (constant "x")] >>= print
 	exit solver >>=print
 
 
