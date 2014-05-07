@@ -20,7 +20,7 @@ ct a = constant a
 
 
 
-mapeia2 :: Solver -> (a -> Expr) -> [a] -> IO ([IO (Result)])
+mapeia2 :: Solver -> (a -> Expr) -> [a] -> IO ([IO (GenResult)])
 mapeia2 solver expr a = return $ map (assert solver) (map expr a)
 
 
