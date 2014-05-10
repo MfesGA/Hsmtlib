@@ -1,15 +1,12 @@
-module Examples(testbv) where
+module Examples(testbv,example2,example1) where
 
 import           Hsmtlib
 import           Hsmtlib.HighLevel
 import           Hsmtlib.Solver    as Slv
 import           SMTLib2
 import           SMTLib2.Array
-import           SMTLib2.Array
 import           SMTLib2.BitVector
 import           SMTLib2.Core
-import           SMTLib2.Core
-import           SMTLib2.Int
 import           SMTLib2.Int
 
 
@@ -44,7 +41,7 @@ example1 :: IO ()
 example1 = do
   solver <- startSolver Z3 Online "AUFLIA" Nothing Nothing
   produceModels solver
-  declareFun solver (N "a") [] tInt
+  declareFun solver (N "a") [] tBool
   declareFun solver (N "f") [tInt, tBool] tInt
   assert solver $ nGeq (constant "a") 10
   assert solver $ nGeq (constant "(f a true)")  (literal 100)
@@ -57,10 +54,11 @@ example1 = do
 
 example2 :: IO ()
 example2 = do
-  solver <- startSolver Z3 Online "QF_AUFLIA" Nothing Nothing
+  solver <- startSolver Cvc4 Online "QF_AUFLIA" Nothing Nothing
   produceModels solver
   declareFun solver (N "a") [] tInt
   declareFun solver (N "f") [tInt, tBool] tInt
+  declareFun solver (N "g") [tInt] tBool
   declareFun solver (N "a1") [] $ tArray tInt tInt
   declareFun solver (N "a2") [] $ tArray tInt tInt
   declareFun solver (N "a3") [] $ tArray tInt tInt
@@ -70,7 +68,7 @@ example2 = do
   getValue solver [constant "a"]
   getValue solver [constant "(select a1 a)"] >>= pt
   getValue solver [constant "(f a true)"] >>= pt
-  getValue solver [constant "(select a3 2)", constant "a", constant "(f a true)", constant "(select a1 a)"] >>= pt
+  getValue solver [constant "(select a3 2)", constant "a", constant "(f a true)", constant "(select a1 a)", constant"(g 2)"] >>= pt
   exit solver
   print "fin"
 

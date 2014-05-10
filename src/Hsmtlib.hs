@@ -15,7 +15,6 @@ import           Hsmtlib.Solvers.Z3        (startZ3)
 
 
 
-
 {- |  The function to initialialyze a solver.
 The solver can be initialized with a desired configuration, or a diferent
 Path to keep the script in Script Mode, if Nothing is passed then it will use

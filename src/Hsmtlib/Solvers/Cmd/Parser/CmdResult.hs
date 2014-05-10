@@ -1,8 +1,8 @@
 module  Hsmtlib.Solvers.Cmd.Parser.CmdResult where
 
-import           Control.Applicative                    ((<|>))
+import           Control.Applicative                    ((<|>),(<$>))
 import           Control.Monad
---import           Data.List                              (intercalate)
+import           Data.List                              (intercalate)
 import           Data.Map                               as M
 import           Data.Maybe                             (isJust)
 import           Hsmtlib.Solver                         as Solv
@@ -48,10 +48,9 @@ getVR' result =
     Right vals -> intercalate "\n" (fmap (showValuationPair 0) vals)
 
 -}
-
 getValueResponse :: String -> GValResult
 getValueResponse stg = case result of
-                        Left err -> GVUError $ show err
+                        Left err -> GVUError $ stg ++ "|"++show err
                         Right vals -> getVR' $ getValResponse vals
     where result = parse parseGetValueResponse "" stg
 
@@ -104,7 +103,7 @@ getValResponses :: [ValuationPair] -> [Maybe GValResult]
 getValResponses = fmap getGValResult
 
 getGValResult :: ValuationPair -> Maybe GValResult
-getGValResult vp =  getVar vp
+getGValResult vp = getVar vp
                <|> getArray vp
                <|> getFun vp
                <|> getBitVec vp
@@ -121,7 +120,7 @@ getBitVec vp = getBitVec' name vhex
 
 -- auxiliar function to getBitVec
 getBitVec' :: Maybe String -> Maybe String -> Maybe GValResult
-getBitVec' (Just name) (Just vhex) = Just $ Var name $ VHex vhex
+getBitVec' (Just name) (Just vhex) = Just $ Res name $ VHex vhex
 getBitVec' _ _ = Nothing
 
 {- | Retrives the value of a function.
@@ -131,11 +130,11 @@ getBitVec' _ _ = Nothing
 getFun :: ValuationPair -> Maybe GValResult
 getFun vp = getFun' name value
             where name = getFunName vp
-                  value = getFunResultInt vp
+                  value = getFunResult vp
 
 -- auxiliar function to getFun
-getFun' :: Maybe String -> Maybe Integer -> Maybe GValResult
-getFun' (Just name) (Just res) = Just $  Fun name res
+getFun' :: Maybe String -> Maybe Value -> Maybe GValResult
+getFun' (Just name) (Just res) = Just $  Res name  res
 getFun' _ _ = Nothing
 
 
@@ -152,7 +151,7 @@ getVar vp = getVar' name value
 getVar' :: Maybe String -> Maybe Integer -> Maybe GValResult
 getVar' Nothing _ = Nothing
 getVar' _ Nothing = Nothing
-getVar' (Just name) (Just value) = Just $ Var name $ VInt value
+getVar' (Just name) (Just value) = Just $ Res name $ VInt value
 
 
 
@@ -300,8 +299,35 @@ getFunName = symbol <=< qIdentifier <=< fstTermQualIdentierT <=< fstTerm
      Works with:
      - Z3.
 -}
-getFunResultInt :: ValuationPair -> Maybe Integer
-getFunResultInt = numeral <=< getTermSpecConstant <=< sndTerm
+
+
+getFunResult :: ValuationPair -> Maybe Value
+getFunResult vp = getFunResultBool vp <|> getFunResultInt vp
+          
+getFunResultBool :: ValuationPair -> Maybe Value
+getFunResultBool = VBool <#> toBool <=< getFunResultBool'
+
+
+getFunResultInt :: ValuationPair -> Maybe Value
+getFunResultInt = VInt <#> getFunResultInt'
+
+
+
+(<#>):: Functor m => (b -> c) -> (a -> m b) -> (a -> m c)
+(<#>)f m = \x -> f <$> m x 
+
+toBool :: String -> Maybe Bool
+toBool "true" = Just True
+toBool "false" = Just False
+toBool _ = Nothing
+
+getFunResultInt' :: ValuationPair -> Maybe Integer
+getFunResultInt' = numeral <=< getTermSpecConstant <=< sndTerm
+
+
+getFunResultBool' :: ValuationPair -> Maybe String
+getFunResultBool' = symbol <=< qIdentifier <=< termQualIdentifier <=< sndTerm
+ 
 
 {- | Retrives the result of a bitvector.
      Works with:

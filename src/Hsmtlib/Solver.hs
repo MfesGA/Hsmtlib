@@ -57,9 +57,7 @@ data Value = VInt Integer
            | VHex String
             deriving (Show)
 
-data GValResult = Res Value
-                | Fun String Integer
-                | Var String Value
+data GValResult = Res String Value
                 | VArrays Arrays
                 | Results [GValResult]
                 | GVUError String

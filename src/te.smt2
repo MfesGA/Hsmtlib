@@ -1,8 +1,0 @@
-(set-option :print-success true)
-(set-logic QF_BV)
-(set-option :produce-models true)
-(declare-fun x () (_ BitVec 64))
-(declare-fun y () (_ BitVec 64))
-(assert (not (= (bvand (bvnot x) (bvnot y)) (bvnot (bvor x y)))))
-(check-sat)
-(get-value (x y))

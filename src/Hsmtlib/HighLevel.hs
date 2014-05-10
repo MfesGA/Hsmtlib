@@ -3,6 +3,12 @@ module Hsmtlib.HighLevel where
 import           Hsmtlib.Solver            as Slv
 import           SMTLib2
 
+
+
+
+
+
+
 {- | This function hides the application of a function on the SMT syntax
     receives the name of the function and the args and gives the corresponding 
     SMT2Lib syntax.
@@ -29,8 +35,8 @@ assertDistinct solver dexp =
 {- | This function hides Integers on the SMT syntax receives a integer
      and gives the corresponding SMT2Lib syntax.
 -}
-literal :: Integer -> Expr
-literal a = Lit $ LitNum a
+literal :: Int -> Expr
+literal a = Lit $ LitNum (read (show a) :: Integer)
 
 
 {- | This function allows the user to given a list of expressions make a 
@@ -54,6 +60,10 @@ maping solver expr a = mapAssert solver  (map expr a)
 -}
 declFun :: Solver -> String -> [Type] -> Type -> IO GenResult
 declFun solver name dargs tipe = declareFun solver (N name) dargs tipe
+
+defFun :: Solver -> String -> [Binder] -> Type -> Expr -> IO GenResult
+defFun solver name binders result expr = 
+    defineFun solver (N name) binders result expr
 
 {- | This function hides Constants implemnted as functions without arguments 
      on the SMT syntax receives a String and a type  and gives the 
@@ -82,3 +92,7 @@ declType sol name int = declareType sol (N name) int
 -}
 produceModels :: Solver -> IO GenResult
 produceModels solver = setOption solver (OptProduceModels True) 
+
+
+interactiveMode :: Solver -> IO GenResult
+interactiveMode solver = setOption solver (OptInteractiveMode True) 
