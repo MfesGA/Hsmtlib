@@ -36,16 +36,13 @@ data GenResult = Success
                | Unsupported 
                | Error String 
                | GUError String 
-               deriving (Show)
+               deriving (Show,Eq)
 
 data SatResult = Sat 
                | Unsat 
                | Unknown 
                | SUError String
                deriving (Show)
-
-
-
 
 
 
