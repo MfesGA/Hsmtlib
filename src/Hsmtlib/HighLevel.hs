@@ -35,6 +35,11 @@ literal :: Int -> Expr
 literal a = Lit $ LitNum (read (show a) :: Integer)
 
 
+mapDeclConst :: Solver -> [String] -> Type -> IO ()
+mapDeclConst _ [] _ = return ()
+mapDeclConst solver (x:xs) y = 
+    declConst solver x y >> mapDeclConst solver xs y 
+
 {- | This function allows the user to given a list of expressions make a 
      assert of them giving the SMTLib2 syntax corespondant 
      (auxiliary function for maping).
