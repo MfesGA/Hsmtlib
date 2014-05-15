@@ -39,7 +39,8 @@ array = do
 
 example1 :: IO ()
 example1 = do
-  solver <- startSolver Z3 Online "AUFLIA" Nothing Nothing
+  solver <- 
+  startSolver Z3 Online "AUFLIA" Nothing Nothing
   produceModels solver
   declareFun solver (N "a") [] tBool
   declareFun solver (N "f") [tInt, tBool] tInt

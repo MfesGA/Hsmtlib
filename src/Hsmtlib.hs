@@ -81,11 +81,11 @@ The operators and there uses can be found in 'Solver'
 
 
 
-startSolver :: Solvers-- ^ Avaliable'Solvers'.
-            -> Mode-- ^ Avaliable 'Modes', Online, Script, Context.
-            -> String-- ^ The desired SMT Logic.
-            -> Maybe SolverConfig-- ^ A customized Configuration for the Solver.
-            -> Maybe FilePath-- ^  A possible alternate path to save the Script.
+startSolver :: Solvers -- ^ Avaliable'Solvers'.
+            -> Mode -- ^ Avaliable 'Modes', Online, Script, Context.
+            -> String -- ^ The desired SMT Logic.
+            -> Maybe SolverConfig -- ^ A customized Configuration for the Solver.
+            -> Maybe FilePath -- ^  A possible alternate path to save the Script.
             -> IO Solver
 startSolver Z3 = startZ3   
 startSolver Cvc4 = startCvc4
