@@ -5,10 +5,6 @@ import           SMTLib2
 
 
 
-
-
-
-
 {- | This function hides the application of a function on the SMT syntax
     receives the name of the function and the args and gives the corresponding 
     SMT2Lib syntax.

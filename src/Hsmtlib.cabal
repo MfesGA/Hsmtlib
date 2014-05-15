@@ -51,7 +51,7 @@ cabal-version:       >=1.10
 
 library
   -- Modules exported by the library.
-  exposed-modules:     Hsmtlib, Examples, Hsmtlib.Solver, Hsmtlib.HighLevel, Hsmtlib.Solvers.Z3, Hsmtlib.Solvers.Yices, Hsmtlib.Solvers.MathSAT, Hsmtlib.Solvers.Cvc4, Hsmtlib.Solvers.Boolector, Hsmtlib.Solvers.Altergo, Hsmtlib.Solvers.Cmd.ScriptCmd, Hsmtlib.Solvers.Cmd.OnlineCmd, Hsmtlib.Solvers.Cmd.BatchCmd, Hsmtlib.Solvers.Cmd.ProcCom.Process, Hsmtlib.Solvers.Cmd.Parser.Visualizers, Hsmtlib.Solvers.Cmd.Parser.Syntax, Hsmtlib.Solvers.Cmd.Parser.Parsers, Hsmtlib.Solvers.Cmd.Parser.CmdResult
+  exposed-modules:     Hsmtlib, Hsmtlib.Solver, Hsmtlib.HighLevel, Hsmtlib.Solvers.Z3, Hsmtlib.Solvers.Yices, Hsmtlib.Solvers.MathSAT, Hsmtlib.Solvers.Cvc4, Hsmtlib.Solvers.Boolector, Hsmtlib.Solvers.Altergo, Hsmtlib.Solvers.Cmd.ScriptCmd, Hsmtlib.Solvers.Cmd.OnlineCmd, Hsmtlib.Solvers.Cmd.BatchCmd, Hsmtlib.Solvers.Cmd.ProcCom.Process, Hsmtlib.Solvers.Cmd.Parser.Visualizers, Hsmtlib.Solvers.Cmd.Parser.Syntax, Hsmtlib.Solvers.Cmd.Parser.Parsers, Hsmtlib.Solvers.Cmd.Parser.CmdResult
   
   -- Modules included in this library but not exported.
   -- other-modules:       
