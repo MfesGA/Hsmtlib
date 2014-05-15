@@ -10,7 +10,7 @@ name:                Hsmtlib
 -- PVP summary:      +-+------- breaking API changes
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
-version:             0.2.0.2
+version:             0.2.0.4
 
 -- A short (one-line) description of the package.
 synopsis:            Haskell library for easy interaction with SMT-LIB 2 compliant solvers.
@@ -60,7 +60,7 @@ library
   -- other-extensions:    
   
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.6 && <4.7, smtLib >=1.0 && <1.1, containers >=0.5 && <0.6, pretty >=1.1 && <1.2, process >=1.1 && <1.2, transformers >=0.3 && <0.4, parsec >=3.1 && <3.2
+  build-depends:       base >=4.6, smtLib >=1.0 && <1.1, containers >=0.5 && <0.6, pretty >=1.1 && <1.2, process >=1.1 , transformers >=0.3 && <0.4, parsec >=3.1 && <3.2
   
   -- Directories containing source files.
   -- hs-source-dirs:      

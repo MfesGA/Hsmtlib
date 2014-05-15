@@ -35,10 +35,7 @@ literal :: Int -> Expr
 literal a = Lit $ LitNum (read (show a) :: Integer)
 
 
-mapDeclConst :: Solver -> [String] -> Type -> IO ()
-mapDeclConst _ [] _ = return ()
-mapDeclConst solver (x:xs) y = 
-    declConst solver x y >> mapDeclConst solver xs y 
+
 
 {- | This function allows the user to given a list of expressions make a 
      assert of them giving the SMTLib2 syntax corespondant 
@@ -77,10 +74,10 @@ declConst solver name tipe = declareFun solver (N name ) [] tipe
      on the SMT syntax receives a String and a type  and gives the 
      corresponding SMT2Lib syntax for declaring a constant function.
 -}
-mapDeclConst :: Solver -> [String] -> [Type] -> IO GenResult
-mapDeclConst solver (x:xs) (y:ys)= do 
-	declConst solver x y 
-	mapDeclConst solver xs ys 
+mapDeclConst :: Solver -> [String] -> Type -> IO ()
+mapDeclConst _ [] _ = return ()
+mapDeclConst solver (x:xs) y = 
+    declConst solver x y >> mapDeclConst solver xs y 
 
 
 
