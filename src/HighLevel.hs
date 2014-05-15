@@ -82,7 +82,6 @@ mapDeclConst solver (x:xs) (y:ys)= do
 	mapDeclConst solver xs ys 
 
 
-
 {- | This function hides the way to access an array (Hammered version)
      on the SMT syntax receives a integer and gives the corresponding 
      SMT2Lib syntax.
