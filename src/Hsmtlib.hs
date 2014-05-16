@@ -1,6 +1,6 @@
 {- |
-Module      : Hsmtlib
-  Main module which provides the function to initialyze a Solver.
+  Module      : Hsmtlib
+  Main module which provides the function to initialize a Solver.
 -}
 
 module Hsmtlib(startSolver) where
@@ -13,15 +13,14 @@ import           Hsmtlib.Solvers.MathSAT   (startMathSat)
 import           Hsmtlib.Solvers.Yices     (startYices)
 import           Hsmtlib.Solvers.Z3        (startZ3)
 
+{- |  
 
-
-{- |  The function to initialialyze a solver.
+The function to initialialyze a solver.
 The solver can be initialized with a desired configuration, or a diferent
 Path to keep the script in Script Mode, if Nothing is passed then it will use
 the default settings.
 
-There exists two'Mode's that a solver can be used, Online,
- and Script.
+There are two 'Mode's of operation for the solvers, Online and Script.
 
 In online Mode a solver is created and kept running. Commands are sent
 via pipe one by one and every time one is sent it also reads the answer of the
@@ -38,61 +37,22 @@ such as checkSat, this are writen to the file, a solver is created and the
 file is given to solver, and it waits for the result. The result is the result
 of the last function.
 
-In context 'Mode' two lists are kept, a list with all the commands given and
-a list that has the results of commands that demand some output from the solver.
-
-The functions in this mode behave has in script 'Mode' being the diference that
-instead of a file the commands are kept in the list.
-
-In order to use the context mode it's nedded some special operators that
-aren't nedded in other modes.
-
-The operators and there uses can be found in 'Solver'
-
-
-
-
-* Example of online or script mode :
-
->main :: IO ()
->main = do
-  >solver <- startSolver Z3 Online "QF_LIA"  Nothing Nothing
-  >declareFun solver (N "a") [] tInt >>= print
-  >declareFun solver (N "x") [] tInt >>= print
-  >declareFun solver (N "y") [] tInt >>= print
-  >declareFun solver (N "f") [] tInt >>= print
-  >checkSat solver >>= print
-  >exit solver >>= print
-
-
-* Example of context mode:
-
->main :: IO ()
->main = do
-  >solver <- startSolver Cvc4 Slv.Context "QF_LIA"  Nothing Nothing
-  >declareFunCt solver (N "a") [] tInt |*|
-  >declareFunCt solver (N "x") [] tInt |#|
-  >declareFunCt solver (N "y") [] tInt |#|
-  >checkSatCt solver |$|
-  >exitCt solver >>= print
-
-
 -}
 
 
 
 startSolver :: Solvers -- ^ Avaliable'Solvers'.
             -> Mode -- ^ Avaliable 'Modes', Online, Script, Context.
-            -> String -- ^ The desired SMT Logic.
+            -> Logic -- ^ The desired SMT Logic.
             -> Maybe SolverConfig -- ^ A customized Configuration for the Solver.
-            -> Maybe FilePath -- ^  A possible alternate path to save the Script.
+            -> Maybe String -- ^  A possible alternate path to save the Script.
             -> IO Solver
-startSolver Z3 = startZ3   
-startSolver Cvc4 = startCvc4
-startSolver Yices = startYices
-startSolver Mathsat= startMathSat
-startSolver Altergo= startAltErgo
-startSolver Boolector= startBoolector
+startSolver Z3 mode logic = startZ3 mode $ show logic  
+startSolver Cvc4 mode logic = startCvc4 mode $ show logic
+startSolver Yices mode logic = startYices mode $ show logic
+startSolver Mathsat mode logic = startMathSat mode $ show logic
+startSolver Altergo mode logic = startAltErgo mode $ show logic
+startSolver Boolector mode logic = startBoolector mode $ show logic
 
 
 

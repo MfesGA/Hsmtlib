@@ -1,5 +1,5 @@
 {- |
-Module      : Z3
+Module      : Hsmtlib.Solvers.Z3
   Module wich has the standard configuration for all Z3 Modes and
   provides the initilizing function.
 -}

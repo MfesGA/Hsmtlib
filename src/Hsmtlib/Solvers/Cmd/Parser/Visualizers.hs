@@ -14,10 +14,10 @@ spaces :: Int -> String
 spaces = spaces' 0
 
 branch' :: Int -> String
-branch' nsp = "\n" ++ (spaces nsp)++"|\n" ++ (spaces (nsp))++ "|- "
+branch' nsp = "\n" ++ spaces nsp++"|\n" ++ spaces nsp ++ "|- "
 
 branchAr' :: Int -> String
-branchAr' nsp = "\n" ++ (spaces nsp)++"\n" ++ (spaces (nsp+1)) ++ "["
+branchAr' nsp = "\n" ++ spaces nsp ++"\n" ++ spaces (nsp+1) ++ "["
 
 fbranch :: Int  -> String -> String -> String
 fbranch nsp mark fin = mark ++ branch' nsp ++ fin
@@ -33,13 +33,11 @@ mLines :: String ->Int -> String
 mLines _ 0 = ""
 mLines sps n =  sps ++ "|\n" ++ mLines sps (n-1)
 
-
-
 showValuationPair :: Int -> ValuationPair-> String
 showValuationPair nsp (ValuationPair t1 t2) = tup "ValP" nsp t1 t2 showTerm showTerm
 
 showSpecConstant :: SpecConstant -> String
-showSpecConstant (SpecConstantNumeral int) = "Num " ++ (show int)
+showSpecConstant (SpecConstantNumeral int) = "Num " ++ show int
 showSpecConstant (SpecConstantDecimal st) = "Dec " ++ st
 showSpecConstant (SpecConstantHexadecimal st) = "Hex " ++ st
 showSpecConstant (SpecConstantBinary it) = "Bin " ++  show it
@@ -81,7 +79,7 @@ tup :: String
 tup mark nsp arg1 arg2 f1 f2 =
     bMark  ++  bf1 ++ bf2
     where bMark = mark ++ branch' nsp
-          bf1 = f1 (nsp+3) arg1 ++ "\n" ++ (spaces (nsp)) ++"|- "
+          bf1 = f1 (nsp+3) arg1 ++ "\n" ++ spaces nsp ++"|- "
           bf2 = f2 (nsp+3) arg2
 
 
@@ -125,7 +123,7 @@ showIdentifier nsp (I_Symbol str1  str2) =
           sstr = brc ++ "|- [ " ++hd ++ strs ++ end
           hd = head str2 ++ "\n"
           bd = drop 1 str2
-          strs = intercalate "\n" (fmap ((++) ((spaces (nsp+3))++", ") ) bd)
+          strs = intercalate "\n" (fmap ((spaces (nsp + 3) ++ ", ") ++) bd)
           end = "\n" ++ spaces (nsp+3) ++ "]"
 
 

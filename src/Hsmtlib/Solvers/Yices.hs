@@ -1,5 +1,5 @@
 {- |
-Module      : Yices
+Module      : Hsmtlib.Solvers.Yices
   Module wich has the standard configuration for all Yices Modes and
   provides the initilizing function.
 -}

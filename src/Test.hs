@@ -54,7 +54,7 @@ tc4 solver mode = TestCase $ t4 solver mode
 
 
 
-(<@>) :: ((Solvers -> Mode -> Test), Solvers, Mode)
+(<@>) :: (Solvers -> Mode -> Test, Solvers, Mode)
       -> (Solvers -> Mode -> Test)
       -> ([Test],Solvers,Mode)
 

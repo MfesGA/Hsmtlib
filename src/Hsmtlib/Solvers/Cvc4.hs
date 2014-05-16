@@ -1,5 +1,5 @@
 {- |
-Module      : Cvc4
+Module      : Hsmtlib.Solvers.Cvc4
   Module wich has the standard configuration for all Cvc4 Modes and
   provides the initilizing function.
 -}

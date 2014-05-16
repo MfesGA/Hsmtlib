@@ -1,5 +1,5 @@
 {- |
-Module      : boolector
+Module      : Hsmtlib.Solvers.Boolector
   Module wich has the standard configuration for all boolector Modes and
   provides the initilizing function.
 -}

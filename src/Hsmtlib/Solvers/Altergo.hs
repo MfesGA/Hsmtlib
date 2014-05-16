@@ -1,5 +1,5 @@
 {- |
-Module      : altergo
+Module      : Hsmtlib.Solvers.Altergo
   Module wich has the standard configuration for all altergo Modes and
   provides the initilizing function.
 -}

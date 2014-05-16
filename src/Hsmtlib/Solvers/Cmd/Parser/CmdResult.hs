@@ -57,7 +57,7 @@ getValueResponse stg = case result of
 
 getVR' :: [GValResult] -> GValResult
 getVR' xs | length xs == 1 = head xs
-          | otherwise = Results $ xs
+          | otherwise = Results xs
 
 getValResponse::[ValuationPair] -> [GValResult]
 getValResponse vp = arrays ++ errors
@@ -75,7 +75,7 @@ getValResponse vp = arrays ++ errors
 valErrors' :: [ValuationPair] -> [Maybe GValResult] -> [GValResult]
 valErrors' [] [] = []
 valErrors' (x:xs) (Nothing:gs) = 
-  (GVUError (showValuationPair 0 x)) :valErrors' xs gs
+  GVUError (showValuationPair 0 x) : valErrors' xs gs
 valErrors' (_:xs) (_:gs) = valErrors' xs  gs  
 
  
@@ -185,7 +185,7 @@ getArray' :: Maybe String
 getArray' (Just name) (Just pos) Nothing (Just val) =
     Just $ singleton name $  singleton (show pos) val
 getArray' (Just name) Nothing (Just pos) (Just val) =
-    Just $ singleton name $ singleton (pos) val
+    Just $ singleton name $ singleton pos val
 getArray' _ _ _ _ = Nothing
 
 
@@ -229,7 +229,7 @@ arrayName = symbol
         <=< fstValArray
         <=< sndTermQualIdentierT
         <=< fstTerm
-        where fstValArray = (\x -> Just $ head x)
+        where fstValArray x = Just $ head x
 
 {-| Retrives the position of the array if it is an Integer.
     Works with:
@@ -241,7 +241,7 @@ arrayIntPos = numeral
           <=< sndValArray
           <=< sndTermQualIdentierT
           <=< fstTerm
-          where sndValArray = (\x -> Just $ x !! 1)
+          where sndValArray x = Just $ x !! 1
 
 {-| Retrives the position of the array if it is a String.
     Works with:
@@ -254,7 +254,7 @@ arrayVarPos = symbol
           <=< sndValArray
           <=< sndTermQualIdentierT
           <=< fstTerm
-          where sndValArray = (\x -> Just $ x !! 1)
+          where sndValArray x = Just $ x !! 1
 
 
 {-| Retrives the value of an array.
@@ -313,8 +313,8 @@ getFunResultInt = VInt <#> getFunResultInt'
 
 
 
-(<#>):: Functor m => (b -> c) -> (a -> m b) -> (a -> m c)
-(<#>)f m = \x -> f <$> m x 
+(<#>):: Functor m => (b -> c) -> (a -> m b) -> a -> m c
+(<#>) f m = \x -> f <$> m x 
 
 toBool :: String -> Maybe Bool
 toBool "true" = Just True

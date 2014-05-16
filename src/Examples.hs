@@ -39,8 +39,7 @@ array = do
 
 example1 :: IO ()
 example1 = do
-  solver <- 
-  startSolver Z3 Online "AUFLIA" Nothing Nothing
+  solver <- startSolver Z3 Online "AUFLIA" Nothing Nothing
   produceModels solver
   declareFun solver (N "a") [] tBool
   declareFun solver (N "f") [tInt, tBool] tInt
@@ -80,7 +79,7 @@ testbv = do
   produceModels solver
   declConst solver  "x" (tBitVec 64)
   declConst solver "y" (tBitVec 64)
-  assert solver (((bvand (bvnot (constant "x")) (bvnot (constant "y"))) === (bvnot (bvor (constant "x") (constant "y"))))  )>>= print
+  assert solver bvand (bvnot (constant "x")) (bvnot (constant "y") === bvnot (bvor (constant "x") (constant "y"))) >>= print
   checkSat solver 
   getValue solver [constant "x", constant "y"] >>= print
   exit solver >>= print

@@ -1,5 +1,5 @@
 {- |
-Module      : mathSat
+Module      : Hsmtlib.Solvers.MathSAT
   Module wich has the standard configuration for all mathSat Modes and
   provides the initilizing function.
 -}
