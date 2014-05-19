@@ -40,3 +40,5 @@ There exists two modes to interact with a solver:
 
 
 A few tutorials on how to use this library can be found in the [wiki] (https://github.com/MfesGA/Hsmtlib/wiki).
+
+The documnetation is in [Hackage](http://hackage.haskell.org/package/Hsmtlib-0.2.0.6/candidate).
