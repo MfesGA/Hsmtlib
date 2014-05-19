@@ -65,6 +65,12 @@ declFun solver name = declareFun solver (N name)
 
 defFun :: Solver -> String -> [Binder] -> Type -> Expr -> IO GenResult
 defFun solver name = defineFun solver (N name)
+
+
+-- | This function binds a name to a type, and returns a Binder.
+bind :: String -> Type -> Binder
+bind name = Bind (N name)
+
 {- | 
     This function hides Constants implemnted as functions without arguments on the SMT syntax receives a String and a type  and gives the corresponding SMT2Lib syntax for declaring a constant function.
 -}

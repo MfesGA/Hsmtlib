@@ -1,4 +1,4 @@
-module Examples(testbv,example2,example1) where
+qmodule Examples(testbv,example2,example1) where
 
 import           Hsmtlib
 import           Hsmtlib.HighLevel
@@ -68,7 +68,7 @@ example2 = do
   getValue solver [constant "a"]
   getValue solver [constant "(select a1 a)"] >>= pt
   getValue solver [constant "(f a true)"] >>= pt
-  getValue solver [constant "(select a3 2)", constant "a", constant "(f a true)", constant "(select a1 a)", constant"(g 2)"] >>= pt
+  getValue solver [constant "(select a3 2)", constant "a", constant "(f a true)", constant "(select a1 a)", constant"(g 2)"] >>= print
   exit solver
   print "fin"
 

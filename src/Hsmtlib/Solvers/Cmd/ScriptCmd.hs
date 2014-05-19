@@ -108,7 +108,7 @@ scriptGetAssertions :: ScriptConf -> IO String
 scriptGetAssertions sConf = scriptFunExec sConf  CmdGetAssertions
 
 scriptGetValue :: ScriptConf -> [Expr] -> IO GValResult
-scriptGetValue sConf exprs = scriptGetValueResponse sConf ( CmdGetValue exprs)
+scriptGetValue sConf exprs = scriptGetValueResponse sConf (CmdGetValue exprs)
 
 scriptGetProof :: ScriptConf -> IO String
 scriptGetProof sConf  = scriptFunExec sConf  CmdGetProof
