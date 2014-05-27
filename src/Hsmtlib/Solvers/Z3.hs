@@ -5,11 +5,13 @@ Module      : Hsmtlib.Solvers.Z3
 -}
 module Hsmtlib.Solvers.Z3(startZ3) where
 
+import           Control.Applicative                  (liftA)
 import           Hsmtlib.Solver                      as Slv
 import           Hsmtlib.Solvers.Cmd.BatchCmd        as B (executeBatch)
 import           Hsmtlib.Solvers.Cmd.OnlineCmd
 import           Hsmtlib.Solvers.Cmd.ProcCom.Process
 import           Hsmtlib.Solvers.Cmd.ScriptCmd
+import           Hsmtlib.Solvers.Cmd.Parser.CmdResult
 import           SMTLib2
 import           System.IO                           (Handle,
                                                       IOMode (WriteMode),
@@ -57,7 +59,7 @@ startZ3Online logic (Just conf) = startZ3Online' logic conf
 
 startZ3Online' :: String -> SolverConfig -> IO Solver
 startZ3Online' logic conf = do
-  -- Starts a Z4 Process.
+  -- Starts a Z3 Process.
   process <- beginProcess (path conf) (args conf)
   --Set Option to print success after accepting a Command.
   onlineSetOption process (OptPrintSuccess True)
@@ -142,6 +144,19 @@ onlineSolver process =
          , getOption = onlineGetOption process
          , exit = onlineExit process
          }
+{-Specific parse result functions that works only in case of Z3 because it breaks the result with new line and not space-}
+scriptGetValueResponseZ3 :: ScriptConf  -> Command -> IO GValResult
+scriptGetValueResponseZ3 conf cmd =
+  liftA getValueResponse (scriptFunExecZ3 conf cmd)
+
+scriptFunExecZ3 :: ScriptConf -> Command -> IO String
+scriptFunExecZ3 sConf cmd = do
+  writeToScript sConf cmd
+  res <- sendScript (sCmdPath sConf) (sArgs sConf) (sFilePath sConf)
+  return  $ unlines $ drop 1 $  snd $ break (==['s','a','t']) $ lines $res
+
+scriptGetValueZ3 :: ScriptConf -> [Expr] -> IO GValResult
+scriptGetValueZ3 sConf exprs = scriptGetValueResponseZ3 sConf (CmdGetValue exprs)
 
 -- Creates the funtion for the script mode.
 -- The configuration of the file is passed.
@@ -159,7 +174,7 @@ scriptSolver srcmd =
          , assert = scriptAssert srcmd
          , checkSat = scriptCheckSat srcmd
          , getAssertions = scriptGetAssertions srcmd
-         , getValue = scriptGetValue srcmd
+         , getValue = scriptGetValueZ3 srcmd
          , getProof = scriptGetProof srcmd
          , getUnsatCore = scriptGetUnsatCore srcmd
          , getInfo = scriptGetInfo srcmd
