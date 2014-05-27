@@ -2,7 +2,7 @@ module  Hsmtlib.Solvers.Cmd.Parser.CmdResult where
 
 import           Control.Applicative                    ((<|>),(<$>))
 import           Control.Monad
-import           Data.List                              (intercalate)
+--import           Data.List                              (intercalate)
 import           Data.Map                               as M
 import           Data.Maybe                             (isJust)
 import           Hsmtlib.Solver                         as Solv

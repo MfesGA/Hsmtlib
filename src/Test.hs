@@ -17,34 +17,36 @@ err teste =
 
 t1 :: Solvers -> Mode -> Assertion
 t1 nSolver  mode = do
-    solver <- startSolver nSolver mode "AUFLIA" Nothing Nothing
+    solver <- startSolver nSolver mode AUFLIA Nothing Nothing
     res <- produceModels solver
     exit solver
     assertEqual (err "t1") Success res
 
 t2 :: Solvers -> Mode -> Assertion
 t2 nSolver mode = do
-    solver <- startSolver nSolver mode "AUFLIA" Nothing Nothing
+    solver <- startSolver nSolver mode AUFLIA Nothing Nothing
     res <- produceModels solver
     exit solver
     assertEqual (err "t2") Success res
 
 t3 :: Solvers -> Mode -> Assertion
 t3 nSolver mode = do
-    solver <- startSolver nSolver mode "AUFLIA" Nothing Nothing
+    solver <- startSolver nSolver mode AUFLIA Nothing Nothing
     res <- declConst solver "x" tInt
     exit solver
     assertEqual (err "t3") Success res
 
 t4 :: Solvers -> Mode -> Assertion
 t4 nSolver mode = do
-    solver <- startSolver nSolver mode "AUFLIA" Nothing Nothing
+    solver <- startSolver nSolver mode AUFLIA Nothing Nothing
     res <- declConst solver "x" tBool
     exit solver
     assertEqual (err "t4") Success res
 
 
-
+t5 :: Solvers -> Mode -> Assertion
+t5 nSolver mode = do
+  solver <- startSolver nSolver mode AUFLIA
 
 tc1 solver mode = TestCase $ t1 solver mode
 tc2 solver mode = TestCase $ t2 solver mode

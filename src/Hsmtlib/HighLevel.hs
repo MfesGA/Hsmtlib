@@ -10,6 +10,14 @@ import           Hsmtlib.Solver            as Slv
 import           SMTLib2
 
 
+{- |  function that hides the creatinf of the quantifier forall-}
+forall :: [Binder] -> Expr -> Expr
+forall = Quant Forall 
+
+{- |  function that hides the creatinf of the quantifier exists-}
+exists :: [Binder] -> Expr -> Expr
+exists = Quant Exists
+
 {- |
     This function hides the application of a function on the SMT syntax
     receives the name of the function and the args and gives the corresponding 
