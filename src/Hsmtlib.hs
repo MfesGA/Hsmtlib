@@ -12,6 +12,12 @@ import           Hsmtlib.Solvers.Cvc4      (startCvc4)
 import           Hsmtlib.Solvers.MathSAT   (startMathSat)
 import           Hsmtlib.Solvers.Yices     (startYices)
 import           Hsmtlib.Solvers.Z3        (startZ3)
+{-import           Hsmtlib.HighLevel
+import           Hsmtlib.Parsers.AuxParser
+import           Hsmtlib.Parsers.ParseResponse
+import           Hsmtlib.Parsers.ParseScript
+import           Hsmtlib.Parsers.Syntax
+import           Hsmtlib.Parsers.Visualizer-}
 
 {- |  
 
@@ -53,6 +59,3 @@ startSolver Yices mode logic = startYices mode $ show logic
 startSolver Mathsat mode logic = startMathSat mode $ show logic
 startSolver Altergo mode logic = startAltErgo mode $ show logic
 startSolver Boolector mode logic = startBoolector mode $ show logic
-
-
-

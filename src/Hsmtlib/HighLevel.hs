@@ -23,8 +23,8 @@ exists = Quant Exists
     receives the name of the function and the args and gives the corresponding 
     SMT2Lib syntax.
 -}
-functionArg :: Name -> [Expr] -> Expr
-functionArg fun = App (I fun []) Nothing
+fun :: String -> [Expr] -> Expr
+fun name = App (I (N name) []) Nothing
 
 
 {- | 
@@ -32,14 +32,14 @@ functionArg fun = App (I fun []) Nothing
      SMT syntax receives the name of the function and gives the corresponding 
      SMT2Lib syntax, the function must be already declared using declareFun.
 -}
-constant :: String -> Expr 
-constant x =App (I (N x) []) Nothing []
+ct :: String -> Expr 
+ct x = App (I (N x) []) Nothing []
 
 {- | 
     This function hides the application of distinct on the SMT syntax
     receives the solver and a list of the expressions which must be distinct and gives the corresponding SMT2Lib syntax.
 -}
-assertDistinct :: Solver -> [Expr] -> IO GenResult
+assertDistinct :: Solver -> [Expr] -> IO Result
 assertDistinct solver dexp = 
     assert solver (App (I (N "distinct") []) Nothing dexp)
 
@@ -47,8 +47,8 @@ assertDistinct solver dexp =
     This function hides Integers on the SMT syntax receives a integer
      and gives the corresponding SMT2Lib syntax.
 -}
-literal :: Int -> Expr
-literal a = Lit $ LitNum (read (show a) :: Integer)
+lit :: Int -> Expr
+lit a = Lit $ LitNum (read (show a) :: Integer)
 
 
 {- | 
@@ -68,10 +68,10 @@ maping solver expr a = mapAssert solver  (map expr a)
 {- | 
     This function hides the name creation on the SMT syntax receives a string and gives the corresponding SMT2Lib syntax for declaring a function.
 -}
-declFun :: Solver -> String -> [Type] -> Type -> IO GenResult
+declFun :: Solver -> String -> [Type] -> Type -> IO Result
 declFun solver name = declareFun solver (N name)
 
-defFun :: Solver -> String -> [Binder] -> Type -> Expr -> IO GenResult
+defFun :: Solver -> String -> [Binder] -> Type -> Expr -> IO Result
 defFun solver name = defineFun solver (N name)
 
 
@@ -82,7 +82,7 @@ bind name = Bind (N name)
 {- | 
     This function hides Constants implemnted as functions without arguments on the SMT syntax receives a String and a type  and gives the corresponding SMT2Lib syntax for declaring a constant function.
 -}
-declConst :: Solver -> String -> Type -> IO GenResult
+declConst :: Solver -> String -> Type -> IO Result
 declConst solver name = declareFun solver (N name) []
 
 {- | 
@@ -99,12 +99,12 @@ mapDeclConst solver (x:xs) y =
     on the SMT syntax receives a integer and gives the corresponding 
     SMT2Lib syntax.
 -} 
-getPos :: Show a => Solver -> String -> a -> IO GValResult
+getPos :: Show a => Solver -> String -> a -> IO Result
 getPos solver arr pos= let name = arr ++ " " ++ show pos in  
 		getValue solver [App (I (N name ) []) Nothing []]   
 
 -- | This function hides the Name Type in the declare type comand  
-declType :: Solver -> String -> Integer -> IO GenResult
+declType :: Solver -> String -> Integer -> IO Result
 declType sol name = declareType sol (N name)
 
 
@@ -112,9 +112,14 @@ declType sol name = declareType sol (N name)
     This function simplifies the command to set the option
     to Produce Models.
 -}
-produceModels :: Solver -> IO GenResult
+produceModels :: Solver -> IO Result
 produceModels solver = setOption solver (OptProduceModels True) 
 
+
+produceProofs :: Solver -> IO Result
+produceProofs solver = setOption solver (OptProduceProofs True) 
+
 -- | This function simplifies the command to set the option to Interactive Mode.
-interactiveMode :: Solver -> IO GenResult
+interactiveMode :: Solver -> IO Result
 interactiveMode solver = setOption solver (OptInteractiveMode True) 
+

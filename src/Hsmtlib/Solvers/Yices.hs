@@ -63,9 +63,9 @@ startYicesOnline' logic conf = do
   -- Starts a Yices Process.
   process <- beginProcess (path conf) (args conf)
   --Set Option to print success after accepting a Command.
-  onlineSetOption process (OptPrintSuccess True)
+  _ <- onlineSetOption Yices process (OptPrintSuccess True)
   -- Sets the SMT Logic.
-  onlineSetLogic process (N logic)
+  _ <-onlineSetLogic Yices process (N logic)
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 
@@ -102,9 +102,9 @@ startYicesScript' logic conf scriptFilePath = do
   -- Creates the arguments for the functions in ScriptCmd
   let srcmd = newScriptArgs conf scriptHandle scriptFilePath
   --Set Option to print success after accepting a Command.
-  scriptSetOption srcmd (OptPrintSuccess True)
+  _ <- scriptSetOption srcmd (OptPrintSuccess True)
   -- Initialize the solver Functions and return them.
-  scriptSetLogic srcmd (N logic)
+  _ <-scriptSetLogic srcmd (N logic)
   return $ scriptSolver srcmd
 
 --Function which creates the ScriptConf for the script functions.
@@ -130,23 +130,23 @@ startYicesBatch' logic conf = return $ batchSolver logic conf
 -- Each function will send the command to the solver and wait for the response.
 onlineSolver :: Process -> Solver
 onlineSolver process =
-  Solver { setLogic = onlineSetLogic process
-         , setOption = onlineSetOption process
-         , setInfo = onlineSetInfo process
-         , declareType = onlineDeclareType process
-         , defineType = onlineDefineType process
-         , declareFun = onlineDeclareFun process
-         , defineFun = onlineDefineFun process
-         , push = onlinePush process
-         , pop = onlinePop process
-         , assert = onlineAssert process
-         , checkSat = onlineCheckSat process
-         , getAssertions = onlineGetAssertions process
-         , getValue = onlineGetValue process
-         , getProof = onlineGetProof process
-         , getUnsatCore = onlineGetUnsatCore process
-         , getInfo = onlineGetInfo process
-         , getOption = onlineGetOption process
+  Solver { setLogic = onlineSetLogic Yices process
+         , setOption = onlineSetOption Yices process
+         , setInfo = onlineSetInfo Yices process
+         , declareType = onlineDeclareType Yices process
+         , defineType = onlineDefineType Yices process
+         , declareFun = onlineDeclareFun Yices process
+         , defineFun = onlineDefineFun Yices process
+         , push = onlinePush Yices process
+         , pop = onlinePop Yices process
+         , assert = onlineAssert Yices process
+         , checkSat = onlineCheckSat Yices process
+         , getAssertions = onlineGetAssertions Yices process
+         , getValue = onlineGetValue Yices process
+         , getProof = onlineGetProof Yices process
+         , getUnsatCore = onlineGetUnsatCore Yices process
+         , getInfo = onlineGetInfo Yices process
+         , getOption = onlineGetOption Yices process
          , exit = onlineExit process
          }
 

@@ -70,9 +70,9 @@ startAltErgoOnline' logic conf = do
   -- Starts a Z4 Process.
   process <- beginProcess (path conf) (args conf)
   --Set Option to print success after accepting a Command.
-  onlineSetOption process (OptPrintSuccess True)
+  _ <- onlineSetOption Altergo process (OptPrintSuccess True)
   -- Sets the SMT Logic.
-  onlineSetLogic process (N logic)
+  _ <- onlineSetLogic  Altergo process (N logic)
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 
@@ -103,8 +103,8 @@ startAltErgoScript' :: String -> SolverConfig -> FilePath -> IO Solver
 startAltErgoScript' logic conf scriptFilePath = do
   scriptHandle <- openFile scriptFilePath WriteMode
   let srcmd = newScriptArgs conf scriptHandle scriptFilePath
-  scriptSetOption srcmd (OptPrintSuccess True)
-  scriptSetLogic srcmd (N logic)
+  _ <- scriptSetOption srcmd (OptPrintSuccess True)
+  _ <- scriptSetLogic srcmd (N logic)
   return $ scriptSolver srcmd
 
 --Function which creates the ScriptConf for the script functions.
@@ -129,23 +129,23 @@ startAltErgoBatch' logic config = return $ batchSolver logic config
 -- Each function will send the command to the solver and wait for the response.
 onlineSolver :: Process -> Solver
 onlineSolver process =
-  Solver { setLogic = onlineSetLogic process
-         , setOption = onlineSetOption process
-         , setInfo = onlineSetInfo process
-         , declareType = onlineDeclareType process
-         , defineType = onlineDefineType process
-         , declareFun = onlineDeclareFun process
-         , defineFun = onlineDefineFun process
-         , push = onlinePush process
-         , pop = onlinePop process
-         , assert = onlineAssert process
-         , checkSat = onlineCheckSat process
-         , getAssertions = onlineGetAssertions process
-         , getValue = onlineGetValue process
-         , getProof = onlineGetProof process
-         , getUnsatCore = onlineGetUnsatCore process
-         , getInfo = onlineGetInfo process
-         , getOption = onlineGetOption process
+  Solver { setLogic = onlineSetLogic Altergo process
+         , setOption = onlineSetOption Altergo process
+         , setInfo = onlineSetInfo Altergo process
+         , declareType = onlineDeclareType Altergo process
+         , defineType = onlineDefineType Altergo process
+         , declareFun = onlineDeclareFun Altergo process
+         , defineFun = onlineDefineFun Altergo process
+         , push = onlinePush Altergo process
+         , pop = onlinePop Altergo process
+         , assert = onlineAssert Altergo process
+         , checkSat = onlineCheckSat Altergo process
+         , getAssertions = onlineGetAssertions Altergo process
+         , getValue = onlineGetValue Altergo process
+         , getProof = onlineGetProof Altergo process
+         , getUnsatCore = onlineGetUnsatCore Altergo process
+         , getInfo = onlineGetInfo Altergo process
+         , getOption = onlineGetOption Altergo process
          , exit = onlineExit process
          }
 

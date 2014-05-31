@@ -5,84 +5,138 @@ Module with the functions used in online Mode.
 -}
 
 module Hsmtlib.Solvers.Cmd.OnlineCmd where
-
+import           Control.Applicative                  (liftA)
 import           Hsmtlib.Solver
+import           Hsmtlib.Solvers.Cmd.CmdResult
 import           Hsmtlib.Solvers.Cmd.ProcCom.Process
 import           SMTLib2
 import           Text.PrettyPrint
-import           Hsmtlib.Solvers.Cmd.Parser.CmdResult
-import           Control.Applicative(liftA)
+
+
 
 --Uses the function  send from Cmd.Solver to send the command.
-onlineFun ::  Process  -> Command -> IO String
-onlineFun proc cmd = send proc (render (pp  cmd) ++ "\n")
+onlineFun ::  Process  -> Command -> Solvers ->  IO String
+onlineFun proc cmd Cvc4 = sendCvc4 proc (render (pp  cmd) ++ "\n") 
+onlineFun proc cmd _ = send proc (render (pp  cmd) ++ "\n") 
 
-onlineGenResponse :: Process -> Command -> IO GenResult
-onlineGenResponse proc cmd  = liftA genResponse (onlineFun proc cmd)
 
-onlineCheckSatResponse :: Process -> Command -> IO SatResult
-onlineCheckSatResponse proc cmd = liftA checkSatResponse (onlineFun proc cmd)
 
-onlineGetValueResponse :: Process -> Command -> IO GValResult
-onlineGetValueResponse proc cmd = liftA getValueResponse (onlineFun proc cmd)
+onExit :: Process -> IO String
+onExit proc = endProcess proc >> return "success"
 
+onlineGenResponse :: Process -> Command -> Solvers -> IO Result
+onlineGenResponse proc cmd solver  = 
+    liftA genResponse (onlineFun proc cmd solver)
+
+onlineCheckSatResponse :: Process -> Command -> Solvers -> IO Result
+onlineCheckSatResponse proc cmd solver = 
+    liftA checkSatResponse (onlineFun proc cmd solver) 
+
+onlineGetValueResponse :: Process -> Command -> Solvers -> IO Result
+onlineGetValueResponse proc cmd solver = 
+    liftA getValueResponse (onlineFun proc cmd solver)
+
+
+onlineGetInfoResponse :: Process -> Command -> Solvers -> IO Result
+onlineGetInfoResponse proc cmd solver = 
+    liftA getInfoResponse (onlineFun proc cmd solver)
+
+
+onlineGetAssertionResponse :: Process -> Command -> Solvers -> IO Result
+onlineGetAssertionResponse proc cmd solver =
+    liftA getAssertionResponse (onlineFun proc cmd solver)
+
+onlineGetProofResponse :: Process -> Command ->  Solvers -> IO Result
+onlineGetProofResponse proc cmd solver = 
+    liftA getProofResponse (onlineFun proc cmd solver)
+
+
+onlineGetUnsatCoreResponse :: Process -> Command -> Solvers -> IO Result
+onlineGetUnsatCoreResponse proc cmd solver = 
+    liftA getUnsatCoreResponse (onlineFun proc cmd solver)
+
+
+onlineGetAssignmentResponse :: Process -> Command -> Solvers -> IO Result
+onlineGetAssignmentResponse proc cmd solver = 
+    liftA getAssignmentResponse (onlineFun proc cmd solver)
+
+
+onlineGetOptionResponse :: Process -> Command -> Solvers -> IO Result
+onlineGetOptionResponse proc cmd solver = 
+    liftA getOptionResponse (onlineFun proc cmd solver)
+
+onlineExitResponse :: Process -> IO Result
+onlineExitResponse proc = liftA genResponse (onExit proc)
 
 --SMT Commands.
 
-onlineSetLogic :: Process -> Name -> IO GenResult
-onlineSetLogic proc name = onlineGenResponse proc (CmdSetLogic name)
+onlineSetLogic ::Solvers -> Process -> Name -> IO Result
+onlineSetLogic solver proc name = 
+    onlineGenResponse proc (CmdSetLogic name) solver
 
-onlineSetOption :: Process -> Option -> IO GenResult
-onlineSetOption proc option = onlineGenResponse proc (CmdSetOption option)
+onlineSetOption ::Solvers -> Process -> Option -> IO Result
+onlineSetOption solver proc option = 
+    onlineGenResponse proc (CmdSetOption option) solver
 
-onlineSetInfo :: Process ->  Attr -> IO GenResult
-onlineSetInfo proc attr  = onlineGenResponse proc  (CmdSetInfo attr)
+onlineSetInfo ::Solvers -> Process ->  Attr -> IO Result
+onlineSetInfo solver proc attr  = 
+    onlineGenResponse proc (CmdSetInfo attr) solver
 
-onlineDeclareType :: Process -> Name -> Integer -> IO GenResult
-onlineDeclareType proc name number =
-    onlineGenResponse proc (CmdDeclareType name number)
+onlineDeclareType ::Solvers -> Process -> Name -> Integer -> IO Result
+onlineDeclareType solver proc name number =
+    onlineGenResponse proc (CmdDeclareType name number) solver
 
-onlineDefineType :: Process -> Name -> [Name] -> Type -> IO GenResult
-onlineDefineType proc name names t =
-    onlineGenResponse proc (CmdDefineType name names t)
+onlineDefineType ::Solvers -> Process -> Name -> [Name] -> Type -> IO Result
+onlineDefineType solver proc name names t =
+    onlineGenResponse proc (CmdDefineType name names t) solver
 
-onlineDeclareFun :: Process -> Name -> [Type] -> Type -> IO GenResult
-onlineDeclareFun proc name lt t =
-    onlineGenResponse proc (CmdDeclareFun name lt t)
+onlineDeclareFun ::Solvers -> Process -> Name -> [Type] -> Type -> IO Result
+onlineDeclareFun solver proc name lt t =
+    onlineGenResponse proc (CmdDeclareFun name lt t) solver
 
-onlineDefineFun :: Process -> Name -> [Binder] -> Type -> Expr -> IO GenResult
-onlineDefineFun proc name binders t expression =
-    onlineGenResponse proc (CmdDefineFun name binders t expression)
+onlineDefineFun ::Solvers -> Process -> Name -> [Binder] -> Type -> Expr -> IO Result
+onlineDefineFun solver proc name binders t expression =
+    onlineGenResponse proc (CmdDefineFun name binders t expression) solver
 
-onlinePush :: Process -> Integer -> IO GenResult
-onlinePush proc number = onlineGenResponse proc (CmdPush number)
+onlinePush ::Solvers -> Process -> Integer -> IO Result
+onlinePush solver proc number = 
+    onlineGenResponse proc (CmdPush number) solver
 
-onlinePop :: Process -> Integer -> IO GenResult
-onlinePop proc number = onlineGenResponse proc (CmdPop number)
+onlinePop ::Solvers -> Process -> Integer -> IO Result
+onlinePop solver proc number = 
+    onlineGenResponse proc (CmdPop number) solver
 
-onlineAssert :: Process -> Expr -> IO GenResult
-onlineAssert proc expression = onlineGenResponse proc (CmdAssert expression)
+onlineAssert ::Solvers -> Process -> Expr -> IO Result
+onlineAssert solver proc expression = 
+    onlineGenResponse proc (CmdAssert expression) solver
 
-onlineCheckSat :: Process  -> IO SatResult
-onlineCheckSat proc = onlineCheckSatResponse proc CmdCheckSat
+onlineCheckSat ::Solvers -> Process  -> IO Result
+onlineCheckSat solver proc = 
+    onlineCheckSatResponse proc CmdCheckSat solver
 
-onlineGetAssertions :: Process -> IO String
-onlineGetAssertions proc = onlineFun proc  CmdGetAssertions
+onlineGetAssertions ::Solvers -> Process -> IO Result
+onlineGetAssertions solver proc = 
+    onlineGetAssertionResponse proc  CmdGetAssertions solver
 
-onlineGetValue :: Process -> [Expr] -> IO GValResult
-onlineGetValue proc exprs = onlineGetValueResponse proc (CmdGetValue exprs)
+onlineGetValue ::Solvers -> Process -> [Expr] -> IO Result
+onlineGetValue solver proc exprs = 
+    onlineGetValueResponse proc (CmdGetValue exprs) solver
 
-onlineGetProof :: Process -> IO String
-onlineGetProof proc = onlineFun proc  CmdGetProof
+onlineGetProof ::Solvers -> Process -> IO Result
+onlineGetProof solver proc = 
+    onlineGetProofResponse proc  CmdGetProof solver
 
-onlineGetUnsatCore :: Process -> IO String
-onlineGetUnsatCore proc = onlineFun proc CmdGetUnsatCore
+onlineGetUnsatCore ::Solvers -> Process -> IO Result
+onlineGetUnsatCore solver proc = 
+    onlineGetUnsatCoreResponse proc CmdGetUnsatCore solver
 
-onlineGetInfo :: Process -> InfoFlag -> IO String
-onlineGetInfo proc info = onlineFun proc ( CmdGetInfo info )
+onlineGetInfo ::Solvers -> Process -> InfoFlag -> IO Result
+onlineGetInfo solver proc info = 
+    onlineGetInfoResponse proc (CmdGetInfo info) solver
 
-onlineGetOption :: Process -> Name -> IO String
-onlineGetOption proc name = onlineFun proc ( CmdGetOption name )
+onlineGetOption ::Solvers -> Process -> Name -> IO Result
+onlineGetOption solver proc name = 
+    onlineGetOptionResponse proc (CmdGetOption name) solver
 
-onlineExit :: Process -> IO String
-onlineExit proc = onlineFun proc CmdExit
+onlineExit :: Process -> IO Result
+onlineExit proc =  onlineExitResponse proc

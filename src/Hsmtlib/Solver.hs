@@ -7,7 +7,7 @@ module Hsmtlib.Solver where
 
 import           Data.Map
 import           SMTLib2
-
+import           Hsmtlib.Parsers.Syntax hiding(Option, Command)
 
 
 -- | Logics that can be passed to the start of the solver
@@ -41,35 +41,39 @@ data Logic = AUFLIA
 data Solvers = Z3 | Cvc4 | Yices | Mathsat | Altergo | Boolector
 
 
-{- |
- Response from most commands that do not demand a feedback from the solver,
- e.g: setLogic,push,pop...
+
+
+
+{-| Each response correspondes to it's respective command,
+   for example CGI correspondes to the command Get Info.
+   The Command CGR is the result for the command that dont return anything by default, for
+   example push or pop. What is returned by this command is if it was succefull or not.
+  
 -}
-data GenResult = Success -- ^ The command was successfully sent to the solver.
-               | Unsupported -- ^ The solver does not support the command.
-               | Error String -- ^ Some error occurred in the solver.
-               -- | Some error occurred parsing the response from the solver.
-               | GUError String
-               deriving (Show,Eq)
+data Result = CGR GenResponse 
+            | CGI GetInfoResponse
+            | CCS CheckSatResponse
+            | CGAssert GetAssertion
+            | CGP GetProofResponse
+            | CGUC GetUnsatCoreResponse
+            | CGV [GValResult]
+            | CGAssig GetAssignmentResponse
+            | CGO GetOptionResponse
+            | ComError String -- ^ Error comunicating with the smt or Parsing
+            deriving (Show, Eq)
 
-
-
--- | Response from the command  checkSat.
-data SatResult = Sat -- ^ The solver has found a model.
-               | Unsat -- ^ The solver has established there is no model.
-               | Unknown -- ^ The search for a model was inconclusive.
-               -- Some error occurred parsing the response from the solver.
-               | SUError String
-               deriving (Show)
-
-
-
--- | Response from the command  getValue
-data GValResult = Res String Value -- ^ Name of the variable or function and result. 
-                | VArrays Arrays -- ^ The result of arrays
-                | Results [GValResult] -- ^ Multiple results from multiple requestes.
-                | GVUError String -- ^ Some error occurred parsing the response from the solver.
-                deriving (Show)
+-- |  Name of the variable or function and result 
+data GValResult = Res String Value  
+                -- The result of arrays
+                | VArrays Arrays 
+                -- |  Multiple results from multiple requestes.
+                | Results [GValResult] 
+                {-|
+                   In case it can't turn the result to one of the results above,
+                   it return the syntax tree
+                -}
+                | Synt GetValueResponse 
+                deriving (Show, Eq)
 
 
 {- |
@@ -82,12 +86,13 @@ data GValResult = Res String Value -- ^ Name of the variable or function and res
 type Arrays = Map String (Map String Integer)
 
 
+
 -- |  The type returned by getValue on constants or functions.
 data Value = VInt Integer
            | VRatio Rational
            | VBool Bool
            | VHex String
-            deriving (Show)
+            deriving (Show, Eq)
 
 
 
@@ -107,24 +112,24 @@ data SolverConfig = Config
 
 -- | Solver data type that has all the functions.
 data Solver = Solver
-    { setLogic      :: Name -> IO GenResult
-    , setOption     :: Option -> IO GenResult
-    , setInfo       :: Attr -> IO GenResult
-    , declareType   :: Name -> Integer -> IO GenResult
-    , defineType    :: Name -> [Name] -> Type -> IO GenResult
-    , declareFun    :: Name -> [Type] -> Type -> IO GenResult
-    , defineFun     :: Name -> [Binder] -> Type -> Expr -> IO GenResult
-    , push          :: Integer -> IO GenResult
-    , pop           :: Integer -> IO GenResult
-    , assert        :: Expr -> IO GenResult
-    , checkSat      :: IO SatResult
-    , getAssertions :: IO String
-    , getValue      :: [Expr] -> IO GValResult
-    , getProof      :: IO String
-    , getUnsatCore  :: IO String
-    , getInfo       :: InfoFlag -> IO String
-    , getOption     :: Name -> IO String
-    , exit          :: IO String
+    { setLogic      :: Name -> IO Result
+    , setOption     :: Option -> IO Result
+    , setInfo       :: Attr -> IO Result
+    , declareType   :: Name -> Integer -> IO Result
+    , defineType    :: Name -> [Name] -> Type -> IO Result
+    , declareFun    :: Name -> [Type] -> Type -> IO Result
+    , defineFun     :: Name -> [Binder] -> Type -> Expr -> IO Result
+    , push          :: Integer -> IO Result
+    , pop           :: Integer -> IO Result
+    , assert        :: Expr -> IO Result
+    , checkSat      :: IO Result
+    , getAssertions :: IO Result
+    , getValue      :: [Expr] -> IO Result
+    , getProof      :: IO Result
+    , getUnsatCore  :: IO Result
+    , getInfo       :: InfoFlag -> IO Result
+    , getOption     :: Name -> IO Result
+    , exit          :: IO Result
     }
     | BSolver
     { executeBatch :: [Command] -> IO String }

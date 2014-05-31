@@ -68,9 +68,9 @@ startMathSatOnline' logic conf = do
   -- Starts a Z4 Process.
   process <- beginProcess (path conf) (args conf)
   --Set Option to print success after accepting a Command.
-  onlineSetOption process (OptPrintSuccess True)
+  _ <- onlineSetOption Mathsat process (OptPrintSuccess True)
   -- Sets the SMT Logic.
-  onlineSetLogic process (N logic)
+  _ <- onlineSetLogic Mathsat process (N logic)
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 
@@ -101,8 +101,8 @@ startMathSatScript' :: String -> SolverConfig -> FilePath -> IO Solver
 startMathSatScript' logic conf scriptFilePath = do
   scriptHandle <- openFile scriptFilePath WriteMode
   let srcmd = newScriptArgs conf scriptHandle scriptFilePath
-  scriptSetOption srcmd (OptPrintSuccess True)
-  scriptSetLogic srcmd (N logic)
+  _ <- scriptSetOption srcmd (OptPrintSuccess True)
+  _ <- scriptSetLogic srcmd (N logic)
   return $ scriptSolver srcmd
 
 --Function which creates the ScriptConf for the script functions.
@@ -133,23 +133,23 @@ startMathSatBatch' logic conf = return $ batchSolver logic conf
 -- Each function will send the command to the solver and wait for the response.
 onlineSolver :: Process -> Solver
 onlineSolver process =
-  Solver { setLogic = onlineSetLogic process
-         , setOption = onlineSetOption process
-         , setInfo = onlineSetInfo process
-         , declareType = onlineDeclareType process
-         , defineType = onlineDefineType process
-         , declareFun = onlineDeclareFun process
-         , defineFun = onlineDefineFun process
-         , push = onlinePush process
-         , pop = onlinePop process
-         , assert = onlineAssert process
-         , checkSat = onlineCheckSat process
-         , getAssertions = onlineGetAssertions process
-         , getValue = onlineGetValue process
-         , getProof = onlineGetProof process
-         , getUnsatCore = onlineGetUnsatCore process
-         , getInfo = onlineGetInfo process
-         , getOption = onlineGetOption process
+  Solver { setLogic = onlineSetLogic Mathsat process
+         , setOption = onlineSetOption Mathsat process
+         , setInfo = onlineSetInfo Mathsat process
+         , declareType = onlineDeclareType Mathsat process
+         , defineType = onlineDefineType Mathsat process
+         , declareFun = onlineDeclareFun Mathsat process
+         , defineFun = onlineDefineFun Mathsat process
+         , push = onlinePush Mathsat process
+         , pop = onlinePop Mathsat process
+         , assert = onlineAssert Mathsat process
+         , checkSat = onlineCheckSat Mathsat process
+         , getAssertions = onlineGetAssertions Mathsat process
+         , getValue = onlineGetValue Mathsat process
+         , getProof = onlineGetProof Mathsat process
+         , getUnsatCore = onlineGetUnsatCore Mathsat process
+         , getInfo = onlineGetInfo Mathsat process
+         , getOption = onlineGetOption Mathsat process
          , exit = onlineExit process
          }
 

@@ -23,7 +23,7 @@ import           System.IO                           (Handle,
 cvc4ConfigOnline :: SolverConfig
 cvc4ConfigOnline =
     Config { path = "cvc4"
-           , args = ["--interactive", "--lang=smt2", "--quiet"]
+           , args = ["--interactive", "--smtlib-strict", "--print-success", "-q"]
            }
 
 -- Both Script configurations are the same but have diferent names
@@ -32,13 +32,13 @@ cvc4ConfigOnline =
 cvc4ConfigScript :: SolverConfig
 cvc4ConfigScript =
     Config { path = "cvc4"
-           , args = ["--lang=smt2"]
+           , args = []
            }
 
 cvc4ConfigBatch :: SolverConfig
 cvc4ConfigBatch =
         Config { path = "cvc4"
-               , args = ["--lang=smt2"]
+               , args = []
                }
 
 {- |
@@ -67,9 +67,9 @@ startCvc4Online' logic conf = do
   -- Starts a Cvc4 Process.
   process <- beginProcess (path conf) (args conf)
   --Set Option to print success after accepting a Command.
-  onlineSetOption process (OptPrintSuccess True)
+  --_ <- onlineSetOption Cvc4 process (OptPrintSuccess True)
   -- Sets the SMT Logic.
-  onlineSetLogic process (N logic)
+  _ <- onlineSetLogic Cvc4 process (N logic)
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 
@@ -106,9 +106,9 @@ startCvc4Script' logic conf scriptFilePath = do
   -- Creates the arguments for the functions in ScriptCmd
   let srcmd = newScriptArgs conf scriptHandle scriptFilePath
   --Set Option to print success after accepting a Command.
-  scriptSetOption srcmd (OptPrintSuccess True)
+  _ <- scriptSetOption srcmd (OptPrintSuccess True)
   -- Initialize the solver Functions and return them.
-  scriptSetLogic srcmd (N logic)
+  _ <- scriptSetLogic srcmd (N logic)
   return $ scriptSolver srcmd
 
 --Function which creates the ScriptConf for the script functions.
@@ -135,23 +135,23 @@ startCvc4Batch' logic conf = return $ batchSolver logic conf
 -- Each function will send the command to the solver and wait for the response.
 onlineSolver :: Process -> Solver
 onlineSolver process =
-  Solver { setLogic = onlineSetLogic process
-         , setOption = onlineSetOption process
-         , setInfo = onlineSetInfo process
-         , declareType = onlineDeclareType process
-         , defineType = onlineDefineType process
-         , declareFun = onlineDeclareFun process
-         , defineFun = onlineDefineFun process
-         , push = onlinePush process
-         , pop = onlinePop process
-         , assert = onlineAssert process
-         , checkSat = onlineCheckSat process
-         , getAssertions = onlineGetAssertions process
-         , getValue = onlineGetValue process
-         , getProof = onlineGetProof process
-         , getUnsatCore = onlineGetUnsatCore process
-         , getInfo = onlineGetInfo process
-         , getOption = onlineGetOption process
+  Solver { setLogic = onlineSetLogic Cvc4 process
+         , setOption = onlineSetOption Cvc4 process
+         , setInfo = onlineSetInfo Cvc4 process
+         , declareType = onlineDeclareType Cvc4 process
+         , defineType = onlineDefineType Cvc4 process
+         , declareFun = onlineDeclareFun Cvc4 process
+         , defineFun = onlineDefineFun Cvc4 process
+         , push = onlinePush Cvc4 process
+         , pop = onlinePop Cvc4 process
+         , assert = onlineAssert Cvc4 process
+         , checkSat = onlineCheckSat Cvc4 process
+         , getAssertions = onlineGetAssertions Cvc4 process
+         , getValue = onlineGetValue Cvc4 process
+         , getProof = onlineGetProof Cvc4 process
+         , getUnsatCore = onlineGetUnsatCore Cvc4 process
+         , getInfo = onlineGetInfo Cvc4 process
+         , getOption = onlineGetOption Cvc4 process
          , exit = onlineExit process
          }
 

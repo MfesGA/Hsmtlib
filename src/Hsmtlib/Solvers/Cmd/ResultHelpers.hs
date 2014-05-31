@@ -1,112 +1,11 @@
-module  Hsmtlib.Solvers.Cmd.Parser.CmdResult where
+module Hsmtlib.Solvers.Cmd.ResultHelpers where
 
-import           Control.Applicative                    ((<|>),(<$>))
+import           Control.Applicative                   ((<$>), (<|>))
 import           Control.Monad
---import           Data.List                              (intercalate)
-import           Data.Map                               as M
-import           Data.Maybe                             (isJust)
-import           Hsmtlib.Solver                         as Solv
-import           Hsmtlib.Solvers.Cmd.Parser.Parsers     hiding (numeral, symbol)
-import           Hsmtlib.Solvers.Cmd.Parser.Syntax      as S
-import           Hsmtlib.Solvers.Cmd.Parser.Visualizers
-import           Prelude                                as P
-import           Text.ParserCombinators.Parsec.Prim     (parse)
+import           Hsmtlib.Parsers.Syntax        as S
+import           Hsmtlib.Solver                        as Solv
+import           Data.Map                           as M
 
-genResponse :: String -> GenResult
-genResponse stg =
-    case result of
-        Left err -> Solv.GUError $ show err
-        Right cmdRep -> case cmdRep of
-                            CmdGenResponse S.Success -> Solv.Success
-                            CmdGenResponse S.Unsupported -> Solv.Unsupported
-                            CmdGenResponse (S.Error err) -> Solv.Error err
-    where result = parse parseCmdGenResponse "" stg
-
-
-checkSatResponse :: String -> SatResult
-checkSatResponse stg =
-    case result of
-        Left err ->  Solv.SUError $ show  err
-        Right cmdRep -> case cmdRep of
-                            S.Sat -> Solv.Sat
-                            S.Unsat -> Solv.Unsat
-                            S.Unknown -> Solv.Unknown
-    where result = parse parseCheckSatResponse "" stg
-
-
-{-
-getValueResponse :: String -> GValResult
-getValueResponse stg = GVUError  $ stg ++ "\n" ++ tree
-    where result = parse parseGetValueResponse "" stg
-          tree =  getVR' result
-
-
-getVR' :: Show a => Either a [ValuationPair] -> String
-getVR' result =
-  case result of
-    Left err -> show err
-    Right vals -> intercalate "\n" (fmap (showValuationPair 0) vals)
-
--}
-getValueResponse :: String -> GValResult
-getValueResponse stg = case result of
-                        Left err -> GVUError $ stg ++ "|"++show err
-                        Right vals -> getVR' $ getValResponse vals
-    where result = parse parseGetValueResponse "" stg
-
-
-getVR' :: [GValResult] -> GValResult
-getVR' xs | length xs == 1 = head xs
-          | otherwise = Results xs
-
-getValResponse::[ValuationPair] -> [GValResult]
-getValResponse vp = arrays ++ errors
-                      -- gets the results in a Maybe GValResult.
-                where res = getValResponses vp 
-                      --Produes UErrors from the results that gave Nothing.
-                      errors = valErrors' vp res
-                      cRes = P.filter isJust res -- Removes the Nothings.
-                      -- Joins all arrays in one and 
-                      --removes the Just from all results.
-                      arrays = joinArrays cRes 
-
-
-
-valErrors' :: [ValuationPair] -> [Maybe GValResult] -> [GValResult]
-valErrors' [] [] = []
-valErrors' (x:xs) (Nothing:gs) = 
-  GVUError (showValuationPair 0 x) : valErrors' xs gs
-valErrors' (_:xs) (_:gs) = valErrors' xs  gs  
-
- 
-
-joinArrays :: [Maybe GValResult] -> [GValResult]
-joinArrays = joinArrays' $ VArrays empty
-
-
-joinArrays' :: GValResult -> [Maybe GValResult] -> [GValResult]
--- if there was no array in the result then don't put an empty one.
-joinArrays' (VArrays n) [] | M.null n = [] 
-                           | otherwise = [VArrays n]
-joinArrays' res (x:xs) = case nVal of
-                          (VArrays _) -> joinArrays' nVal xs
-                          _ -> nVal : joinArrays' res xs
-                         where nVal = checkGVal res x 
-
-checkGVal :: GValResult ->  Maybe GValResult -> GValResult
-checkGVal (VArrays oarr) (Just(VArrays arr)) = 
-  VArrays $ unionWith union oarr arr
-checkGVal _ (Just x) = x
-
-
-getValResponses :: [ValuationPair] -> [Maybe GValResult]
-getValResponses = fmap getGValResult
-
-getGValResult :: ValuationPair -> Maybe GValResult
-getGValResult vp = getVar vp
-               <|> getArray vp
-               <|> getFun vp
-               <|> getBitVec vp
 
 {- | Retrives the value of a BitVector.
      Works with:
@@ -198,10 +97,10 @@ getArray' _ _ _ _ = Nothing
 
 
 isArray :: ValuationPair -> Maybe Bool
-isArray = isArray' 
-      <=< symbol 
-      <=< qIdentifier 
-      <=< fstTermQualIdentierT 
+isArray = isArray'
+      <=< symbol
+      <=< qIdentifier
+      <=< fstTermQualIdentierT
       <=< fstTerm
 
 
@@ -303,7 +202,7 @@ getFunName = symbol <=< qIdentifier <=< fstTermQualIdentierT <=< fstTerm
 
 getFunResult :: ValuationPair -> Maybe Value
 getFunResult vp = getFunResultBool vp <|> getFunResultInt vp
-          
+
 getFunResultBool :: ValuationPair -> Maybe Value
 getFunResultBool = VBool <#> toBool <=< getFunResultBool'
 
@@ -312,9 +211,17 @@ getFunResultInt :: ValuationPair -> Maybe Value
 getFunResultInt = VInt <#> getFunResultInt'
 
 
+{-
+   #########################################################################
+   #                                                                       #
+   #                           Auxiliar functions to acess Syntax          #
+   #                                                                       #
+   #########################################################################
+-}
+
 
 (<#>):: Functor m => (b -> c) -> (a -> m b) -> a -> m c
-(<#>) f m = \x -> f <$> m x 
+(f <#> m) x  = f <$> m x
 
 toBool :: String -> Maybe Bool
 toBool "true" = Just True
@@ -327,7 +234,7 @@ getFunResultInt' = numeral <=< getTermSpecConstant <=< sndTerm
 
 getFunResultBool' :: ValuationPair -> Maybe String
 getFunResultBool' = symbol <=< qIdentifier <=< termQualIdentifier <=< sndTerm
- 
+
 
 {- | Retrives the result of a bitvector.
      Works with:

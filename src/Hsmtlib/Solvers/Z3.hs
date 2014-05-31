@@ -11,7 +11,7 @@ import           Hsmtlib.Solvers.Cmd.BatchCmd        as B (executeBatch)
 import           Hsmtlib.Solvers.Cmd.OnlineCmd
 import           Hsmtlib.Solvers.Cmd.ProcCom.Process
 import           Hsmtlib.Solvers.Cmd.ScriptCmd
-import           Hsmtlib.Solvers.Cmd.Parser.CmdResult
+import           Hsmtlib.Solvers.Cmd.CmdResult
 import           SMTLib2
 import           System.IO                           (Handle,
                                                       IOMode (WriteMode),
@@ -62,9 +62,9 @@ startZ3Online' logic conf = do
   -- Starts a Z3 Process.
   process <- beginProcess (path conf) (args conf)
   --Set Option to print success after accepting a Command.
-  onlineSetOption process (OptPrintSuccess True)
+  onlineSetOption Z3 process (OptPrintSuccess True)
   -- Sets the SMT Logic.
-  onlineSetLogic process (N logic)
+  onlineSetLogic Z3 process (N logic)
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 
@@ -125,27 +125,27 @@ startZ3Batch' logic conf = return $ batchSolver logic conf
 -- Each function will send the command to the solver and wait for the response.
 onlineSolver :: Process -> Solver
 onlineSolver process =
-  Solver { setLogic = onlineSetLogic process
-         , setOption = onlineSetOption process
-         , setInfo = onlineSetInfo process
-         , declareType = onlineDeclareType process
-         , defineType = onlineDefineType process
-         , declareFun = onlineDeclareFun process
-         , defineFun = onlineDefineFun process
-         , push = onlinePush process
-         , pop = onlinePop process
-         , assert = onlineAssert process
-         , checkSat = onlineCheckSat process
-         , getAssertions = onlineGetAssertions process
-         , getValue = onlineGetValue process
-         , getProof = onlineGetProof process
-         , getUnsatCore = onlineGetUnsatCore process
-         , getInfo = onlineGetInfo process
-         , getOption = onlineGetOption process
+  Solver { setLogic = onlineSetLogic Z3 process
+         , setOption = onlineSetOption Z3  process
+         , setInfo = onlineSetInfo Z3  process
+         , declareType = onlineDeclareType Z3  process
+         , defineType = onlineDefineType Z3  process
+         , declareFun = onlineDeclareFun Z3  process
+         , defineFun = onlineDefineFun Z3  process
+         , push = onlinePush Z3 process 
+         , pop = onlinePop Z3 process
+         , assert = onlineAssert Z3 process
+         , checkSat = onlineCheckSat Z3 process
+         , getAssertions = onlineGetAssertions Z3 process
+         , getValue = onlineGetValue Z3 process
+         , getProof = onlineGetProof Z3 process
+         , getUnsatCore = onlineGetUnsatCore Z3 process
+         , getInfo = onlineGetInfo Z3 process
+         , getOption = onlineGetOption Z3 process
          , exit = onlineExit process
          }
 {-Specific parse result functions that works only in case of Z3 because it breaks the result with new line and not space-}
-scriptGetValueResponseZ3 :: ScriptConf  -> Command -> IO GValResult
+scriptGetValueResponseZ3 :: ScriptConf  -> Command -> IO Result
 scriptGetValueResponseZ3 conf cmd =
   liftA getValueResponse (scriptFunExecZ3 conf cmd)
 
@@ -153,9 +153,9 @@ scriptFunExecZ3 :: ScriptConf -> Command -> IO String
 scriptFunExecZ3 sConf cmd = do
   writeToScript sConf cmd
   res <- sendScript (sCmdPath sConf) (sArgs sConf) (sFilePath sConf)
-  return  $ unlines $ drop 1 $  snd $ break (==['s','a','t']) $ lines $res
+  return $ unlines $ drop 1 $  snd $ break (==['s','a','t']) $ lines $ res
 
-scriptGetValueZ3 :: ScriptConf -> [Expr] -> IO GValResult
+scriptGetValueZ3 :: ScriptConf -> [Expr] -> IO Result
 scriptGetValueZ3 sConf exprs = scriptGetValueResponseZ3 sConf (CmdGetValue exprs)
 
 -- Creates the funtion for the script mode.

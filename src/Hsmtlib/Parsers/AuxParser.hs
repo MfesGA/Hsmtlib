@@ -1,18 +1,14 @@
-module AuxParser where
+module Hsmtlib.Parsers.AuxParser where
 
 {-|
     In the String terminal, it does not parse C-style characters.
     Quoted Symbol does not parse all printable ASCII characters.
 -}
 
-import           Data.Functor.Identity                    (Identity)
-import           Text.Parsec.Prim                         as Prim (ParsecT,
-                                                                   unexpected)
-import           Text.ParserCombinators.Parsec.Char       (char, digit, letter,
-                                                           string)
-
-import           Control.Applicative
-import           Text.ParserCombinators.Parsec.Combinator (many1)
+import           Control.Applicative               as Ctr hiding ((<|>))
+import           Data.Functor.Identity
+import           Text.Parsec.Prim                  as Prim
+import           Text.ParserCombinators.Parsec     as Pc
 
 
 (<:>) :: Applicative f => f a -> f [a] -> f [a]
@@ -27,11 +23,12 @@ import           Text.ParserCombinators.Parsec.Combinator (many1)
 numeral :: ParsecT String u Identity String
 numeral = many1 digit
 
-
+num :: ParsecT String u Identity String
+num = Pc.many digit
 -- Parse a decimal
 
 decimal :: ParsecT String u Identity String
-decimal = numeral <++>  dot <++> zeros <++> numeral
+decimal = numeral <++> dot <++> Pc.try zeros <++> num
 
 zeros :: ParsecT String u Identity String
 zeros = Pc.many $ char '0'
@@ -60,14 +57,18 @@ str :: ParsecT String u Identity String
 str = string "\"" <++> Pc.many strChar <++> string "\""
 
 strChar :: ParsecT String u Identity Char
-strChar = alphaNum <|> char ' '
+strChar = alphaNum 
+      <|> char ' '
+      <|> char ':' 
+      <|> char ',' 
+
 
 --parse a Symbol
 symbol :: ParsecT String u Identity String
 symbol = simpleSymbol <|> quotedSymbol
 
 quotedSymbol :: ParsecT String u Identity String
-quotedSymbol = char '|' <:> Pc.many alphaNum <++> string "|"
+quotedSymbol = char '|' *> Pc.many (noneOf "|")  <* char '|'
 
 simpleSymbol :: ParsecT String u Identity String
 simpleSymbol = (letter <|> spcSymb) <:>  sq
@@ -89,6 +90,18 @@ aspC = char ')'
 
 aspUS :: ParsecT String u Identity Char
 aspUS = char '_'
+
+
+true :: ParsecT String u Identity String
+true = string "true"
+
+false :: ParsecT String u Identity String
+false = string "false"
+
+
+emptySpace :: ParsecT String u Identity String
+emptySpace = Pc.try $ Pc.many $ 
+    char ' ' <|> char '\n' <|> char '\t' <|> char '\r'
 
 reservedWords :: ParsecT String u Identity String
 reservedWords =  string "let"

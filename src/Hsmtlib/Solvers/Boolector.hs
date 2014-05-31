@@ -69,7 +69,7 @@ startBoolectorOnline' logic conf = do
   --Set Option to print success after accepting a Command.
   --onlineSetOption process (OptPrintSuccess True)
   -- Sets the SMT Logic.
-  onlineSetLogic process (N logic)
+  _ <- onlineSetLogic Boolector process (N logic)
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 
@@ -100,8 +100,8 @@ startBoolectorScript' :: String -> SolverConfig -> FilePath -> IO Solver
 startBoolectorScript' logic conf scriptFilePath = do
   scriptHandle <- openFile scriptFilePath WriteMode
   let srcmd = newScriptArgs conf scriptHandle scriptFilePath
-  scriptSetOption srcmd (OptPrintSuccess True)
-  scriptSetLogic srcmd (N logic)
+  _ <- scriptSetOption srcmd (OptPrintSuccess True)
+  _ <- scriptSetLogic srcmd (N logic)
   return $ scriptSolver srcmd
 
 --Function which creates the ScriptConf for the script functions.
@@ -127,23 +127,23 @@ startBoolectorBatch' logic conf = return $ batchSolver logic conf
 -- Each function will send the command to the solver and wait for the response.
 onlineSolver :: Process -> Solver
 onlineSolver process =
-  Solver { setLogic = onlineSetLogic process
-         , setOption = onlineSetOption process
-         , setInfo = onlineSetInfo process
-         , declareType = onlineDeclareType process
-         , defineType = onlineDefineType process
-         , declareFun = onlineDeclareFun process
-         , defineFun = onlineDefineFun process
-         , push = onlinePush process
-         , pop = onlinePop process
-         , assert = onlineAssert process
-         , checkSat = onlineCheckSat process
-         , getAssertions = onlineGetAssertions process
-         , getValue = onlineGetValue process
-         , getProof = onlineGetProof process
-         , getUnsatCore = onlineGetUnsatCore process
-         , getInfo = onlineGetInfo process
-         , getOption = onlineGetOption process
+  Solver { setLogic = onlineSetLogic Boolector process
+         , setOption = onlineSetOption Boolector process
+         , setInfo = onlineSetInfo Boolector process
+         , declareType = onlineDeclareType Boolector process
+         , defineType = onlineDefineType Boolector process
+         , declareFun = onlineDeclareFun Boolector process
+         , defineFun = onlineDefineFun Boolector process
+         , push = onlinePush Boolector process
+         , pop = onlinePop Boolector process
+         , assert = onlineAssert Boolector process
+         , checkSat = onlineCheckSat Boolector process
+         , getAssertions = onlineGetAssertions Boolector process
+         , getValue = onlineGetValue Boolector process
+         , getProof = onlineGetProof Boolector process
+         , getUnsatCore = onlineGetUnsatCore Boolector process
+         , getInfo = onlineGetInfo Boolector process
+         , getOption = onlineGetOption Boolector process
          , exit = onlineExit process
          }
 

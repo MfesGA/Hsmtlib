@@ -1,6 +1,6 @@
-module Hsmtlib.Solvers.Cmd.Parser.Visualizers where
+module Hsmtlib.Parsers.Visualizer where
 
-import           Hsmtlib.Solvers.Cmd.Parser.Syntax  as S
+import           Hsmtlib.Parsers.Syntax  as S
 import           Data.List
 
 
@@ -121,9 +121,9 @@ showIdentifier nsp (I_Symbol str1  str2) =
     where brc = "\n" ++ spaces nsp ++ "|\n" ++ spaces nsp
           fstr = brc ++  "|- "  ++ str1
           sstr = brc ++ "|- [ " ++hd ++ strs ++ end
-          hd = head str2 ++ "\n"
+          hd = show ( head str2) ++ "\n"
           bd = drop 1 str2
-          strs = intercalate "\n" (fmap ((spaces (nsp + 3) ++ ", ") ++) bd)
+          strs = intercalate "\n" (fmap (\x ->((spaces (nsp + 3) ++ ", ")) ++ show x) bd)
           end = "\n" ++ spaces (nsp+3) ++ "]"
 
 
