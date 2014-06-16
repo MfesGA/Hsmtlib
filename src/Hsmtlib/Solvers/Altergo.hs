@@ -14,6 +14,14 @@ import           SMTLib2
 import           System.IO                           (Handle,
                                                       IOMode (WriteMode),
                                                       openFile)
+import           Control.Applicative           as Ctr hiding ((<|>))
+import           Control.Monad
+import           Data.Functor.Identity
+import           Hsmtlib.Parsers.AuxParser
+import           Hsmtlib.Parsers.ParseScript
+import           Hsmtlib.Parsers.Syntax        as CmdRsp
+import           Text.Parsec.Prim              as Prim
+import           Text.ParserCombinators.Parsec as Pc
 
 
 -- All the configurations are the same but have diferent names so if anything
@@ -124,6 +132,43 @@ startAltErgoBatch logic (Just conf) = startAltErgoBatch' logic conf
 startAltErgoBatch' :: String -> SolverConfig -> IO Solver
 startAltErgoBatch' logic config = return $ batchSolver logic config
 
+-- parsing the results of altergo's checksat in online mode (not compliant)
+
+parseCheckSatResponseAlt :: ParsecT String u Identity CheckSatResponse
+parseCheckSatResponseAlt =
+    (string "sat" >> return Sat) <|>
+    (string "unsat" >> return Unsat) <|>
+    (string "unknown (sat)" >> return Unknown)
+
+parseCmdCheckSatResponseAlt :: ParsecT String u Identity CmdResponse
+parseCmdCheckSatResponseAlt = liftM  CmdCheckSatResponse parseCheckSatResponseAlt
+
+onlineCheckSatAlt ::Solvers -> Process  -> IO Result
+onlineCheckSatAlt solver proc = 
+    onlineCheckSatResponseAlt proc CmdCheckSat solver
+
+
+onlineCheckSatResponseAlt :: Process -> SMTLib2.Command -> Solvers -> IO Result
+onlineCheckSatResponseAlt proc cmd solver = 
+    liftA checkSatResponseAlt (onlineFun proc cmd solver) 
+
+checkSatResponseAlt :: String -> Result
+checkSatResponseAlt stg =
+    case result of
+        Left err ->  ComError $ stg ++  " | " ++ show  err
+        Right cmdRep ->  CCS cmdRep
+    where result = parse parseCheckSatResponseAlt "" stg
+
+-- parsing the results of altergo's checksat in script mode (not compliant)
+
+scriptCheckSatResponseAlt :: ScriptConf -> SMTLib2.Command -> IO Result
+scriptCheckSatResponseAlt conf cmd =
+  liftA checkSatResponseAlt  (scriptFunExec conf cmd)
+
+scriptCheckSatAlt :: ScriptConf -> IO Result
+scriptCheckSatAlt sConf = scriptCheckSatResponseAlt sConf CmdCheckSat
+
+
 
 -- Creates the functions for online mode with the process already running.
 -- Each function will send the command to the solver and wait for the response.
@@ -139,7 +184,7 @@ onlineSolver process =
          , push = onlinePush Altergo process
          , pop = onlinePop Altergo process
          , assert = onlineAssert Altergo process
-         , checkSat = onlineCheckSat Altergo process
+         , checkSat = onlineCheckSatAlt Altergo process
          , getAssertions = onlineGetAssertions Altergo process
          , getValue = onlineGetValue Altergo process
          , getProof = onlineGetProof Altergo process
@@ -163,7 +208,7 @@ scriptSolver srcmd =
          , push = scriptPush srcmd
          , pop = scriptPop srcmd
          , assert = scriptAssert srcmd
-         , checkSat = scriptCheckSat srcmd
+         , checkSat = scriptCheckSatAlt srcmd
          , getAssertions = scriptGetAssertions srcmd
          , getValue = scriptGetValue srcmd
          , getProof = scriptGetProof srcmd
