@@ -76,9 +76,13 @@ tOption (OptionAttr attr) = "OptAttr " ++ "( " ++ tAttr attr ++ " )"
 
 tAttr :: Attribute -> String
 tAttr (Attribute str) = "Attr " ++ "(N " ++ show str ++ ") Nothing"  
-tAttr (AttributeVal str val) = "Attr "  ++ "(N " ++ show str ++ ") Nothing"
+tAttr (AttributeVal str val) = "Attr "  ++ "(N " ++ show str ++ ") (Just ( " ++  tAttrVal val ++" ) )"
 
 
+tAttrVal :: AttrValue -> String
+tAttrVal (AtrValueConstant spc) = "( Lit ( " ++  tSpecConst spc ++ ") )"
+tAttrVal (AttrValueSymbol str) = "( Lit ( LitStr " ++   str ++ ") )"
+tAttrVal (AttrValueSexpr sexpr ) = "( Annot ( " ++ (tAttrVal (head sexpr)) ++ ")"
 
 tSpecConst  :: SpecConstant -> String
 tSpecConst (SpecConstantNumeral n) = "LitNum " ++ show n

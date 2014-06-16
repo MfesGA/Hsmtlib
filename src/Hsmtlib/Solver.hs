@@ -1,3 +1,5 @@
+
+
 {- |
 Module      : Hsmtlib.Solver
   This module has most types,data and functions that a user might need to
@@ -64,12 +66,13 @@ data Result = CGR GenResponse
 
 -- |  Name of the variable or function and result 
 data GValResult = Res String Value  
-                -- The result of arrays
+                --| The result of arrays
                 | VArrays Arrays 
                 -- |  Multiple results from multiple requestes.
                 | Results [GValResult] 
                 {-|
-                   In case it can't turn the result to one of the results above,
+                   In case it can't turn the result 
+                   to one of the results above,
                    it return the syntax tree
                 -}
                 | Synt GetValueResponse 

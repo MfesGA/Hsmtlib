@@ -1,4 +1,4 @@
-{- |
+ {- |
 Module      : Process
 
   The following module contains method that facilitate the comunication with
