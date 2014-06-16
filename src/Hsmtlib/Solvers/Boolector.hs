@@ -69,7 +69,7 @@ startBoolectorOnline' logic conf = do
   --Set Option to print success after accepting a Command.
   --onlineSetOption process (OptPrintSuccess True)
   -- Sets the SMT Logic.
-  _ <- onlineSetLogic Boolector process (N logic)
+  _ <- onlineSetLogic Boolector process (N (show logic))
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 

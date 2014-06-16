@@ -22,7 +22,7 @@ import           Hsmtlib.Solvers.Z3        (startZ3)
 
 altScript:: IO()
 altScript= do 
-	solver <- startAltErgo Slv.Script "QF_NIA" Nothing (Just "te.smt2")
+	solver <- startSolver Altergo Slv.Script QF_NIA Nothing (Just "te.smt2")
 	setOption solver (OptProduceModels True)
 	declConst solver "x11" tInt 
 	declConst solver "x12" tInt 
@@ -40,22 +40,22 @@ altScript= do
 	declConst solver "x42" tInt 
 	declConst solver "x43" tInt
 	declConst solver "x44" tInt  
-  	assertDistinct solver [constant "x11", constant "x12", constant "x13", constant "x14"] >>=print 
-	assertDistinct solver [constant "x21", constant "x22", constant "x23", constant "x24"] >>=print 
-	assertDistinct solver [constant "x31", constant "x32", constant "x33", constant "x34"] >>=print 
-	assertDistinct solver [constant "x41", constant "x42", constant "x43", constant "x44"] >>=print 
-	assertDistinct solver [constant "x11", constant "x21", constant "x31", constant "x41"] >>=print 
-	assertDistinct solver [constant "x12", constant "x22", constant "x32", constant "x42"] >>=print
-	assertDistinct solver [constant "x13", constant "x23", constant "x33", constant "x43"] >>=print
-	assertDistinct solver [constant "x14", constant "x24", constant "x34", constant "x44"] >>=print
-  	assertDistinct solver [constant "x11", constant "x12", constant "x21", constant "x22"] >>=print
-	assertDistinct solver [constant "x13", constant "x14", constant "x23", constant "x24"] >>=print
-	assertDistinct solver [constant "x31", constant "x32", constant "x41", constant "x42"] >>=print
-	assertDistinct solver [constant "x33", constant "x34", constant "x43", constant "x44"] >>=print
-	maping solver (nLt (literal 0)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
-	maping solver (nGeq (literal 4)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14"] >>=print 
+	assertDistinct solver [ct  "x21", ct  "x22", ct  "x23", ct  "x24"] >>=print 
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x33", ct  "x34"] >>=print 
+	assertDistinct solver [ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>=print 
+	assertDistinct solver [ct  "x11", ct  "x21", ct  "x31", ct  "x41"] >>=print 
+	assertDistinct solver [ct  "x12", ct  "x22", ct  "x32", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x23", ct  "x33", ct  "x43"] >>=print
+	assertDistinct solver [ct  "x14", ct  "x24", ct  "x34", ct  "x44"] >>=print
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x21", ct  "x22"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x14", ct  "x23", ct  "x24"] >>=print
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x41", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x33", ct  "x34", ct  "x43", ct  "x44"] >>=print
+	maping solver (nLt (lit 0)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
+	maping solver (nGeq (lit 4)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
   	checkSat solver >>= print
-	getValue solver [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print
+	getValue solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print
 	declType solver "edc" 5 >>= print
 	exit solver >>= print 
 
@@ -65,7 +65,7 @@ altScript= do
 
 altOnline:: IO()-- does not terminate 
 altOnline= do 
-	solver <- startAltErgo Slv.Online "QF_NIA" Nothing Nothing
+	solver <- startSolver Altergo Slv.Online QF_NIA Nothing Nothing
 	setOption solver (OptProduceModels True)
 	declConst solver "x11" tInt 
 	declConst solver "x12" tInt 
@@ -83,22 +83,22 @@ altOnline= do
 	declConst solver "x42" tInt 
 	declConst solver "x43" tInt
 	declConst solver "x44" tInt  
-  	assertDistinct solver [constant "x11", constant "x12", constant "x13", constant "x14"] >>=print 
-	assertDistinct solver [constant "x21", constant "x22", constant "x23", constant "x24"] >>=print 
-	assertDistinct solver [constant "x31", constant "x32", constant "x33", constant "x34"] >>=print 
-	assertDistinct solver [constant "x41", constant "x42", constant "x43", constant "x44"] >>=print 
-	assertDistinct solver [constant "x11", constant "x21", constant "x31", constant "x41"] >>=print 
-	assertDistinct solver [constant "x12", constant "x22", constant "x32", constant "x42"] >>=print
-	assertDistinct solver [constant "x13", constant "x23", constant "x33", constant "x43"] >>=print
-	assertDistinct solver [constant "x14", constant "x24", constant "x34", constant "x44"] >>=print
-  	assertDistinct solver [constant "x11", constant "x12", constant "x21", constant "x22"] >>=print
-	assertDistinct solver [constant "x13", constant "x14", constant "x23", constant "x24"] >>=print
-	assertDistinct solver [constant "x31", constant "x32", constant "x41", constant "x42"] >>=print
-	assertDistinct solver [constant "x33", constant "x34", constant "x43", constant "x44"] >>=print
-	maping solver (nLt (literal 0)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
-	maping solver (nGeq (literal 4)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14"] >>=print 
+	assertDistinct solver [ct  "x21", ct  "x22", ct  "x23", ct  "x24"] >>=print 
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x33", ct  "x34"] >>=print 
+	assertDistinct solver [ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>=print 
+	assertDistinct solver [ct  "x11", ct  "x21", ct  "x31", ct  "x41"] >>=print 
+	assertDistinct solver [ct  "x12", ct  "x22", ct  "x32", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x23", ct  "x33", ct  "x43"] >>=print
+	assertDistinct solver [ct  "x14", ct  "x24", ct  "x34", ct  "x44"] >>=print
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x21", ct  "x22"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x14", ct  "x23", ct  "x24"] >>=print
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x41", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x33", ct  "x34", ct  "x43", ct  "x44"] >>=print
+	maping solver (nLt (lit 0)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
+	maping solver (nGeq (lit 4)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
   	checkSat solver >>= print
-	getValue solver [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print
+	getValue solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print
 	declType solver "edc" 5 >>= print
 	exit solver >>= print 
 
@@ -107,7 +107,7 @@ altOnline= do
 
 matOnline:: IO()
 matOnline= do 
-	solver <- startMathSat Slv.Online "QF_NIA" Nothing Nothing
+	solver <- startSolver Mathsat Slv.Online QF_NIA Nothing Nothing
 	setOption solver (OptProduceModels True)
 	declConst solver "x11" tInt 
 	declConst solver "x12" tInt 
@@ -125,22 +125,22 @@ matOnline= do
 	declConst solver "x42" tInt 
 	declConst solver "x43" tInt
 	declConst solver "x44" tInt  
-  	assertDistinct solver [constant "x11", constant "x12", constant "x13", constant "x14"] >>=print 
-	assertDistinct solver [constant "x21", constant "x22", constant "x23", constant "x24"] >>=print 
-	assertDistinct solver [constant "x31", constant "x32", constant "x33", constant "x34"] >>=print 
-	assertDistinct solver [constant "x41", constant "x42", constant "x43", constant "x44"] >>=print 
-	assertDistinct solver [constant "x11", constant "x21", constant "x31", constant "x41"] >>=print 
-	assertDistinct solver [constant "x12", constant "x22", constant "x32", constant "x42"] >>=print
-	assertDistinct solver [constant "x13", constant "x23", constant "x33", constant "x43"] >>=print
-	assertDistinct solver [constant "x14", constant "x24", constant "x34", constant "x44"] >>=print
-  	assertDistinct solver [constant "x11", constant "x12", constant "x21", constant "x22"] >>=print
-	assertDistinct solver [constant "x13", constant "x14", constant "x23", constant "x24"] >>=print
-	assertDistinct solver [constant "x31", constant "x32", constant "x41", constant "x42"] >>=print
-	assertDistinct solver [constant "x33", constant "x34", constant "x43", constant "x44"] >>=print
-	maping solver (nLt (literal 0)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
-	maping solver (nGeq (literal 4)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14"] >>=print 
+	assertDistinct solver [ct  "x21", ct  "x22", ct  "x23", ct  "x24"] >>=print 
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x33", ct  "x34"] >>=print 
+	assertDistinct solver [ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>=print 
+	assertDistinct solver [ct  "x11", ct  "x21", ct  "x31", ct  "x41"] >>=print 
+	assertDistinct solver [ct  "x12", ct  "x22", ct  "x32", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x23", ct  "x33", ct  "x43"] >>=print
+	assertDistinct solver [ct  "x14", ct  "x24", ct  "x34", ct  "x44"] >>=print
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x21", ct  "x22"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x14", ct  "x23", ct  "x24"] >>=print
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x41", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x33", ct  "x34", ct  "x43", ct  "x44"] >>=print
+	maping solver (nLt (lit 0)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
+	maping solver (nGeq (lit 4)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
   	checkSat solver >>= print
-	getValue solver [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print
+	getValue solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print
 	declType solver "edc" 5 >>= print
 	exit solver >>= print 
 
@@ -148,7 +148,7 @@ matOnline= do
 
 matScript:: IO()
 matScript= do 
-	solver <- startMathSat Slv.Script "QF_NIA" Nothing (Just "te.smt2")
+	solver <- startSolver Mathsat Slv.Script QF_NIA Nothing (Just "te.smt2")
 	setOption solver (OptProduceModels True)
 	declConst solver "x11" tInt 
 	declConst solver "x12" tInt 
@@ -166,22 +166,22 @@ matScript= do
 	declConst solver "x42" tInt 
 	declConst solver "x43" tInt
 	declConst solver "x44" tInt  
-  	assertDistinct solver [constant "x11", constant "x12", constant "x13", constant "x14"] >>=print 
-	assertDistinct solver [constant "x21", constant "x22", constant "x23", constant "x24"] >>=print 
-	assertDistinct solver [constant "x31", constant "x32", constant "x33", constant "x34"] >>=print 
-	assertDistinct solver [constant "x41", constant "x42", constant "x43", constant "x44"] >>=print 
-	assertDistinct solver [constant "x11", constant "x21", constant "x31", constant "x41"] >>=print 
-	assertDistinct solver [constant "x12", constant "x22", constant "x32", constant "x42"] >>=print
-	assertDistinct solver [constant "x13", constant "x23", constant "x33", constant "x43"] >>=print
-	assertDistinct solver [constant "x14", constant "x24", constant "x34", constant "x44"] >>=print
-  	assertDistinct solver [constant "x11", constant "x12", constant "x21", constant "x22"] >>=print
-	assertDistinct solver [constant "x13", constant "x14", constant "x23", constant "x24"] >>=print
-	assertDistinct solver [constant "x31", constant "x32", constant "x41", constant "x42"] >>=print
-	assertDistinct solver [constant "x33", constant "x34", constant "x43", constant "x44"] >>=print
-	maping solver (nLt (literal 0)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
-	maping solver (nGeq (literal 4)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14"] >>=print 
+	assertDistinct solver [ct  "x21", ct  "x22", ct  "x23", ct  "x24"] >>=print 
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x33", ct  "x34"] >>=print 
+	assertDistinct solver [ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>=print 
+	assertDistinct solver [ct  "x11", ct  "x21", ct  "x31", ct  "x41"] >>=print 
+	assertDistinct solver [ct  "x12", ct  "x22", ct  "x32", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x23", ct  "x33", ct  "x43"] >>=print
+	assertDistinct solver [ct  "x14", ct  "x24", ct  "x34", ct  "x44"] >>=print
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x21", ct  "x22"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x14", ct  "x23", ct  "x24"] >>=print
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x41", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x33", ct  "x34", ct  "x43", ct  "x44"] >>=print
+	maping solver (nLt (lit 0)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
+	maping solver (nGeq (lit 4)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
   	checkSat solver >>= print
-	getValue solver [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print
+	getValue solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print
 	declType solver "edc" 5 >>= print
 	exit solver >>= print 
 
@@ -190,7 +190,7 @@ matScript= do
 
 yiOnline:: IO()
 yiOnline= do 
-	solver <- startYices Slv.Online "QF_NIA" Nothing Nothing
+	solver <- startSolver Yices Slv.Online QF_NIA Nothing Nothing
 	setOption solver (OptProduceModels True)
 	declConst solver "x11" tInt 
 	declConst solver "x12" tInt 
@@ -208,22 +208,22 @@ yiOnline= do
 	declConst solver "x42" tInt 
 	declConst solver "x43" tInt
 	declConst solver "x44" tInt  
-  	assertDistinct solver [constant "x11", constant "x12", constant "x13", constant "x14"] >>=print 
-	assertDistinct solver [constant "x21", constant "x22", constant "x23", constant "x24"] >>=print 
-	assertDistinct solver [constant "x31", constant "x32", constant "x33", constant "x34"] >>=print 
-	assertDistinct solver [constant "x41", constant "x42", constant "x43", constant "x44"] >>=print 
-	assertDistinct solver [constant "x11", constant "x21", constant "x31", constant "x41"] >>=print 
-	assertDistinct solver [constant "x12", constant "x22", constant "x32", constant "x42"] >>=print
-	assertDistinct solver [constant "x13", constant "x23", constant "x33", constant "x43"] >>=print
-	assertDistinct solver [constant "x14", constant "x24", constant "x34", constant "x44"] >>=print
-  	assertDistinct solver [constant "x11", constant "x12", constant "x21", constant "x22"] >>=print
-	assertDistinct solver [constant "x13", constant "x14", constant "x23", constant "x24"] >>=print
-	assertDistinct solver [constant "x31", constant "x32", constant "x41", constant "x42"] >>=print
-	assertDistinct solver [constant "x33", constant "x34", constant "x43", constant "x44"] >>=print
-	maping solver (nLt (literal 0)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
-	maping solver (nGeq (literal 4)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14"] >>=print 
+	assertDistinct solver [ct  "x21", ct  "x22", ct  "x23", ct  "x24"] >>=print 
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x33", ct  "x34"] >>=print 
+	assertDistinct solver [ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>=print 
+	assertDistinct solver [ct  "x11", ct  "x21", ct  "x31", ct  "x41"] >>=print 
+	assertDistinct solver [ct  "x12", ct  "x22", ct  "x32", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x23", ct  "x33", ct  "x43"] >>=print
+	assertDistinct solver [ct  "x14", ct  "x24", ct  "x34", ct  "x44"] >>=print
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x21", ct  "x22"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x14", ct  "x23", ct  "x24"] >>=print
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x41", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x33", ct  "x34", ct  "x43", ct  "x44"] >>=print
+	maping solver (nLt (lit 0)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
+	maping solver (nGeq (lit 4)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
   	checkSat solver >>= print
-	getValue solver [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print
+	getValue solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print
 	declType solver "edc" 5 >>= print
 	exit solver >>= print 
 
@@ -231,7 +231,7 @@ yiOnline= do
 
 yiScript:: IO()
 yiScript= do 
-	solver <- startYices Slv.Script "QF_NIA" Nothing (Just "te.smt2")
+	solver <- startSolver Yices Slv.Script QF_NIA Nothing (Just "te.smt2")
 	setOption solver (OptProduceModels True)
 	declConst solver "x11" tInt 
 	declConst solver "x12" tInt 
@@ -249,22 +249,22 @@ yiScript= do
 	declConst solver "x42" tInt 
 	declConst solver "x43" tInt
 	declConst solver "x44" tInt  
-  	assertDistinct solver [constant "x11", constant "x12", constant "x13", constant "x14"] >>=print 
-	assertDistinct solver [constant "x21", constant "x22", constant "x23", constant "x24"] >>=print 
-	assertDistinct solver [constant "x31", constant "x32", constant "x33", constant "x34"] >>=print 
-	assertDistinct solver [constant "x41", constant "x42", constant "x43", constant "x44"] >>=print 
-	assertDistinct solver [constant "x11", constant "x21", constant "x31", constant "x41"] >>=print 
-	assertDistinct solver [constant "x12", constant "x22", constant "x32", constant "x42"] >>=print
-	assertDistinct solver [constant "x13", constant "x23", constant "x33", constant "x43"] >>=print
-	assertDistinct solver [constant "x14", constant "x24", constant "x34", constant "x44"] >>=print
-  	assertDistinct solver [constant "x11", constant "x12", constant "x21", constant "x22"] >>=print
-	assertDistinct solver [constant "x13", constant "x14", constant "x23", constant "x24"] >>=print
-	assertDistinct solver [constant "x31", constant "x32", constant "x41", constant "x42"] >>=print
-	assertDistinct solver [constant "x33", constant "x34", constant "x43", constant "x44"] >>=print
-	maping solver (nLt (literal 0)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
-	maping solver (nGeq (literal 4)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14"] >>=print 
+	assertDistinct solver [ct  "x21", ct  "x22", ct  "x23", ct  "x24"] >>=print 
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x33", ct  "x34"] >>=print 
+	assertDistinct solver [ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>=print 
+	assertDistinct solver [ct  "x11", ct  "x21", ct  "x31", ct  "x41"] >>=print 
+	assertDistinct solver [ct  "x12", ct  "x22", ct  "x32", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x23", ct  "x33", ct  "x43"] >>=print
+	assertDistinct solver [ct  "x14", ct  "x24", ct  "x34", ct  "x44"] >>=print
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x21", ct  "x22"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x14", ct  "x23", ct  "x24"] >>=print
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x41", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x33", ct  "x34", ct  "x43", ct  "x44"] >>=print
+	maping solver (nLt (lit 0)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
+	maping solver (nGeq (lit 4)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
   	checkSat solver >>= print
-	getValue solver [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print
+	getValue solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print
 	declType solver "edc" 5 >>= print
 	exit solver >>= print 
 
@@ -276,7 +276,7 @@ yiScript= do
 
 c4Online:: IO()
 c4Online= do 
-	solver <- startCvc4 Slv.Online "QF_NIA" Nothing Nothing
+	solver <- startSolver Cvc4 Slv.Online QF_NIA Nothing Nothing
 	setOption solver (OptProduceModels True)
 	declConst solver "x11" tInt 
 	declConst solver "x12" tInt 
@@ -294,22 +294,22 @@ c4Online= do
 	declConst solver "x42" tInt 
 	declConst solver "x43" tInt
 	declConst solver "x44" tInt  
-  	assertDistinct solver [constant "x11", constant "x12", constant "x13", constant "x14"] >>=print 
-	assertDistinct solver [constant "x21", constant "x22", constant "x23", constant "x24"] >>=print 
-	assertDistinct solver [constant "x31", constant "x32", constant "x33", constant "x34"] >>=print 
-	assertDistinct solver [constant "x41", constant "x42", constant "x43", constant "x44"] >>=print 
-	assertDistinct solver [constant "x11", constant "x21", constant "x31", constant "x41"] >>=print 
-	assertDistinct solver [constant "x12", constant "x22", constant "x32", constant "x42"] >>=print
-	assertDistinct solver [constant "x13", constant "x23", constant "x33", constant "x43"] >>=print
-	assertDistinct solver [constant "x14", constant "x24", constant "x34", constant "x44"] >>=print
-  	assertDistinct solver [constant "x11", constant "x12", constant "x21", constant "x22"] >>=print
-	assertDistinct solver [constant "x13", constant "x14", constant "x23", constant "x24"] >>=print
-	assertDistinct solver [constant "x31", constant "x32", constant "x41", constant "x42"] >>=print
-	assertDistinct solver [constant "x33", constant "x34", constant "x43", constant "x44"] >>=print
-	maping solver (nLt (literal 0)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
-	maping solver (nGeq (literal 4)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14"] >>=print 
+	assertDistinct solver [ct  "x21", ct  "x22", ct  "x23", ct  "x24"] >>=print 
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x33", ct  "x34"] >>=print 
+	assertDistinct solver [ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>=print 
+	assertDistinct solver [ct  "x11", ct  "x21", ct  "x31", ct  "x41"] >>=print 
+	assertDistinct solver [ct  "x12", ct  "x22", ct  "x32", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x23", ct  "x33", ct  "x43"] >>=print
+	assertDistinct solver [ct  "x14", ct  "x24", ct  "x34", ct  "x44"] >>=print
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x21", ct  "x22"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x14", ct  "x23", ct  "x24"] >>=print
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x41", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x33", ct  "x34", ct  "x43", ct  "x44"] >>=print
+	maping solver (nLt (lit 0)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
+	maping solver (nGeq (lit 4)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
   	checkSat solver >>= print
-	getValue solver [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print
+	getValue solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print
 	declType solver "edc" 5 >>= print
 	exit solver >>= print 
 
@@ -317,7 +317,7 @@ c4Online= do
 
 c4Script:: IO()
 c4Script= do 
-	solver <- startCvc4 Slv.Script "QF_NIA" Nothing (Just "te.smt2")
+	solver <- startSolver Cvc4 Slv.Script QF_NIA Nothing (Just "te.smt2")
 	setOption solver (OptProduceModels True)
 	declConst solver "x11" tInt 
 	declConst solver "x12" tInt 
@@ -335,22 +335,22 @@ c4Script= do
 	declConst solver "x42" tInt 
 	declConst solver "x43" tInt
 	declConst solver "x44" tInt  
-  	assertDistinct solver [constant "x11", constant "x12", constant "x13", constant "x14"] >>=print 
-	assertDistinct solver [constant "x21", constant "x22", constant "x23", constant "x24"] >>=print 
-	assertDistinct solver [constant "x31", constant "x32", constant "x33", constant "x34"] >>=print 
-	assertDistinct solver [constant "x41", constant "x42", constant "x43", constant "x44"] >>=print 
-	assertDistinct solver [constant "x11", constant "x21", constant "x31", constant "x41"] >>=print 
-	assertDistinct solver [constant "x12", constant "x22", constant "x32", constant "x42"] >>=print
-	assertDistinct solver [constant "x13", constant "x23", constant "x33", constant "x43"] >>=print
-	assertDistinct solver [constant "x14", constant "x24", constant "x34", constant "x44"] >>=print
-  	assertDistinct solver [constant "x11", constant "x12", constant "x21", constant "x22"] >>=print
-	assertDistinct solver [constant "x13", constant "x14", constant "x23", constant "x24"] >>=print
-	assertDistinct solver [constant "x31", constant "x32", constant "x41", constant "x42"] >>=print
-	assertDistinct solver [constant "x33", constant "x34", constant "x43", constant "x44"] >>=print
-	maping solver (nLt (literal 0)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
-	maping solver (nGeq (literal 4)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14"] >>=print 
+	assertDistinct solver [ct  "x21", ct  "x22", ct  "x23", ct  "x24"] >>=print 
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x33", ct  "x34"] >>=print 
+	assertDistinct solver [ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>=print 
+	assertDistinct solver [ct  "x11", ct  "x21", ct  "x31", ct  "x41"] >>=print 
+	assertDistinct solver [ct  "x12", ct  "x22", ct  "x32", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x23", ct  "x33", ct  "x43"] >>=print
+	assertDistinct solver [ct  "x14", ct  "x24", ct  "x34", ct  "x44"] >>=print
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x21", ct  "x22"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x14", ct  "x23", ct  "x24"] >>=print
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x41", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x33", ct  "x34", ct  "x43", ct  "x44"] >>=print
+	maping solver (nLt (lit 0)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
+	maping solver (nGeq (lit 4)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
   	checkSat solver >>= print
-	getValue solver [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print
+	getValue solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print
 	declType solver "edc" 5 >>= print
 	exit solver >>= print 
 
@@ -359,7 +359,7 @@ c4Script= do
 
 z3Online:: IO()
 z3Online= do 
-	solver <- startZ3 Slv.Online "QF_NIA" Nothing Nothing
+	solver <- startSolver Z3 Slv.Online QF_NIA Nothing Nothing
 	setOption solver (OptProduceModels True)
 	declConst solver "x11" tInt 
 	declConst solver "x12" tInt 
@@ -377,22 +377,22 @@ z3Online= do
 	declConst solver "x42" tInt 
 	declConst solver "x43" tInt
 	declConst solver "x44" tInt  
-  	assertDistinct solver [constant "x11", constant "x12", constant "x13", constant "x14"] >>=print 
-	assertDistinct solver [constant "x21", constant "x22", constant "x23", constant "x24"] >>=print 
-	assertDistinct solver [constant "x31", constant "x32", constant "x33", constant "x34"] >>=print 
-	assertDistinct solver [constant "x41", constant "x42", constant "x43", constant "x44"] >>=print 
-	assertDistinct solver [constant "x11", constant "x21", constant "x31", constant "x41"] >>=print 
-	assertDistinct solver [constant "x12", constant "x22", constant "x32", constant "x42"] >>=print
-	assertDistinct solver [constant "x13", constant "x23", constant "x33", constant "x43"] >>=print
-	assertDistinct solver [constant "x14", constant "x24", constant "x34", constant "x44"] >>=print
-  	assertDistinct solver [constant "x11", constant "x12", constant "x21", constant "x22"] >>=print
-	assertDistinct solver [constant "x13", constant "x14", constant "x23", constant "x24"] >>=print
-	assertDistinct solver [constant "x31", constant "x32", constant "x41", constant "x42"] >>=print
-	assertDistinct solver [constant "x33", constant "x34", constant "x43", constant "x44"] >>=print
-	maping solver (nLt (literal 0)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
-	maping solver (nGeq (literal 4)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14"] >>=print 
+	assertDistinct solver [ct  "x21", ct  "x22", ct  "x23", ct  "x24"] >>=print 
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x33", ct  "x34"] >>=print 
+	assertDistinct solver [ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>=print 
+	assertDistinct solver [ct  "x11", ct  "x21", ct  "x31", ct  "x41"] >>=print 
+	assertDistinct solver [ct  "x12", ct  "x22", ct  "x32", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x23", ct  "x33", ct  "x43"] >>=print
+	assertDistinct solver [ct  "x14", ct  "x24", ct  "x34", ct  "x44"] >>=print
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x21", ct  "x22"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x14", ct  "x23", ct  "x24"] >>=print
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x41", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x33", ct  "x34", ct  "x43", ct  "x44"] >>=print
+	maping solver (nLt (lit 0)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
+	maping solver (nGeq (lit 4)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
   	checkSat solver >>= print
-	getValue solver [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print
+	getValue solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print
 	declType solver "edc" 5 >>= print
 	exit solver >>= print 
 
@@ -400,7 +400,7 @@ z3Online= do
 
 z3Script:: IO()
 z3Script= do 
-	solver <- startZ3 Slv.Script "QF_NIA" Nothing (Just "te.smt2")
+	solver <- startSolver Z3 Slv.Script QF_NIA Nothing (Just "te.smt2")
 	setOption solver (OptProduceModels True)
 	declConst solver "x11" tInt 
 	declConst solver "x12" tInt 
@@ -418,22 +418,22 @@ z3Script= do
 	declConst solver "x42" tInt 
 	declConst solver "x43" tInt
 	declConst solver "x44" tInt  
-  	assertDistinct solver [constant "x11", constant "x12", constant "x13", constant "x14"] >>=print 
-	assertDistinct solver [constant "x21", constant "x22", constant "x23", constant "x24"] >>=print 
-	assertDistinct solver [constant "x31", constant "x32", constant "x33", constant "x34"] >>=print 
-	assertDistinct solver [constant "x41", constant "x42", constant "x43", constant "x44"] >>=print 
-	assertDistinct solver [constant "x11", constant "x21", constant "x31", constant "x41"] >>=print 
-	assertDistinct solver [constant "x12", constant "x22", constant "x32", constant "x42"] >>=print
-	assertDistinct solver [constant "x13", constant "x23", constant "x33", constant "x43"] >>=print
-	assertDistinct solver [constant "x14", constant "x24", constant "x34", constant "x44"] >>=print
-  	assertDistinct solver [constant "x11", constant "x12", constant "x21", constant "x22"] >>=print
-	assertDistinct solver [constant "x13", constant "x14", constant "x23", constant "x24"] >>=print
-	assertDistinct solver [constant "x31", constant "x32", constant "x41", constant "x42"] >>=print
-	assertDistinct solver [constant "x33", constant "x34", constant "x43", constant "x44"] >>=print
-	maping solver (nLt (literal 0)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
-	maping solver (nGeq (literal 4)) [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print 
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14"] >>=print 
+	assertDistinct solver [ct  "x21", ct  "x22", ct  "x23", ct  "x24"] >>=print 
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x33", ct  "x34"] >>=print 
+	assertDistinct solver [ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>=print 
+	assertDistinct solver [ct  "x11", ct  "x21", ct  "x31", ct  "x41"] >>=print 
+	assertDistinct solver [ct  "x12", ct  "x22", ct  "x32", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x23", ct  "x33", ct  "x43"] >>=print
+	assertDistinct solver [ct  "x14", ct  "x24", ct  "x34", ct  "x44"] >>=print
+  	assertDistinct solver [ct  "x11", ct  "x12", ct  "x21", ct  "x22"] >>=print
+	assertDistinct solver [ct  "x13", ct  "x14", ct  "x23", ct  "x24"] >>=print
+	assertDistinct solver [ct  "x31", ct  "x32", ct  "x41", ct  "x42"] >>=print
+	assertDistinct solver [ct  "x33", ct  "x34", ct  "x43", ct  "x44"] >>=print
+	maping solver (nLt (lit 0)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
+	maping solver (nGeq (lit 4)) [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print 
   	checkSat solver >>= print
-	getValue solver [constant "x11", constant "x12", constant "x13", constant "x14", constant "x21", constant "x22", constant "x23", constant "x24", constant "x31", constant "x32", constant "x33", constant "x34", constant "x41", constant "x42", constant "x43", constant "x44"] >>= print
+	getValue solver [ct  "x11", ct  "x12", ct  "x13", ct  "x14", ct  "x21", ct  "x22", ct  "x23", ct  "x24", ct  "x31", ct  "x32", ct  "x33", ct  "x34", ct  "x41", ct  "x42", ct  "x43", ct  "x44"] >>= print
 	declType solver "edc" 5 >>= print
 	exit solver >>= print 
 
@@ -441,12 +441,12 @@ z3Script= do
 --BVexaple
 testbv :: IO()
 testbv = do 
-	solver <- startBoolector Slv.Script "QF_BV" Nothing (Just "te.smt2")
+	solver <- startSolver Boolector Slv.Script QF_BV Nothing (Just "te.smt2")
 	declConst solver  "x" (tBitVec 64)
 	declConst solver "y" (tBitVec 64)
-	assert solver (SMTLib2.Core.not ((bvand (bvnot (constant "x")) (bvnot (constant "y"))) === (bvnot (bvor (constant "x") (constant "y"))))  )>>= print
+	assert solver (SMTLib2.Core.not ((bvand (bvnot (ct  "x")) (bvnot (ct  "y"))) === (bvnot (bvor (ct  "x") (ct  "y"))))  )>>= print
 	checkSat solver >>=print
-	getValue solver [constant "x", constant "y", extract 0 1 (constant "x")] >>= print
+	getValue solver [ct  "x", ct  "y", extract 0 1 (ct  "x")] >>= print
 	exit solver >>=print
 
 

@@ -311,5 +311,11 @@ parseCmdGetOptionResponse = liftM CmdGetOptionResponse parseGetOptionResponse
 parseGetOptionResponse :: ParsecT String u Identity AttrValue
 parseGetOptionResponse = parseAttributeValue
 
-
+{-
+   #########################################################################
+   #                                                                       #
+   #                       Parser check-sat Alterg'os response             #
+   #                                                                       #
+   #########################################################################
+-}
 
