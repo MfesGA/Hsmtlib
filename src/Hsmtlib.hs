@@ -19,7 +19,7 @@ import           Hsmtlib.Parsers.ParseScript
 import           Hsmtlib.Parsers.Syntax
 import           Hsmtlib.Parsers.Visualizer-}
 
-{- |  
+{- |
 
 The function to initialialyze a solver.
 The solver can be initialized with a desired configuration, or a diferent
@@ -53,7 +53,7 @@ startSolver :: Solvers -- ^ Avaliable'Solvers'.
             -> Maybe SolverConfig -- ^ A customized Configuration for the Solver.
             -> Maybe String -- ^  A possible alternate path to save the Script.
             -> IO Solver
-startSolver Z3 mode logic = startZ3 mode $ show logic  
+startSolver Z3 mode logic = startZ3 mode $ show logic
 startSolver Cvc4 mode logic = startCvc4 mode $ show logic
 startSolver Yices mode logic = startYices mode $ show logic
 startSolver Mathsat mode logic = startMathSat mode $ show logic

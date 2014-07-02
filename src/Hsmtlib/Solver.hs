@@ -1,5 +1,3 @@
-
-
 {- |
 Module      : Hsmtlib.Solver
   This module has most types,data and functions that a user might need to
@@ -66,7 +64,7 @@ data Result = CGR GenResponse
 
 -- |  Name of the variable or function and result 
 data GValResult = Res String Value  
-                --| The result of arrays
+                -- | The result of arrays
                 | VArrays Arrays 
                 -- |  Multiple results from multiple requestes.
                 | Results [GValResult] 
