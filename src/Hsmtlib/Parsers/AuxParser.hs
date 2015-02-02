@@ -1,6 +1,6 @@
 module Hsmtlib.Parsers.AuxParser where
 
-{-|
+{-
     In the String terminal, it does not parse C-style characters.
     Quoted Symbol does not parse all printable ASCII characters.
 -}
