@@ -1,6 +1,6 @@
 module Hsmtlib.Parsers.AuxParser where
 
-{-|
+{-
     In the String terminal, it does not parse C-style characters.
     Quoted Symbol does not parse all printable ASCII characters.
 -}
@@ -57,10 +57,10 @@ str :: ParsecT String u Identity String
 str = string "\"" <++> Pc.many strChar <++> string "\""
 
 strChar :: ParsecT String u Identity Char
-strChar = alphaNum 
+strChar = alphaNum
       <|> char ' '
-      <|> char ':' 
-      <|> char ',' 
+      <|> char ':'
+      <|> char ','
 
 
 --parse a Symbol
@@ -100,7 +100,7 @@ false = string "false"
 
 
 emptySpace :: ParsecT String u Identity String
-emptySpace = Pc.try $ Pc.many $ 
+emptySpace = Pc.try $ Pc.many $
     char ' ' <|> char '\n' <|> char '\t' <|> char '\r'
 
 reservedWords :: ParsecT String u Identity String
