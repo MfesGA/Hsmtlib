@@ -11,7 +11,7 @@ import           Hsmtlib.Solvers.Cmd.BatchCmd        as B (executeBatch)
 import           Hsmtlib.Solvers.Cmd.OnlineCmd
 import           Hsmtlib.Solvers.Cmd.ProcCom.Process
 import           Hsmtlib.Solvers.Cmd.ScriptCmd
-import           SMTLib2
+import           Smtlib
 import           System.IO                           (Handle,
                                                       IOMode (WriteMode),
                                                       openFile)
@@ -138,8 +138,8 @@ onlineSolver process =
   Solver { setLogic = onlineSetLogic Cvc4 process
          , setOption = onlineSetOption Cvc4 process
          , setInfo = onlineSetInfo Cvc4 process
-         , declareType = onlineDeclareType Cvc4 process
-         , defineType = onlineDefineType Cvc4 process
+         , declareSort = onlineDeclareType Cvc4 process
+         , defineSort = onlineDefineType Cvc4 process
          , declareFun = onlineDeclareFun Cvc4 process
          , defineFun = onlineDefineFun Cvc4 process
          , push = onlinePush Cvc4 process
@@ -162,8 +162,8 @@ scriptSolver srcmd =
   Solver { setLogic = scriptSetLogic srcmd
          , setOption = scriptSetOption srcmd
          , setInfo = scriptSetInfo srcmd
-         , declareType = scriptDeclareType srcmd
-         , defineType = scriptDefineType srcmd
+         , declareSort = scriptDeclareType srcmd
+         , defineSort = scriptDefineType srcmd
          , declareFun = scriptDeclareFun srcmd
          , defineFun = scriptDefineFun srcmd
          , push = scriptPush srcmd

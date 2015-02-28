@@ -10,7 +10,9 @@ import           Hsmtlib.Parsers.Syntax              (GenResponse (Success))
 import           Hsmtlib.Solver
 import           Hsmtlib.Solvers.Cmd.CmdResult
 import           Hsmtlib.Solvers.Cmd.ProcCom.Process
-import           SMTLib2
+
+import           Smtlib
+
 import           System.IO                           (Handle, hClose, hFlush,
                                                       hPutStr)
 import           Text.PrettyPrint

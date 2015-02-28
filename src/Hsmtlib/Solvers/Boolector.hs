@@ -9,8 +9,8 @@ import           Hsmtlib.Solver                      as Slv
 import           Hsmtlib.Solvers.Cmd.BatchCmd        as B (executeBatch)
 import           Hsmtlib.Solvers.Cmd.OnlineCmd
 import           Hsmtlib.Solvers.Cmd.ProcCom.Process
-import           Hsmtlib.Solvers.Cmd.ScriptCmd
-import           SMTLib2
+import           Hsmtlib.Solvers.Cmd.ScriptCmdlp
+import           Smtlib.Syntax.Syntax
 import           System.IO                           (Handle,
                                                       IOMode (WriteMode),
                                                       openFile)
@@ -69,7 +69,7 @@ startBoolectorOnline' logic conf = do
   --Set Option to print success after accepting a Command.
   --onlineSetOption process (OptPrintSuccess True)
   -- Sets the SMT Logic.
-  _ <- onlineSetLogic Boolector process (N (show logic))
+  _ <- onlineSetLogic Boolector process logic
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 
@@ -100,8 +100,8 @@ startBoolectorScript' :: String -> SolverConfig -> FilePath -> IO Solver
 startBoolectorScript' logic conf scriptFilePath = do
   scriptHandle <- openFile scriptFilePath WriteMode
   let srcmd = newScriptArgs conf scriptHandle scriptFilePath
-  _ <- scriptSetOption srcmd (OptPrintSuccess True)
-  _ <- scriptSetLogic srcmd (N logic)
+  _ <- scriptSetOption srcmd (PrintSuccess True)
+  _ <- scriptSetLogic srcmd logic
   return $ scriptSolver srcmd
 
 --Function which creates the ScriptConf for the script functions.
@@ -130,8 +130,8 @@ onlineSolver process =
   Solver { setLogic = onlineSetLogic Boolector process
          , setOption = onlineSetOption Boolector process
          , setInfo = onlineSetInfo Boolector process
-         , declareType = onlineDeclareType Boolector process
-         , defineType = onlineDefineType Boolector process
+         , declareSort = onlineDeclareType Boolector process
+         , defineSort = onlineDefineType Boolector process
          , declareFun = onlineDeclareFun Boolector process
          , defineFun = onlineDefineFun Boolector process
          , push = onlinePush Boolector process
@@ -154,8 +154,8 @@ scriptSolver srcmd =
   Solver { setLogic = scriptSetLogic srcmd
          , setOption = scriptSetOption srcmd
          , setInfo = scriptSetInfo srcmd
-         , declareType = scriptDeclareType srcmd
-         , defineType = scriptDefineType srcmd
+         , declareSort = scriptDeclareType srcmd
+         , defineSort = scriptDefineType srcmd
          , declareFun = scriptDeclareFun srcmd
          , defineFun = scriptDefineFun srcmd
          , push = scriptPush srcmd

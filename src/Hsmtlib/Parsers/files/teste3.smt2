@@ -1,1 +1,0 @@
-(set-info :smt-lib-version 2.0)

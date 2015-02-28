@@ -10,7 +10,7 @@ import           Hsmtlib.Solvers.Cmd.BatchCmd        as B (executeBatch)
 import           Hsmtlib.Solvers.Cmd.OnlineCmd
 import           Hsmtlib.Solvers.Cmd.ProcCom.Process
 import           Hsmtlib.Solvers.Cmd.ScriptCmd
-import           SMTLib2
+import           Smtlib
 import           System.IO                           (Handle,
                                                       IOMode (WriteMode),
                                                       openFile)
@@ -136,8 +136,8 @@ onlineSolver process =
   Solver { setLogic = onlineSetLogic Mathsat process
          , setOption = onlineSetOption Mathsat process
          , setInfo = onlineSetInfo Mathsat process
-         , declareType = onlineDeclareType Mathsat process
-         , defineType = onlineDefineType Mathsat process
+         , declareSort = onlineDeclareType Mathsat process
+         , defineSort = onlineDefineType Mathsat process
          , declareFun = onlineDeclareFun Mathsat process
          , defineFun = onlineDefineFun Mathsat process
          , push = onlinePush Mathsat process
@@ -160,8 +160,8 @@ scriptSolver srcmd =
   Solver { setLogic = scriptSetLogic srcmd
          , setOption = scriptSetOption srcmd
          , setInfo = scriptSetInfo srcmd
-         , declareType = scriptDeclareType srcmd
-         , defineType = scriptDefineType srcmd
+         , declareSort = scriptDeclareType srcmd
+         , defineSort = scriptDefineType srcmd
          , declareFun = scriptDeclareFun srcmd
          , defineFun = scriptDefineFun srcmd
          , push = scriptPush srcmd

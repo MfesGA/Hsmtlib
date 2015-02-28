@@ -5,10 +5,13 @@ import           Control.Monad
 --import           Data.List                              (intercalate)
 import           Data.Map                           as M
 import           Data.Maybe                         (isJust)
-import           Hsmtlib.Parsers.ParseResponse
-import           Hsmtlib.Parsers.Syntax             as S
+
+import           Smtlib.Parsers.ResponseParsers
+import           Smtlib.Syntax.Syntax             as S
+
 import           Hsmtlib.Solver                     as Solv
 import           Hsmtlib.Solvers.Cmd.ResultHelpers
+
 import           Prelude                            as P
 import           Text.ParserCombinators.Parsec.Prim (parse)
 

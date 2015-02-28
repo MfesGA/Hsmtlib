@@ -3,7 +3,7 @@ module  Hsmtlib.Solvers.Cmd.BatchCmd(executeBatch) where
 import           Data.List                           (intercalate)
 import           Hsmtlib.Solvers.Cmd.ProcCom.Process (Args, CmdPath,
                                                       sendContext)
-import           SMTLib2                             (Command (CmdSetLogic),
+import           Smtlib                             (Command (CmdSetLogic),
                                                       Name (N), pp)
 import           Text.PrettyPrint                    (Doc, render)
 

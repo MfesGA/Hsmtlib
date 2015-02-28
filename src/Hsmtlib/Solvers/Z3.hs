@@ -12,7 +12,7 @@ import           Hsmtlib.Solvers.Cmd.OnlineCmd
 import           Hsmtlib.Solvers.Cmd.ProcCom.Process
 import           Hsmtlib.Solvers.Cmd.ScriptCmd
 import           Hsmtlib.Solvers.Cmd.CmdResult
-import           SMTLib2
+import           Smtlib
 import           System.IO                           (Handle,
                                                       IOMode (WriteMode),
                                                       openFile)
@@ -128,8 +128,8 @@ onlineSolver process =
   Solver { setLogic = onlineSetLogic Z3 process
          , setOption = onlineSetOption Z3  process
          , setInfo = onlineSetInfo Z3  process
-         , declareType = onlineDeclareType Z3  process
-         , defineType = onlineDefineType Z3  process
+         , declareSort = onlineDeclareType Z3  process
+         , defineSort = onlineDefineType Z3  process
          , declareFun = onlineDeclareFun Z3  process
          , defineFun = onlineDefineFun Z3  process
          , push = onlinePush Z3 process 
@@ -165,8 +165,8 @@ scriptSolver srcmd =
   Solver { setLogic = scriptSetLogic srcmd
          , setOption = scriptSetOption srcmd
          , setInfo = scriptSetInfo srcmd
-         , declareType = scriptDeclareType srcmd
-         , defineType = scriptDefineType srcmd
+         , declareSort = scriptDeclareType srcmd
+         , defineSort = scriptDefineType srcmd
          , declareFun = scriptDeclareFun srcmd
          , defineFun = scriptDefineFun srcmd
          , push = scriptPush srcmd

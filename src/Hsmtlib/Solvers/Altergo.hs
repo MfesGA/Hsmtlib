@@ -10,16 +10,17 @@ import           Hsmtlib.Solvers.Cmd.BatchCmd        as B (executeBatch)
 import           Hsmtlib.Solvers.Cmd.OnlineCmd
 import           Hsmtlib.Solvers.Cmd.ProcCom.Process
 import           Hsmtlib.Solvers.Cmd.ScriptCmd
-import           SMTLib2
 import           System.IO                           (Handle,
                                                       IOMode (WriteMode),
                                                       openFile)
 import           Control.Applicative           as Ctr hiding ((<|>))
 import           Control.Monad
 import           Data.Functor.Identity
-import           Hsmtlib.Parsers.AuxParser
-import           Hsmtlib.Parsers.ParseScript
-import           Hsmtlib.Parsers.Syntax        as CmdRsp
+
+import           Smtlib.Parsers.CommonParsers
+--import           Smtlib.Parsers.ParseScript
+import           Smtlib.Syntax.Syntax        as CmdRsp
+
 import           Text.Parsec.Prim              as Prim
 import           Text.ParserCombinators.Parsec as Pc
 
@@ -177,8 +178,8 @@ onlineSolver process =
   Solver { setLogic = onlineSetLogic Altergo process
          , setOption = onlineSetOption Altergo process
          , setInfo = onlineSetInfo Altergo process
-         , declareType = onlineDeclareType Altergo process
-         , defineType = onlineDefineType Altergo process
+         , declareSort = onlineDeclareType Altergo process
+         , defineSort = onlineDefineType Altergo process
          , declareFun = onlineDeclareFun Altergo process
          , defineFun = onlineDefineFun Altergo process
          , push = onlinePush Altergo process
@@ -201,8 +202,8 @@ scriptSolver srcmd =
   Solver { setLogic = scriptSetLogic srcmd
          , setOption = scriptSetOption srcmd
          , setInfo = scriptSetInfo srcmd
-         , declareType = scriptDeclareType srcmd
-         , defineType = scriptDefineType srcmd
+         , declareSort = scriptDeclareType srcmd
+         , defineSort = scriptDefineType srcmd
          , declareFun = scriptDeclareFun srcmd
          , defineFun = scriptDefineFun srcmd
          , push = scriptPush srcmd

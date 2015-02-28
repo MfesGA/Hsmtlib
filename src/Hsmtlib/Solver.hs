@@ -6,8 +6,8 @@ Module      : Hsmtlib.Solver
 module Hsmtlib.Solver where
 
 import           Data.Map
-import           SMTLib2
-import           Hsmtlib.Parsers.Syntax hiding(Option, Command)
+import           Smtlib.Syntax.Syntax
+--import           Hsmtlib.Parsers.Syntax hiding(Option, Command)
 
 
 -- | Logics that can be passed to the start of the solver
@@ -42,8 +42,6 @@ data Solvers = Z3 | Cvc4 | Yices | Mathsat | Altergo | Boolector
 
 
 
-
-
 {-| Each response correspondes to it's respective command,
    for example CGI correspondes to the command Get Info.
    The Command CGR is the result for the command that dont return anything by default, for
@@ -53,7 +51,7 @@ data Solvers = Z3 | Cvc4 | Yices | Mathsat | Altergo | Boolector
 data Result = CGR GenResponse 
             | CGI GetInfoResponse
             | CCS CheckSatResponse
-            | CGAssert GetAssertion
+            | CGAssert GetAssertionsResponse
             | CGP GetProofResponse
             | CGUC GetUnsatCoreResponse
             | CGV [GValResult]
@@ -113,24 +111,22 @@ data SolverConfig = Config
 
 -- | Solver data type that has all the functions.
 data Solver = Solver
-    { setLogic      :: Name -> IO Result
+    { setLogic      :: String -> IO Result
     , setOption     :: Option -> IO Result
-    , setInfo       :: Attr -> IO Result
-    , declareType   :: Name -> Integer -> IO Result
-    , defineType    :: Name -> [Name] -> Type -> IO Result
-    , declareFun    :: Name -> [Type] -> Type -> IO Result
-    , defineFun     :: Name -> [Binder] -> Type -> Expr -> IO Result
-    , push          :: Integer -> IO Result
-    , pop           :: Integer -> IO Result
-    , assert        :: Expr -> IO Result
+    , setInfo       :: Attribute -> IO Result
+    , declareSort   :: String -> Int -> IO Result
+    , defineSort    :: String -> [String] -> Sort -> IO Result
+    , declareFun    :: String -> [Sort] -> Sort -> IO Result
+    , defineFun     :: String -> [SortedVar] -> Sort -> Term -> IO Result
+    , push          :: Int -> IO Result
+    , pop           :: Int -> IO Result
+    , assert        :: Term -> IO Result
     , checkSat      :: IO Result
     , getAssertions :: IO Result
-    , getValue      :: [Expr] -> IO Result
+    , getValue      :: [Term] -> IO Result
     , getProof      :: IO Result
     , getUnsatCore  :: IO Result
-    , getInfo       :: InfoFlag -> IO Result
-    , getOption     :: Name -> IO Result
+    , getInfo       :: InfoFlags -> IO Result
+    , getOption     :: String -> IO Result
     , exit          :: IO Result
     }
-    | BSolver
-    { executeBatch :: [Command] -> IO String }
