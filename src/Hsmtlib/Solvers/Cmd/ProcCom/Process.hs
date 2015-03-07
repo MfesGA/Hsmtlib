@@ -58,7 +58,7 @@ newProcess p a = CreateProcess
     , std_err = CreatePipe
     , close_fds = False
     , create_group =  False
-    --, delegate_ctlc= True
+    , delegate_ctlc= True
     }
 
 -- | Creates a Process ready to be executed.

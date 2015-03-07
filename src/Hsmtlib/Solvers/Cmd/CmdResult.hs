@@ -1,19 +1,20 @@
 module Hsmtlib.Solvers.Cmd.CmdResult where
 
-import           Control.Applicative                ((<|>))
-import           Control.Monad
---import           Data.List                              (intercalate)
+
+import           Prelude                            as P
 import           Data.Map                           as M
 import           Data.Maybe                         (isJust)
+import           Control.Monad
+import           Control.Applicative                ((<|>))
+import           Text.ParserCombinators.Parsec.Prim (parse)
+
+
 
 import           Smtlib.Parsers.ResponseParsers
 import           Smtlib.Syntax.Syntax             as S
-
 import           Hsmtlib.Solver                     as Solv
-import           Hsmtlib.Solvers.Cmd.ResultHelpers
 
-import           Prelude                            as P
-import           Text.ParserCombinators.Parsec.Prim (parse)
+
 
 
 
@@ -63,83 +64,13 @@ checkSatResponse stg =
    #########################################################################
 -}
 
-
-
-{-
-getValueResponse :: String -> GValResult
-getValueResponse stg = GVUError  $ stg ++ "\n" ++ tree
-    where result = parse parseGetValueResponse "" stg
-          tree =  getVR' result
-
-
-getVR' :: Show a => Either a [ValuationPair] -> String
-getVR' result =
-  case result of
-    Left err -> show err
-    Right vals -> intercalate "\n" (fmap (showValuationPair 0) vals)
-
--}
-
 getValueResponse :: String -> Result
 getValueResponse stg = case result of
                         Left err ->  ComError $ stg ++  " | " ++  show err
-                        Right vals -> getValResponse vals
+                        Right vals -> CGV vals
     where result = parse parseGetValueResponse "" stg
 
 
-
-getValResponse::[ValuationPair] -> Result
-getValResponse vp = CGV $  arrays ++ [errors]
-                      -- gets the results in a Maybe GValResult.
-                where res = getValResponses vp
-                      --Produes UErrors from the results that gave Nothing.
-                      errors = Synt $ valErrors' vp res
-                      cRes = P.filter isJust res -- Removes the Nothings.
-                      -- Joins all arrays in one and
-                      --removes the Just from all results.
-                      arrays = joinArrays cRes
-
-
-
-valErrors' :: [ValuationPair] -> [Maybe GValResult] -> [ValuationPair]
-valErrors' [] [] = []
-valErrors' [] (_:_) = []
-valErrors' (_:_) [] = []
-valErrors' (x:xs) (Nothing:gs) =
-  x : valErrors' xs gs
-valErrors' (_:xs) (_:gs) = valErrors' xs  gs
-
-
-
-joinArrays :: [Maybe GValResult] -> [GValResult]
-joinArrays = joinArrays' $ VArrays empty
-
-
-joinArrays' :: GValResult -> [Maybe GValResult] -> [GValResult]
--- if there was no array in the result then don't put an empty one.
-joinArrays' (VArrays n) [] | M.null n = []
-                           | otherwise = [VArrays n]
-joinArrays' res (x:xs) = case nVal of
-                          (VArrays _) -> joinArrays' nVal xs
-                          _ -> nVal : joinArrays' res xs
-                         where nVal = checkGVal res x
-joinArrays' _ _ = []
-
-checkGVal :: GValResult ->  Maybe GValResult -> GValResult
-checkGVal (VArrays oarr) (Just(VArrays arr)) =
-  VArrays $ unionWith union oarr arr
-checkGVal _ (Just x) = x
-checkGVal _ _ = VArrays empty
-
-
-getValResponses :: [ValuationPair] -> [Maybe GValResult]
-getValResponses = fmap getGValResult
-
-getGValResult :: ValuationPair -> Maybe GValResult
-getGValResult vp = getVar vp
-               <|> getArray vp
-               <|> getFun vp
-               <|> getBitVec vp
 
 
 {- 
@@ -170,7 +101,7 @@ getAssertionResponse :: String  -> Result
 getAssertionResponse stg = case result of
                         Left err ->  ComError $ stg ++  " | " ++  show err
                         Right vals -> CGAssert vals
-          where result = parse parseGetAssertionResponse "" stg
+          where result = parse parseGetAssertionsResponse "" stg
 
 
 

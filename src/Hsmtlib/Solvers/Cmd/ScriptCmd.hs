@@ -6,13 +6,12 @@ Module with the functions used in script Mode.
 module Hsmtlib.Solvers.Cmd.ScriptCmd where
 
 import           Control.Applicative                 (liftA)
-import           Hsmtlib.Parsers.Syntax              (GenResponse (Success))
+import           Smtlib.Syntax.Syntax              (GenResponse (Success))
 import           Hsmtlib.Solver
 import           Hsmtlib.Solvers.Cmd.CmdResult
 import           Hsmtlib.Solvers.Cmd.ProcCom.Process
-
-import           Smtlib
-
+import           Smtlib.Syntax.Syntax
+import           Smtlib.Syntax.ShowSL
 import           System.IO                           (Handle, hClose, hFlush,
                                                       hPutStr)
 import           Text.PrettyPrint
@@ -32,7 +31,7 @@ data ScriptConf = ScriptConf
 --Writes to the script the command given.
 writeToScript :: ScriptConf -> Command -> IO ()
 writeToScript sConf cmd = do
-  let scmd = render (pp  cmd) ++ "\n"
+  let scmd = showSL cmd ++ "\n"
   hPutStr (sHandle sConf) scmd
   hFlush (sHandle sConf)
 
@@ -105,65 +104,65 @@ scriptGetOptionResponse conf cmd =
 --All above functions use ScriptFunExc the rest use scriptFun.
 
 
-scriptSetLogic :: ScriptConf -> Name -> IO Result
-scriptSetLogic sConf name = scriptGenResponse sConf (CmdSetLogic name )
+scriptSetLogic :: ScriptConf -> String -> IO Result
+scriptSetLogic sConf name = scriptGenResponse sConf (SetLogic name )
 
 scriptSetOption :: ScriptConf -> Option -> IO Result
-scriptSetOption sConf option = scriptGenResponse sConf (CmdSetOption option)
+scriptSetOption sConf option = scriptGenResponse sConf (SetOption option)
 
-scriptSetInfo :: ScriptConf -> Attr -> IO Result
-scriptSetInfo sConf attr  = scriptGenResponse sConf  (CmdSetInfo attr)
+scriptSetInfo :: ScriptConf -> Attribute -> IO Result
+scriptSetInfo sConf attr  = scriptGenResponse sConf  (SetInfo attr)
 
-scriptDeclareType :: ScriptConf -> Name -> Integer -> IO Result
-scriptDeclareType sConf name number =
-    scriptGenResponse sConf (CmdDeclareType name number)
+scriptDeclareSort :: ScriptConf -> String -> Int -> IO Result
+scriptDeclareSort sConf name number =
+    scriptGenResponse sConf (DeclareSort name number)
 
-scriptDefineType :: ScriptConf  -> Name -> [Name] -> Type -> IO Result
-scriptDefineType sConf name names t =
-    scriptGenResponse sConf (CmdDefineType name names t)
+scriptDefineSort :: ScriptConf  -> String -> [String] -> Sort -> IO Result
+scriptDefineSort sConf name names t =
+    scriptGenResponse sConf (DefineSort name names t)
 
-scriptDeclareFun :: ScriptConf  -> Name -> [Type] -> Type -> IO Result
+scriptDeclareFun :: ScriptConf  -> String -> [Sort] -> Sort -> IO Result
 scriptDeclareFun sConf name lt t =
-    scriptGenResponse sConf (CmdDeclareFun name lt t)
+    scriptGenResponse sConf (DeclareFun name lt t)
 
-scriptDefineFun :: ScriptConf -> Name -> [Binder] -> Type -> Expr -> IO Result
+scriptDefineFun :: ScriptConf -> String -> [SortedVar] -> Sort -> Term -> IO Result
 scriptDefineFun sConf name binders t expression =
-    scriptGenResponse sConf (CmdDefineFun name binders t expression)
+    scriptGenResponse sConf (DefineFun name binders t expression)
 
-scriptPush :: ScriptConf -> Integer -> IO Result
-scriptPush sConf number = scriptGenResponse sConf (CmdPush number)
+scriptPush :: ScriptConf -> Int -> IO Result
+scriptPush sConf number = scriptGenResponse sConf (Push number)
 
-scriptPop :: ScriptConf -> Integer -> IO Result
+scriptPop :: ScriptConf -> Int -> IO Result
 scriptPop sConf number =
- scriptGenResponse sConf (CmdPop number)
+ scriptGenResponse sConf (Pop number)
 
-scriptAssert :: ScriptConf -> Expr -> IO Result
+scriptAssert :: ScriptConf -> Term -> IO Result
 scriptAssert sConf expression =
-    scriptGenResponse sConf (CmdAssert expression)
+    scriptGenResponse sConf (Assert expression)
 
 scriptCheckSat :: ScriptConf -> IO Result
-scriptCheckSat sConf = scriptCheckSatResponse sConf CmdCheckSat
+scriptCheckSat sConf = scriptCheckSatResponse sConf CheckSat
 
 scriptGetAssertions :: ScriptConf -> IO Result
-scriptGetAssertions sConf = scriptGetAssertionResponse sConf CmdGetAssertions
+scriptGetAssertions sConf = scriptGetAssertionResponse sConf GetAssertions
 
-scriptGetValue :: ScriptConf -> [Expr] -> IO Result
-scriptGetValue sConf exprs = scriptGetValueResponse sConf (CmdGetValue exprs)
+scriptGetValue :: ScriptConf -> [Term] -> IO Result
+scriptGetValue sConf exprs = scriptGetValueResponse sConf (GetValue exprs)
 
 scriptGetProof :: ScriptConf -> IO Result
-scriptGetProof sConf  = scriptGetProofResponse sConf  CmdGetProof
+scriptGetProof sConf  = scriptGetProofResponse sConf GetProof
 
 scriptGetUnsatCore :: ScriptConf -> IO Result
-scriptGetUnsatCore sConf = scriptGetUnsatCoreResponse sConf CmdGetUnsatCore
+scriptGetUnsatCore sConf = scriptGetUnsatCoreResponse sConf GetUnsatCore
 
-scriptGetInfo :: ScriptConf-> InfoFlag -> IO Result
-scriptGetInfo sConf info = scriptGetInfoResponse sConf (CmdGetInfo info)
+scriptGetInfo :: ScriptConf-> InfoFlags -> IO Result
+scriptGetInfo sConf info = scriptGetInfoResponse sConf (GetInfo info)
 
-scriptGetOption :: ScriptConf -> Name -> IO Result
-scriptGetOption sConf name = scriptGetOptionResponse sConf (CmdGetOption name)
+scriptGetOption :: ScriptConf -> String -> IO Result
+scriptGetOption sConf name = scriptGetOptionResponse sConf (GetOption name)
 
 scriptExit :: ScriptConf -> IO Result
 scriptExit sConf = do
-  _ <- scriptFun sConf CmdExit --Write to the script and execute
+  _ <- scriptFun sConf Exit --Write to the script and execute
   hClose (sHandle sConf) -- close the handle of the script
   return (CGR Success)

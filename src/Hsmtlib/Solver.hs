@@ -7,7 +7,6 @@ module Hsmtlib.Solver where
 
 import           Data.Map
 import           Smtlib.Syntax.Syntax
---import           Hsmtlib.Parsers.Syntax hiding(Option, Command)
 
 
 -- | Logics that can be passed to the start of the solver
@@ -54,49 +53,16 @@ data Result = CGR GenResponse
             | CGAssert GetAssertionsResponse
             | CGP GetProofResponse
             | CGUC GetUnsatCoreResponse
-            | CGV [GValResult]
+            | CGV GetValueResponse
             | CGAssig GetAssignmentResponse
             | CGO GetOptionResponse
             | ComError String -- ^ Error comunicating with the smt or Parsing
             deriving (Show, Eq)
 
--- |  Name of the variable or function and result 
-data GValResult = Res String Value  
-                -- | The result of arrays
-                | VArrays Arrays 
-                -- |  Multiple results from multiple requestes.
-                | Results [GValResult] 
-                {-|
-                   In case it can't turn the result 
-                   to one of the results above,
-                   it return the syntax tree
-                -}
-                | Synt GetValueResponse 
-                deriving (Show, Eq)
-
-
-{- |
-  When the value of an array or several values from diferent arrays are 
-  requested with getValue then the value returned is a Map where the value
-  ís the name of the array, and the value is also a map. This inner map has 
-  as value the position of the array and returned value.
-  Only integers are supported as values of arrays.
--}
-type Arrays = Map String (Map String Integer)
-
-
-
--- |  The type returned by getValue on constants or functions.
-data Value = VInt Integer
-           | VRatio Rational
-           | VBool Bool
-           | VHex String
-            deriving (Show, Eq)
-
 
 
 -- | Avaliable modes to use a solver.
-data Mode = Online | Script | Batch
+data Mode = Online | Script
 
 
 {- |

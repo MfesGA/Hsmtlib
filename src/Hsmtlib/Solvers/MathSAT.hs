@@ -6,11 +6,10 @@ Module      : Hsmtlib.Solvers.MathSAT
 module Hsmtlib.Solvers.MathSAT(startMathSat) where
 
 import           Hsmtlib.Solver                      as Slv
-import           Hsmtlib.Solvers.Cmd.BatchCmd        as B (executeBatch)
 import           Hsmtlib.Solvers.Cmd.OnlineCmd
 import           Hsmtlib.Solvers.Cmd.ProcCom.Process
 import           Hsmtlib.Solvers.Cmd.ScriptCmd
-import           Smtlib
+import           Smtlib.Syntax.Syntax
 import           System.IO                           (Handle,
                                                       IOMode (WriteMode),
                                                       openFile)
@@ -50,7 +49,6 @@ startMathSat :: Mode
              -> Maybe FilePath
              -> IO Solver
 
-startMathSat Slv.Batch logic sConf _ = startMathSatBatch logic sConf
 startMathSat Slv.Online logic sConf _ = startMathSatOnline logic sConf
 startMathSat Slv.Script logic sConf scriptFilePath =
     startMathSatScript logic sConf scriptFilePath
@@ -68,9 +66,9 @@ startMathSatOnline' logic conf = do
   -- Starts a Z4 Process.
   process <- beginProcess (path conf) (args conf)
   --Set Option to print success after accepting a Command.
-  _ <- onlineSetOption Mathsat process (OptPrintSuccess True)
+  _ <- onlineSetOption Mathsat process (PrintSuccess True)
   -- Sets the SMT Logic.
-  _ <- onlineSetLogic Mathsat process (N logic)
+  _ <- onlineSetLogic Mathsat process logic
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 
@@ -101,8 +99,8 @@ startMathSatScript' :: String -> SolverConfig -> FilePath -> IO Solver
 startMathSatScript' logic conf scriptFilePath = do
   scriptHandle <- openFile scriptFilePath WriteMode
   let srcmd = newScriptArgs conf scriptHandle scriptFilePath
-  _ <- scriptSetOption srcmd (OptPrintSuccess True)
-  _ <- scriptSetLogic srcmd (N logic)
+  _ <- scriptSetOption srcmd (PrintSuccess True)
+  _ <- scriptSetLogic srcmd logic
   return $ scriptSolver srcmd
 
 --Function which creates the ScriptConf for the script functions.
@@ -115,19 +113,6 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              }
 
 
--- Start MathSat batch mode
-
-startMathSatBatch :: String -> Maybe SolverConfig -> IO Solver
-startMathSatBatch logic Nothing = startMathSatBatch' logic mathSatConfigBatch
-startMathSatBatch logic (Just conf) = startMathSatBatch' logic conf
-
-startMathSatBatch' :: String -> SolverConfig -> IO Solver
-startMathSatBatch' logic conf = return $ batchSolver logic conf
-
-
-
-
-
 
 -- Creates the functions for online mode with the process already running.
 -- Each function will send the command to the solver and wait for the response.
@@ -136,8 +121,8 @@ onlineSolver process =
   Solver { setLogic = onlineSetLogic Mathsat process
          , setOption = onlineSetOption Mathsat process
          , setInfo = onlineSetInfo Mathsat process
-         , declareSort = onlineDeclareType Mathsat process
-         , defineSort = onlineDefineType Mathsat process
+         , declareSort = onlineDeclareSort Mathsat process
+         , defineSort = onlineDefineSort Mathsat process
          , declareFun = onlineDeclareFun Mathsat process
          , defineFun = onlineDefineFun Mathsat process
          , push = onlinePush Mathsat process
@@ -160,8 +145,8 @@ scriptSolver srcmd =
   Solver { setLogic = scriptSetLogic srcmd
          , setOption = scriptSetOption srcmd
          , setInfo = scriptSetInfo srcmd
-         , declareSort = scriptDeclareType srcmd
-         , defineSort = scriptDefineType srcmd
+         , declareSort = scriptDeclareSort srcmd
+         , defineSort = scriptDefineSort srcmd
          , declareFun = scriptDeclareFun srcmd
          , defineFun = scriptDefineFun srcmd
          , push = scriptPush srcmd
@@ -176,8 +161,3 @@ scriptSolver srcmd =
          , getOption = scriptGetOption srcmd
          , exit = scriptExit srcmd
          }
-
-
-batchSolver :: String -> SolverConfig -> Solver
-batchSolver logic config =
-  BSolver { Slv.executeBatch = B.executeBatch (path config) (args config) logic}

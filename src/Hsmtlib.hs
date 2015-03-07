@@ -12,12 +12,7 @@ import           Hsmtlib.Solvers.Cvc4      (startCvc4)
 import           Hsmtlib.Solvers.MathSAT   (startMathSat)
 import           Hsmtlib.Solvers.Yices     (startYices)
 import           Hsmtlib.Solvers.Z3        (startZ3)
-{-import           Hsmtlib.HighLevel
-import           Hsmtlib.Parsers.AuxParser
-import           Hsmtlib.Parsers.ParseResponse
-import           Hsmtlib.Parsers.ParseScript
-import           Hsmtlib.Parsers.Syntax
-import           Hsmtlib.Parsers.Visualizer-}
+
 
 {- |
 

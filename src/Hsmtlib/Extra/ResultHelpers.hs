@@ -293,3 +293,106 @@ numeral _ = Nothing
 hex :: SpecConstant -> Maybe String
 hex (SpecConstantHexadecimal shex) = Just shex
 hex  _ = Nothing
+
+
+{-
+   #########################################################################
+   #                                                                       #
+   #        Simplification of getValue response                            #
+   #                                                                       #
+   #########################################################################
+-}
+
+
+
+
+
+getValResponse::[ValuationPair] -> Result
+getValResponse vp = CGV $  arrays ++ [errors]
+                      -- gets the results in a Maybe GValResult.
+                where res = getValResponses vp
+                      --Produes UErrors from the results that gave Nothing.
+                      errors = Synt $ valErrors' vp res
+                      cRes = P.filter isJust res -- Removes the Nothings.
+                      -- Joins all arrays in one and
+                      --removes the Just from all results.
+                      arrays = joinArrays cRes
+
+
+
+valErrors' :: [ValuationPair] -> [Maybe GValResult] -> [ValuationPair]
+valErrors' [] [] = []
+valErrors' [] (_:_) = []
+valErrors' (_:_) [] = []
+valErrors' (x:xs) (Nothing:gs) =
+  x : valErrors' xs gs
+valErrors' (_:xs) (_:gs) = valErrors' xs  gs
+
+
+
+joinArrays :: [Maybe GValResult] -> [GValResult]
+joinArrays = joinArrays' $ VArrays empty
+
+
+joinArrays' :: GValResult -> [Maybe GValResult] -> [GValResult]
+-- if there was no array in the result then don't put an empty one.
+joinArrays' (VArrays n) [] | M.null n = []
+                           | otherwise = [VArrays n]
+joinArrays' res (x:xs) = case nVal of
+                          (VArrays _) -> joinArrays' nVal xs
+                          _ -> nVal : joinArrays' res xs
+                         where nVal = checkGVal res x
+joinArrays' _ _ = []
+
+checkGVal :: GValResult ->  Maybe GValResult -> GValResult
+checkGVal (VArrays oarr) (Just(VArrays arr)) =
+  VArrays $ unionWith union oarr arr
+checkGVal _ (Just x) = x
+checkGVal _ _ = VArrays empty
+
+
+getValResponses :: [ValuationPair] -> [Maybe GValResult]
+getValResponses = fmap getGValResult
+
+getGValResult :: ValuationPair -> Maybe GValResult
+getGValResult vp = getVar vp
+               <|> getArray vp
+               <|> getFun vp
+               <|> getBitVec vp
+
+
+
+
+
+-- |  Name of the variable or function and result 
+data GValResult = Res String Value  
+                -- | The result of arrays
+                | VArrays Arrays 
+                -- |  Multiple results from multiple requestes.
+                | Results [GValResult] 
+                {-|
+                   In case it can't turn the result 
+                   to one of the results above,
+                   it return the syntax tree
+                -}
+                | Synt GetValueResponse 
+                deriving (Show, Eq)
+
+
+{- |
+  When the value of an array or several values from diferent arrays are 
+  requested with getValue then the value returned is a Map where the value
+  ís the name of the array, and the value is also a map. This inner map has 
+  as value the position of the array and returned value.
+  Only integers are supported as values of arrays.
+-}
+type Arrays = Map String (Map String Integer)
+
+
+
+-- |  The type returned by getValue on constants or functions.
+data Value = VInt Integer
+           | VRatio Rational
+           | VBool Bool
+           | VHex String
+            deriving (Show, Eq)

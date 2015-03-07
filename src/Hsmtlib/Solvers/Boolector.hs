@@ -6,10 +6,9 @@ Module      : Hsmtlib.Solvers.Boolector
 module Hsmtlib.Solvers.Boolector(startBoolector) where
 
 import           Hsmtlib.Solver                      as Slv
-import           Hsmtlib.Solvers.Cmd.BatchCmd        as B (executeBatch)
 import           Hsmtlib.Solvers.Cmd.OnlineCmd
 import           Hsmtlib.Solvers.Cmd.ProcCom.Process
-import           Hsmtlib.Solvers.Cmd.ScriptCmdlp
+import           Hsmtlib.Solvers.Cmd.ScriptCmd
 import           Smtlib.Syntax.Syntax
 import           System.IO                           (Handle,
                                                       IOMode (WriteMode),
@@ -50,8 +49,6 @@ startBoolector :: Mode
                -> Maybe SolverConfig
                -> Maybe FilePath
                -> IO Solver
-
-startBoolector Slv.Batch logic sConf _ = startBoolectorBatch logic sConf
 startBoolector Slv.Online logic sConf _ = startBoolectorOnline logic sConf
 startBoolector Slv.Script logic sConf scriptFilePath =
     startBoolectorScript logic sConf scriptFilePath
@@ -113,16 +110,6 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              , sFilePath  = scriptFilePath
              }
 
--- Start Booleactor batch
-startBoolectorBatch :: String -> Maybe SolverConfig -> IO Solver
-startBoolectorBatch logic Nothing =
-  startBoolectorBatch' logic boolectorConfigBatch
-startBoolectorBatch logic (Just conf) = startBoolectorBatch' logic conf
-
-startBoolectorBatch' :: String -> SolverConfig -> IO Solver
-startBoolectorBatch' logic conf = return $ batchSolver logic conf
-
-
 -- Creates the functions for online mode with the process already running.
 -- Each function will send the command to the solver and wait for the response.
 onlineSolver :: Process -> Solver
@@ -130,8 +117,8 @@ onlineSolver process =
   Solver { setLogic = onlineSetLogic Boolector process
          , setOption = onlineSetOption Boolector process
          , setInfo = onlineSetInfo Boolector process
-         , declareSort = onlineDeclareType Boolector process
-         , defineSort = onlineDefineType Boolector process
+         , declareSort = onlineDeclareSort Boolector process
+         , defineSort = onlineDefineSort Boolector process
          , declareFun = onlineDeclareFun Boolector process
          , defineFun = onlineDefineFun Boolector process
          , push = onlinePush Boolector process
@@ -154,8 +141,8 @@ scriptSolver srcmd =
   Solver { setLogic = scriptSetLogic srcmd
          , setOption = scriptSetOption srcmd
          , setInfo = scriptSetInfo srcmd
-         , declareSort = scriptDeclareType srcmd
-         , defineSort = scriptDefineType srcmd
+         , declareSort = scriptDeclareSort srcmd
+         , defineSort = scriptDefineSort srcmd
          , declareFun = scriptDeclareFun srcmd
          , defineFun = scriptDefineFun srcmd
          , push = scriptPush srcmd
@@ -170,7 +157,3 @@ scriptSolver srcmd =
          , getOption = scriptGetOption srcmd
          , exit = scriptExit srcmd
          }
-
-batchSolver :: String -> SolverConfig -> Solver
-batchSolver logic config =
-  BSolver { Slv.executeBatch = B.executeBatch (path config) (args config) logic}

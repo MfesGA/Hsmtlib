@@ -6,11 +6,10 @@ Module      : Hsmtlib.Solvers.Yices
 module Hsmtlib.Solvers.Yices(startYices) where
 
 import           Hsmtlib.Solver                      as Slv
-import           Hsmtlib.Solvers.Cmd.BatchCmd        as B (executeBatch)
 import           Hsmtlib.Solvers.Cmd.OnlineCmd
 import           Hsmtlib.Solvers.Cmd.ProcCom.Process
 import           Hsmtlib.Solvers.Cmd.ScriptCmd
-import           SMTLib2
+import           Smtlib.Syntax.Syntax
 import           System.IO                           (Handle,
                                                       IOMode (WriteMode),
                                                       openFile)
@@ -45,7 +44,6 @@ yicesConfigBatch =
   In Online Mode if a FilePath is passed then it's ignored.
 -}
 startYices :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
-startYices Slv.Batch logic sConf _ = startYicesBatch logic sConf
 startYices Slv.Online logic sConf _ = startYicesOnline logic sConf
 startYices Slv.Script logic sConf scriptFilePath =
     startYicesScript logic sConf scriptFilePath
@@ -63,9 +61,9 @@ startYicesOnline' logic conf = do
   -- Starts a Yices Process.
   process <- beginProcess (path conf) (args conf)
   --Set Option to print success after accepting a Command.
-  _ <- onlineSetOption Yices process (OptPrintSuccess True)
+  _ <- onlineSetOption Yices process (PrintSuccess True)
   -- Sets the SMT Logic.
-  _ <-onlineSetLogic Yices process (N logic)
+  _ <-onlineSetLogic Yices process logic
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 
@@ -102,9 +100,9 @@ startYicesScript' logic conf scriptFilePath = do
   -- Creates the arguments for the functions in ScriptCmd
   let srcmd = newScriptArgs conf scriptHandle scriptFilePath
   --Set Option to print success after accepting a Command.
-  _ <- scriptSetOption srcmd (OptPrintSuccess True)
+  _ <- scriptSetOption srcmd (PrintSuccess True)
   -- Initialize the solver Functions and return them.
-  _ <-scriptSetLogic srcmd (N logic)
+  _ <-scriptSetLogic srcmd logic
   return $ scriptSolver srcmd
 
 --Function which creates the ScriptConf for the script functions.
@@ -116,14 +114,7 @@ newScriptArgs solverConfig nHandle scriptFilePath =
              , sFilePath  = scriptFilePath
              }
 
--- start Yices solver
 
-startYicesBatch :: String -> Maybe SolverConfig -> IO Solver
-startYicesBatch logic Nothing = startYicesBatch' logic yicesConfigBatch
-startYicesBatch logic (Just conf) = startYicesBatch' logic conf
-
-startYicesBatch' :: String -> SolverConfig -> IO Solver
-startYicesBatch' logic conf = return $ batchSolver logic conf
 
 
 -- Creates the functions for online mode with the process already running.
@@ -133,8 +124,8 @@ onlineSolver process =
   Solver { setLogic = onlineSetLogic Yices process
          , setOption = onlineSetOption Yices process
          , setInfo = onlineSetInfo Yices process
-         , declareSort = onlineDeclareType Yices process
-         , defineSort = onlineDefineType Yices process
+         , declareSort = onlineDeclareSort Yices process
+         , defineSort = onlineDefineSort Yices process
          , declareFun = onlineDeclareFun Yices process
          , defineFun = onlineDefineFun Yices process
          , push = onlinePush Yices process
@@ -158,8 +149,8 @@ scriptSolver srcmd =
   Solver { setLogic = scriptSetLogic srcmd
          , setOption = scriptSetOption srcmd
          , setInfo = scriptSetInfo srcmd
-         , declareSort = scriptDeclareType srcmd
-         , defineSort = scriptDefineType srcmd
+         , declareSort = scriptDeclareSort srcmd
+         , defineSort = scriptDefineSort srcmd
          , declareFun = scriptDeclareFun srcmd
          , defineFun = scriptDefineFun srcmd
          , push = scriptPush srcmd
@@ -175,6 +166,3 @@ scriptSolver srcmd =
          , exit = scriptExit srcmd
          }
 
-batchSolver :: String -> SolverConfig -> Solver
-batchSolver logic config =
-  BSolver { Slv.executeBatch = B.executeBatch (path config) (args config) logic}
