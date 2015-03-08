@@ -25,11 +25,6 @@ z3ConfigOnline =
                , args = ["-smt2","-in"]
                }
 
-z3ConfigScript :: SolverConfig
-z3ConfigScript =
-        Config { path = "z3"
-               , args = ["-smt2"]
-               }
 
 {- |
   Function that initialyzes a Z3 Solver.
@@ -38,67 +33,18 @@ z3ConfigScript =
 
   In Online Mode if a FilePath is passed then it's ignored.
 -}
-startZ3 :: Mode -> String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
-startZ3 Slv.Online logic sConf _ = startZ3Online logic sConf
-startZ3 Slv.Script logic sConf scriptFilePath =
-    startZ3Script logic sConf scriptFilePath
 
--- Start Z3 Online.
+ 
 
-startZ3Online :: String -> Maybe SolverConfig -> IO Solver
-startZ3Online logic Nothing = startZ3Online' logic z3ConfigOnline
-startZ3Online logic (Just conf) = startZ3Online' logic conf
 
-startZ3Online' :: String -> SolverConfig -> IO Solver
-startZ3Online' logic conf = do
+startZ3 :: IO Solver
+startZ3 = do
   -- Starts a Z3 Process.
-  process <- beginProcess (path conf) (args conf)
+  process <- beginProcess (path z3ConfigOnline) (args z3ConfigOnline)
   --Set Option to print success after accepting a Command.
   onlineSetOption Z3 process (PrintSuccess True)
-  -- Sets the SMT Logic.
-  onlineSetLogic Z3 process logic
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
-
---Start Z3 Script.
-
-startZ3Script :: String -> Maybe SolverConfig -> Maybe FilePath -> IO Solver
-startZ3Script logic Nothing Nothing =
-    startZ3Script' logic z3ConfigScript "temp.smt2"
-startZ3Script logic (Just conf) Nothing =
-    startZ3Script' logic conf "temp.smt2"
-startZ3Script logic Nothing (Just scriptFilePath) =
-    startZ3Script' logic z3ConfigScript scriptFilePath
-startZ3Script logic (Just conf) (Just scriptFilePath) =
-    startZ3Script' logic conf scriptFilePath
-
-{-
-  In this function a file is created where the commands are kept.
-
-  Every function in the ScriptCmd Module needs a ScriptConf data which has:
-
-  - sHandle: The handle of the script file
-  - sCmdPath: The Path to initilyze the solver
-  - sArgs: The options of the solver
-  - sFilePath: The file path of the script so it can be passed to the solver
-               when started.
--}
-startZ3Script' :: String -> SolverConfig -> FilePath -> IO Solver
-startZ3Script' logic conf scriptFilePath = do
-  scriptHandle <- openFile scriptFilePath WriteMode
-  let srcmd = newScriptArgs conf scriptHandle scriptFilePath
-  scriptSetOption srcmd (PrintSuccess True)
-  scriptSetLogic srcmd logic
-  return $ scriptSolver srcmd
-
---Function which creates the ScriptConf for the script functions.
-newScriptArgs :: SolverConfig  -> Handle -> FilePath -> ScriptConf
-newScriptArgs solverConfig nHandle scriptFilePath =
-  ScriptConf { sHandle = nHandle
-             , sCmdPath = path solverConfig
-             , sArgs = args solverConfig
-             , sFilePath  = scriptFilePath
-             }
 
 
 
@@ -124,42 +70,5 @@ onlineSolver process =
          , getInfo = onlineGetInfo Z3 process
          , getOption = onlineGetOption Z3 process
          , exit = onlineExit process
-         }
-{-Specific parse result functions that works only in case of Z3 because it breaks the result with new line and not space-}
-scriptGetValueResponseZ3 :: ScriptConf  -> Command -> IO Result
-scriptGetValueResponseZ3 conf cmd =
-  liftA getValueResponse (scriptFunExecZ3 conf cmd)
-
-scriptFunExecZ3 :: ScriptConf -> Command -> IO String
-scriptFunExecZ3 sConf cmd = do
-  writeToScript sConf cmd
-  res <- sendScript (sCmdPath sConf) (sArgs sConf) (sFilePath sConf)
-  return $ unlines $ drop 1 $  snd $ break (==['s','a','t']) $ lines $ res
-
-scriptGetValueZ3 :: ScriptConf -> [Term] -> IO Result
-scriptGetValueZ3 sConf exprs = scriptGetValueResponseZ3 sConf (GetValue exprs)
-
--- Creates the funtion for the script mode.
--- The configuration of the file is passed.
-scriptSolver :: ScriptConf -> Solver
-scriptSolver srcmd =
-  Solver { setLogic = scriptSetLogic srcmd
-         , setOption = scriptSetOption srcmd
-         , setInfo = scriptSetInfo srcmd
-         , declareSort = scriptDeclareSort srcmd
-         , defineSort = scriptDefineSort srcmd
-         , declareFun = scriptDeclareFun srcmd
-         , defineFun = scriptDefineFun srcmd
-         , push = scriptPush srcmd
-         , pop = scriptPop srcmd
-         , assert = scriptAssert srcmd
-         , checkSat = scriptCheckSat srcmd
-         , getAssertions = scriptGetAssertions srcmd
-         , getValue = scriptGetValueZ3 srcmd
-         , getProof = scriptGetProof srcmd
-         , getUnsatCore = scriptGetUnsatCore srcmd
-         , getInfo = scriptGetInfo srcmd
-         , getOption = scriptGetOption srcmd
-         , exit = scriptExit srcmd
          }
 

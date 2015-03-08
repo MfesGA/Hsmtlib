@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                Hsmtlib
-version:             2.8.8.9
+version:             2.8.9.0
 synopsis:            Haskell library for easy interaction with SMT-LIB 2 compliant solvers.
 -- description:         
 homepage:            https://github.com/MfesGA/Hsmtlib
