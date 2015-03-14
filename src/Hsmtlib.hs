@@ -55,8 +55,8 @@ startSolver :: Solvers -- ^ Avaliable'Solvers'.
 startSolver Z3 = startZ3
 
 
-executeScript :: String -> Solvers -> IO [Result]
-executeScript path solver = parseFile path >>= parseRes solver
+executeScript :: String -> Solvers -> IO()
+executeScript path solver = parseFile path >>= parseRes solver >>= print
 
 	--return res
 

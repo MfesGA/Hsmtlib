@@ -163,6 +163,7 @@ send :: Process -> String -> IO String
 send (Just hIn, Just hOut, _, _) cmd =  do
     let put_str = flip hPutStr  cmd
     resPut <-tryIO put_str hIn -- trys to write to std in
+    print cmd
     case resPut of
       --If there was an excepion writing then return the error
       Left exception -> return $ "send1: " ++ show exception
@@ -186,7 +187,9 @@ send (Just hIn, Just hOut, _, _) cmd =  do
 readResponse :: Int -> String -> Handle -> IO String
 readResponse time str procHandle = do
   -- if the process dosent write to std out this function will block.
+  print "ola"
   let hWait = flip hWaitForInput time
+  print "ola2"
   readOut <- tryIO hWait procHandle -- trys to wait for some output in std out.
   case readOut of
     -- if the wait gave an exception returns the error.
@@ -195,6 +198,7 @@ readResponse time str procHandle = do
     Right True -> do
       -- if there is something to read then trys to read a line.
       res_get <- tryIO hGetLine procHandle
+      print res_get
       case res_get of
         -- if there was an exception then return it.
         Left exception -> return $ "readResponse2:" ++ show exception
