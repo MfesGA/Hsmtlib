@@ -71,7 +71,7 @@ data Mode = Online | Script
 -}
 data SolverConfig = Config 
                   { path :: String
-                  , args :: [String]
+                  , version :: String
                   }
 
 

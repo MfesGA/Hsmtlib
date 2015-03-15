@@ -16,10 +16,10 @@ import Control.Monad
 {-
 import           Hsmtlib.Solvers.Altergo   (startAltErgo)
 import           Hsmtlib.Solvers.Boolector (startBoolector)
-import           Hsmtlib.Solvers.Cvc4      (startCvc4)
-import           Hsmtlib.Solvers.MathSAT   (startMathSat)
 import           Hsmtlib.Solvers.Yices     (startYices)-}
 import           Hsmtlib.Solvers.Z3        (startZ3)
+import           Hsmtlib.Solvers.MathSAT   (startMathSat)
+import           Hsmtlib.Solvers.Cvc4      (startCvc4)
 
 
 {- |
@@ -51,23 +51,24 @@ of the last function.
 
 
 startSolver :: Solvers -- ^ Avaliable'Solvers'.
+			-> Maybe SolverConfig 
             -> IO Solver
 startSolver Z3 = startZ3
+startSolver Mathsat = startMathSat
+startSolver Cvc4 = startCvc4
 
 
-executeScript :: String -> Solvers -> IO()
-executeScript path solver = parseFile path >>= parseRes solver >>= print
+executeScript :: Solvers -> Maybe SolverConfig -> String -> IO [Result]
+executeScript solver cfg path  = parseFile path >>= parseRes solver cfg
 
-	--return res
-
-parseRes :: Solvers -> (Either ParseError Source) -> IO [Result]
-parseRes _ (Left error) = return [ComError (show error)]
-parseRes solver (Right cmds) =executeCommands solver cmds
+parseRes :: Solvers -> Maybe SolverConfig -> (Either ParseError Source) -> IO [Result]
+parseRes _ _ (Left error) = return [ComError (show error)]
+parseRes solver cfg (Right cmds) =executeCommands solver cfg cmds
 
 
-executeCommands :: Solvers -> Source -> IO [Result]
-executeCommands solver cmds = do 
-	solv <- startSolver solver
+executeCommands :: Solvers -> Maybe SolverConfig -> Source -> IO [Result]
+executeCommands solver cfg cmds = do 
+	solv <- startSolver solver cfg
 	mapM (execCmd solv) cmds
 
 

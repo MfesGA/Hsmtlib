@@ -19,12 +19,12 @@ import           System.IO                           (Handle,
 -- All the configurations are the same but have diferent names so if anything
 -- changes it's easy to alter its configuration.
 
-z3ConfigOnline :: SolverConfig
-z3ConfigOnline =
-        Config { path = "z3"
-               , args = ["-smt2","-in"]
-               }
+z3Config :: SolverConfig
+z3Config = Config { path = "z3"
+                  , version = "4.3"
+                  }
 
+stdFlags = ["-smt2","-in"]
 
 {- |
   Function that initialyzes a Z3 Solver.
@@ -35,12 +35,14 @@ z3ConfigOnline =
 -}
 
  
+startZ3 :: Maybe SolverConfig -> IO Solver
+startZ3 Nothing = startZ3' z3Config
+startZ3 (Just cfg) = startZ3' cfg
 
-
-startZ3 :: IO Solver
-startZ3 = do
+startZ3' :: SolverConfig -> IO Solver
+startZ3' config = do
   -- Starts a Z3 Process.
-  process <- beginProcess (path z3ConfigOnline) (args z3ConfigOnline)
+  process <- beginProcess (path config) stdFlags
   --Set Option to print success after accepting a Command.
   onlineSetOption Z3 process (PrintSuccess True)
   -- Initialize the solver Functions and return them.

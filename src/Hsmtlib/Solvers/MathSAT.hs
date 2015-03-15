@@ -18,17 +18,24 @@ import           System.IO                           (Handle,
 -- changes it's easy to alter its configuration.
 
 
-mathSatConfigOnline :: SolverConfig
-mathSatConfigOnline =
-        Config { path = "mathsat"
-               , args = []
-               }
+mathSatConfig :: SolverConfig
+mathSatConfig = Config { path = "mathsat"
+                       , version = "5"
+                       }
+
+stdFlags = []
 
 
-startMathSat ::  IO Solver
-startMathSat = do
+startMathSat :: Maybe SolverConfig -> IO Solver
+startMathSat Nothing = startMathSat' mathSatConfig
+startMathSat (Just cfg) = startMathSat' cfg
+
+
+
+startMathSat' :: SolverConfig -> IO Solver
+startMathSat' cfg = do
   -- Starts a Z4 Process.
-  process <- beginProcess (path mathSatConfigOnline) (args mathSatConfigOnline)
+  process <- beginProcess (path cfg) stdFlags
   --Set Option to print success after accepting a Command.
   _ <- onlineSetOption Mathsat process (PrintSuccess True)
   -- Initialize the solver Functions and return them.

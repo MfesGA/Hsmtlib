@@ -19,18 +19,23 @@ import           System.IO                           (Handle,
     TODO: Why the flag --status frezzes the process.
 -}
 
-cvc4ConfigOnline :: SolverConfig
-cvc4ConfigOnline =
-    Config { path = "cvc4"
-           , args = ["--interactive", "--smtlib-strict", "--print-success", "-q"]
-           }
+cvc4Config :: SolverConfig
+cvc4Config = Config { path = "cvc4"
+                    , version = "5"
+                    }
 
 
+stdFlags = ["--interactive", "--smtlib-strict", "--print-success", "-q"]
 
-startCvc4:: IO Solver
-startCvc4 = do
+startCvc4 ::Maybe SolverConfig -> IO Solver
+startCvc4 Nothing = startCvc4' cvc4Config
+startCvc4 (Just cfg) = startCvc4' cfg
+
+
+startCvc4' :: SolverConfig -> IO Solver
+startCvc4' cfg = do
   -- Starts a Cvc4 Process.
-  process <- beginProcess (path cvc4ConfigOnline) (args cvc4ConfigOnline)
+  process <- beginProcess (path cfg) stdFlags
   -- Set Option to print success after accepting a Command.
   _ <- onlineSetOption Mathsat process (PrintSuccess True)
   -- Initialize the solver Functions and return them.
