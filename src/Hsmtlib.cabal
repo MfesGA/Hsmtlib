@@ -22,11 +22,8 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:  Hsmtlib, Hsmtlib.Solver,
-                    Hsmtlib.Solvers.Boolector, 
                     Hsmtlib.Solvers.Cvc4, 
-                    Hsmtlib.Solvers.Altergo, 
                     Hsmtlib.Solvers.Z3, 
-                    Hsmtlib.Solvers.Yices, 
                     Hsmtlib.Solvers.MathSAT, 
                     Hsmtlib.Solvers.Cmd.CmdResult, 
                     Hsmtlib.Solvers.Cmd.OnlineCmd, 
@@ -35,5 +32,5 @@ library
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base >=4.6 && <4.8, containers >=0.5 && <0.6, Smtlib >=0.1, transformers >=0.3 && <0.5, parsec >=3.1 && <3.2, pretty >=1.1 && <1.2, process >=1.2 && <1.3
-  -- hs-source-dirs:      
+  hs-source-dirs:      .
   default-language:    Haskell2010

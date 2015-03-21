@@ -13,10 +13,7 @@ import Text.ParserCombinators.Parsec
 import Data.Functor
 import Control.Monad
 
-{-
-import           Hsmtlib.Solvers.Altergo   (startAltErgo)
-import           Hsmtlib.Solvers.Boolector (startBoolector)
-import           Hsmtlib.Solvers.Yices     (startYices)-}
+
 import           Hsmtlib.Solvers.Z3        (startZ3)
 import           Hsmtlib.Solvers.MathSAT   (startMathSat)
 import           Hsmtlib.Solvers.Cvc4      (startCvc4)

@@ -36,8 +36,6 @@ startCvc4' :: SolverConfig -> IO Solver
 startCvc4' cfg = do
   -- Starts a Cvc4 Process.
   process <- beginProcess (path cfg) stdFlags
-  -- Set Option to print success after accepting a Command.
-  _ <- onlineSetOption Mathsat process (PrintSuccess True)
   -- Initialize the solver Functions and return them.
   return $ onlineSolver process
 
@@ -67,4 +65,3 @@ onlineSolver process =
          , getOption = onlineGetOption Cvc4 process
          , exit = onlineExit process
          }
-

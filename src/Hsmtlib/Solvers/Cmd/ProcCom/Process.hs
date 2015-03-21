@@ -92,11 +92,12 @@ tryIO f arg = try $ f arg
 sendCvc4 :: Process -> String -> IO String
 sendCvc4 (Just hIn, Just hOut, _, _) cmd =  do
     let put_str = flip hPutStr  cmd
+    print cmd
     resPut <-tryIO put_str hIn -- trys to write to std in
     case resPut of
       --If there was an excepion writing then return the error
       Left exception -> return $ "send1: " ++ show exception
-      Right _ -> do  -- if it was successeful
+      Right _ -> do  -- if it was successeful     
         resFlush <- tryIO hFlush hIn -- trys to flush std in
         case resFlush of
           --if there was an exception flushing then return the error
