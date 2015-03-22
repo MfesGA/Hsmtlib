@@ -20,6 +20,7 @@ import           Control.Exception
 import           GHC.IO.Handle
 import           System.Exit
 import           System.Process
+import           System.IO(hReady)
 -- | Path to the process
 type CmdPath = String
 
@@ -92,7 +93,7 @@ tryIO f arg = try $ f arg
 sendCvc4 :: Process -> String -> IO String
 sendCvc4 (Just hIn, Just hOut, _, _) cmd =  do
     let put_str = flip hPutStr  cmd
-    print cmd
+    --print cmd
     resPut <-tryIO put_str hIn -- trys to write to std in
     case resPut of
       --If there was an excepion writing then return the error
@@ -103,14 +104,7 @@ sendCvc4 (Just hIn, Just hOut, _, _) cmd =  do
           --if there was an exception flushing then return the error
           Left exception -> return $ "send2: "  ++ show exception
           --if it was succeful then start reading from the std out
-          Right _ ->  do
-            -- the first line in the buffer is the command written 
-            -- so we throw it away.
-            res<- hGetLine hOut
-            let b = reverse $ drop 1 $reverse cmd -- drop new line in linux
-            case res == b of 
-              True -> readResponseCvc4 (-1)  "" hOut -- linux
-              False -> readResponseCvc4 (10)  res hOut -- windows
+          Right _ ->  readResponseCvc4 hOut
 
             
 {-|
@@ -121,27 +115,27 @@ sendCvc4 (Just hIn, Just hOut, _, _) cmd =  do
     Working smt with this methid:
     -Cvc4
 -}
-readResponseCvc4 :: Int -> String -> Handle -> IO String
-readResponseCvc4 time str procHandle = do
-  -- if the process dosent write to std out this function will block.
-  let hWait = flip hWaitForInput time
-  readOut <- tryIO hWait procHandle -- trys to wait for some output in std out.
-  case readOut of
-    -- if the wait gave an exception returns the error.
-    Left exception -> return $ "readResponse1:" ++ show exception
-    Right False -> return str  -- returns the lines read until now.
-    Right True -> do
-      -- if there is something to read then trys to read a line.
-      res_get <- tryIO hGetLine procHandle
-      case res_get of
-        -- if there was an exception then return it.
-        Left exception -> return $ "readResponse2:" ++ show exception
-        --  if some text was read then trys to read the pipe again.
-        Right text -> readResponse 10 (str++text) procHandle
+readResponseCvc4 :: Handle -> IO String
+readResponseCvc4 procHandle = readCvc4 procHandle >> hGetLine procHandle
+ 
 
 
+readCvc4 :: Handle -> IO ()
+readCvc4 = readCvc4' 6
+
+readCvc4' :: Int -> Handle -> IO ()
+readCvc4' 0 _ = return ()
+readCvc4' n handle = hGetChar handle >> readCvc4' (n-1) handle
 
 
+readResp :: Handle -> String -> IO String
+readResp handle str = do 
+        hasInput <- hReady handle
+        case hasInput of
+            True -> do
+                     char <- hGetLine handle
+                     readResp handle (char++str)
+            False -> return str               
 
 
 {-

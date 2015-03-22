@@ -1,6 +1,6 @@
 (set-logic LRA)
 (set-info :status unsat)
-(declare-fun v1 () Real)
+    
 (declare-fun ts8uscore0 () Real)
 (declare-fun A () Real)
 (declare-fun v1uscore1dollarskuscore8 () Real)

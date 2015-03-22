@@ -1,0 +1,7 @@
+(set-logic AUFLIA)
+(declare-fun a () Int)
+(declare-fun f (Int Bool) Int)
+(assert (> a 10))
+(assert (< (f a true) 100))
+(check-sat)
+(get-value (a))
